@@ -2,7 +2,7 @@ const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
 const { publishAsset, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
-const retryFailedLogs  = require('../util/retryfailed')
+const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
 queue.consumer = bulkPublish;
@@ -18,7 +18,7 @@ if (config.publish_assets.bulkPublish) {
   logFileName = 'publishAssets';
 }
 
-const logger = iniatlizeLogger(logFileName);
+iniatlizeLogger(logFileName);
 
 
 async function getAssets(folder = 'cs_root', skip = 0) {
@@ -36,7 +36,7 @@ async function getAssets(folder = 'cs_root', skip = 0) {
       skipCount += assetResponse.assets.length;
       assetResponse.assets.forEach((asset, index) => {
         if (asset.is_dir === true) {
-          return getAssets(asset.uid,0);
+          return getAssets(asset.uid, 0);
         }
         if (config.publish_assets.bulkPublish) {
           if (bulkPublishSet.length < 10) {
@@ -45,24 +45,23 @@ async function getAssets(folder = 'cs_root', skip = 0) {
             });
           }
           if (bulkPublishSet.length === 10) {
-            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments:config.publish_assets.environments });
+            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
             bulkPublishSet = [];
           }
 
           if (assetResponse.assets.length === index) {
-            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments:config.publish_assets.environments });
+            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
             bulkPublishSet = [];
           }
         } else {
-          queue.Enqueue({ assetUid: asset.uid, environments:config.publish_assets.environments });
+          queue.Enqueue({ assetUid: asset.uid, environments: config.publish_assets.environments });
         }
         return true;
       });
       if (skipCount === assetResponse.count) {
         return true;
-      }else{
-        return getAssets(folder, skipCount);
       }
+      return getAssets(folder, skipCount);
     }
   } catch (error) {
     console.log(error);
@@ -89,13 +88,13 @@ module.exports = {
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
-   if(typeof process.argv.slice(2)[1] ==='string'){
-     if(logFileName ==='bulkPublishAssets'){
-        retryFailedLogs(process.argv.slice(2)[1],queue,'bulkPublish')
-     }else{
-        retryFailedLogs(process.argv.slice(2)[1],queue)
-     }
-   }
+  if (typeof process.argv.slice(2)[1] === 'string') {
+    if (logFileName === 'bulkPublishAssets') {
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], queue);
+    }
+  }
 } else {
   start();
 }
