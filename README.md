@@ -4,7 +4,7 @@ Contentstack is a headless CMS with an API-first approach. It is a CMS that deve
 
 ## Contentstack publishing script
 
-Contentstack publishing script lets you publish auto publish your entries and assets depending upon the cases given below
+Contentstack publishing script lets you auto publish your entries and assets depending upon the cases given below
 
 - Publish the edits made in the entries on a particular environment
 - Publish the unpublished/draft entries on a particular environment
