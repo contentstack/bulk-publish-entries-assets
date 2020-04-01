@@ -1,5 +1,5 @@
 {
-  "name": "auto-bulk-publish-entries-assets",
+  "name": "Contentstack_Bulk_Publishing_Script",
   "version": "1.0.0",
   "description": "This script lets you auto publish entries and assets of your stack",
   "main": "index.js",
@@ -37,4 +37,3 @@
     "nock": "^12.0.1"
   }
 }
-
