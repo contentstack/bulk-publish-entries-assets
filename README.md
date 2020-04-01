@@ -166,11 +166,13 @@ $ module.exports = {
 	}
 }  
 ```
-**start publishing**
+**Start publishing**
 
 ```sh
 $ npm run add_fields
 ```
+
+
 
 #### Retrying failed Entries 
 entries which failed to publish are stored in logs directory with unique name. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it
