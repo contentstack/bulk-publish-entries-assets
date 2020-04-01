@@ -4,7 +4,6 @@ const dummyConfig = require('../dummy/config');
 const bulkassetResponse = require('../dummy/bulkasset');
 const assetPublishResponse = require('../dummy/assetpublished');
 
-
 describe('testing asset bulk publish', () => {
   const mockedlog = () => {};
 
