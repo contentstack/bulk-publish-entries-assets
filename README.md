@@ -2,9 +2,10 @@
 
 Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/).
 
-## Contentstack publishing script
+## Contentstack Bulk Publishing Script
 
-Contentstack publishing script lets you auto publish your entries and assets depending upon the cases given below
+Contentstack bulk publish script lets you publish your entries and assets depending upon the cases given below 
+
 
 - Publish the edits made in the entries on a particular environment
 - Publish the unpublished/draft entries on a particular environment
@@ -198,3 +199,4 @@ for example
 ### Coming soon:
 - Support for successful publish logging
 - Support for un publish cases
+- adding more coverage in test case
