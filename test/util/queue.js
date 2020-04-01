@@ -1,12 +1,11 @@
 const _ = require('lodash');
 const Queue = require('../../src/util/queue');
-const config = require('../dummy/config');
 
 const queue = new Queue();
 
 
 function sampleConsumerFunction(data) {
-
+  console.log(data);
 }
 
 queue.consumer = sampleConsumerFunction;
