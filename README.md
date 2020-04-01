@@ -2,10 +2,9 @@
 
 Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/).
 
-## Contentstack Bulk Publishing Script
+## Contentstack publishing script
 
-Contentstack bulk publish script lets you publish your entries and assets depending upon the cases given below 
-
+Contentstack publishing script lets you publish auto publish your entries and assets depending upon the cases given below
 
 - Publish the edits made in the entries on a particular environment
 - Publish the unpublished/draft entries on a particular environment
@@ -14,6 +13,7 @@ Contentstack bulk publish script lets you publish your entries and assets depend
 - Publish the entries when a non-localized field is changed
 - Update and publish the entries when a new field is added to a content type
 
+**Note:Currently We do not have revert script for entries published using this script**
 
 ### Usage
 #### Install dependencies:
@@ -23,81 +23,78 @@ Before we dive into the use cases, let's ensure that we install the required dep
 ```sh
 $ npm install 
 ```
-#### Specify Stack details in config file(config/index.ssssjs)
+#### Specify Stack details in config file(config/index.js)
 ```sh
 $ module.exports = {
-	apikey:'',
-	access_token:'',
+	apikey:'', //api key of the stack
+	access_token:'', //access token of the stack
 	apiEndPoint:'https://api.contentstack.io',
 	cdnEndPoint:'https://cdn.contentstack.io',
-	authToken:'',
-	manageToken:'',
+	authToken:'',  
+	manageToken:'',//management token for the stack
 }
 ```
 
 ### Cases
 
-#### Case 1) Publish edits on entries made on particular environment
+#### Case 1) Publish edited entries on particular environment
 
-#### 1. specify case details in config file
+**Specify case details in config file**
 
 ```sh
 $ module.exports = {
 		publish_edits_on_env:{
 		contentTypes:['test'], // array of contentTypes where edits needs to be checked
 		sourceEnv : 'production', //environment where entry edits needs to be checked
-		publishEnvironments:['production'], //publishing environment(usually same as source Env)
+		environments:['production'], //publishing environment(usually same as source Env)
 		locales:['en-us',] // locales of entries where it needs to be checked
-		bulkPublish:true //if u want publish using bulk publish api
 	}
 }  
 ```
 
 
 
-#### 2. start publishing
+**Start publishing**
 
 ```sh
 $ npm run publish_edits
 ```
 
-#### Case 2) Publish unpublish/draft entries on particular environment
+#### Case 2) Publish Draft entries(latest version) on particular environment
 
-#### 1. specify case details in config file
+**Specify case details in config file**
 
 ```sh
 $ module.exports = {
 	publish_unpublished_env:{
 		contentTypes:['test'], //list of contentTypes
 		sourceEnv : 'staging', //sourceEnv
-		publishEnvironments:['testdin1996'],
-		locales:['en-us'],
-		bulkPublish:true
+		environments:['testdin1996'],
+		locales:['en-us']
 	}
 }  
 ```
-#### 2. start publishing
+**Start publishing**
 
 ```sh
 $ npm run publish_unpublish
 ```
 
 
-#### Case 3) Publish assets of the stack
+#### Case 3) Publish all assets of the stack
 
-#### 1. specify case details in config file
+**Specify case details in config file**
 
 ```sh
 $ module.exports = {
 	publish_assets:{
 		environments:['bulktest'],
 		locales :['en-us'],
-		bulkPublish:true //if you want to bulk publish assets,
-		folderUid: 'cs_root', // uid of the folder to be published Default 'cs_root'
+		bulkPublish:true //if you want to bulk publish assets
 	}
 }  
 ```
-#### 2. start publishing
+**Start publishing**
 
 ```sh
 $ npm run publish_assets
@@ -105,9 +102,9 @@ $ npm run publish_assets
 
 
 
-#### Case 4) Publish entries of the stack
+#### Case 4) Publish all entries of the stack
 
-#### 1. specify case details in config file
+**Specify case details in config file**
 
 ```sh
 $ module.exports = {
@@ -120,7 +117,7 @@ $ module.exports = {
 	}	
 }  
 ```
-#### 2. start publishing
+**Start publishing**
 
 ```sh
 $ npm run publish_entries
@@ -128,21 +125,20 @@ $ npm run publish_entries
 
 
 
-#### Case 5) Publish entries when nonloclized field of an entry is changed
+#### Case 5) Publish localized entries when nonlocalized field of master Entry is updated
 
-#### 1. specify case details in config file
+**Specify case details in config file**
 
 ```sh
 $ module.exports = {
 	nonlocalized_field_changes:{
 		sourceEnv:'production',
 		contentTypes:['helloworld'],
-		environments:['production'],
-		bulkPublish: true,
+		environments:['production']
 	}
 }  
 ```
-#### 2. start publishing
+**Start publishing**
 
 ```sh
 $ npm run publish_nonlocalized_changes
@@ -151,7 +147,7 @@ $ npm run publish_nonlocalized_changes
 
 #### Case 6) update and publish entries when a field is added to contentType
 
-#### 1. specify case details in config file
+**Specify case details in config file**
 
 ```sh
 $ module.exports = {
@@ -170,7 +166,7 @@ $ module.exports = {
 	}
 }  
 ```
-#### 2. start publishing
+**start publishing**
 
 ```sh
 $ npm run add_fields
@@ -193,10 +189,12 @@ for example
 ##### Case 4:
 - For less failure of publish entries we recommend you to try one contenttype at a time
 ##### Case 5:NA
-##### Case 5:
+##### Case 6:
 - Custom field will not to be added
+
+Currently success logs are not getting stored. If required u can use any other methods to store it. For example
+**npm run publish_entries >> addlogs.txt**
 
 ### Coming soon:
 - Support for successful publish logging
 - Support for un publish cases
-- adding more coverage in test case
