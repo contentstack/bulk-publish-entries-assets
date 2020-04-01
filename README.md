@@ -75,8 +75,6 @@ $ module.exports = {
 $ npm run publish_assets
 ```
 
-
-
 #### Case 3) Publish all entries of the stack
 
 **Specify case details in config file**
@@ -121,4 +119,4 @@ Currently success logs are not getting stored. If required u can use any other m
 
 ### Coming soon:
 - Support for successful publish logging
-- Support for unpublish publish cases
+- Support for unpublish published entries
