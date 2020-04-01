@@ -14,7 +14,7 @@ describe('testing unpublished entries on particular environment', () => {
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
-       	authtoken: dummyConfig.authToken,
+        authtoken: dummyConfig.authToken,
       },
     })
       .get('/v3/environments/dummyEnvironment')
