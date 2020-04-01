@@ -69,7 +69,7 @@ describe('testing bulk entries publish', () => {
       Type: 'entry',
     };
 
-    const bulkResponse = bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish');
+    expect(bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish')).toBeUndefined();
   });
 
 
@@ -84,7 +84,7 @@ describe('testing bulk entries publish', () => {
       Type: 'asset',
     };
 
-    const bulkResponse = bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish');
+    expect(bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish')).toBeUndefined();
   });
 
   // it('logging testing', async () => {
