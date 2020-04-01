@@ -1,0 +1,40 @@
+{
+  "name": "auto-bulk-publish-entries-assets",
+  "version": "1.0.0",
+  "description": "This script lets you auto publish entries and assets of your stack",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "publish_edits": "node src/producer/publish_edits_on_env.js",
+    "publish_assets": "node src/producer/publish_assets.js",
+    "publish_entries": "node src/producer/publish_entries.js",
+    "publish_nonlocalized_changes": "node src/producer/nonlocalized_field_changes.js",
+    "add_fields": "node src/producer/add_fields.js",
+    "publish_unpublish": "node src/producer/publish_unpublished_env.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "chalk": "^3.0.0",
+    "debug": "^4.1.1",
+    "lodash": "^4.17.15",
+    "request": "^2.88.2",
+    "winston": "^3.2.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "jest": "^25.1.0",
+    "jest-html-reporter": "^2.8.1",
+    "nock": "^12.0.1"
+  }
+}
+
