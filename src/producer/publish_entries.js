@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config/stag');
+let config = require('../../config');
 const req = require('../util/request');
 const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
