@@ -1,0 +1,11 @@
+
+# Dependency directories
+node_modules
+package-lock.json
+coverage
+logs/*
+config/stag.js
+# Coverage directories
+coverage
+
+test-report.html
