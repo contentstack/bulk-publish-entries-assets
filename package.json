@@ -5,11 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "publish_edits": "node src/producer/publish_edits_on_env.js",
     "publish_assets": "node src/producer/publish_assets.js",
     "publish_entries": "node src/producer/publish_entries.js",
-    "publish_nonlocalized_changes": "node src/producer/nonlocalized_field_changes.js",
-    "add_fields": "node src/producer/add_fields.js",
     "publish_unpublish": "node src/producer/publish_unpublished_env.js"
   },
   "author": "",
