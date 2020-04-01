@@ -1,10 +1,9 @@
 const path = require('path');
 const winston = require('winston');
-const fs = require('fs');
 
 let filename;
 
-let getLoggerInstance=module.exports.getLoggerInstance = (fileName) => {
+const getLoggerInstance = module.exports.getLoggerInstance = (fileName) => {
   filename = path.join(__dirname, '../', '../', 'logs', fileName);
   const logger = winston.createLogger({
     transports: [
@@ -21,13 +20,13 @@ module.exports.getAllLogs = (filename) => new Promise((resolve, reject) => {
     start: 0,
     order: 'desc',
   };
-  logger = getLoggerInstance(filename)
+  const logger = getLoggerInstance(filename);
   logger.query(options, async (err, result) => {
     if (err) return reject(err);
     try {
       resolve(result);
-    } catch (err) {
-      reject(err);
+    } catch (error) {
+      reject(error);
     }
   });
 });
