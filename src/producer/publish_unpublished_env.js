@@ -37,7 +37,6 @@ async function getEnvironment(environmentName) {
   }
 }
 
-let count =0;
 
 async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
@@ -61,7 +60,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
         config.publish_unpublished_env.locales.forEach((locale) => {
           const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
           if (!publishedEntry) {
-             changedFlag = true;
+            changedFlag = true;
             if (config.publish_unpublished_env.bulkPublish) {
               if (bulkPublishSet.length < 10) {
                 bulkPublishSet.push({
@@ -72,13 +71,17 @@ async function getEntries(contentType, environmentUid, skip = 0) {
               }
 
               if (bulkPublishSet.length === 10) {
-                queue.Enqueue({ entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments });
+                queue.Enqueue({
+                  entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+                });
                 bulkPublishSet = [];
                 return;
               }
 
               if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10) {
-                queue.Enqueue({ entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments });
+                queue.Enqueue({
+                  entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+                });
                 bulkPublishSet = [];
               }
             } else {

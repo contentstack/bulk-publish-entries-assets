@@ -1,10 +1,11 @@
-const req  = require('../util/request');
-const { getLoggerInstance, addLogs } = require('../util/logger');
 const chalk = require('chalk');
+const req = require('../util/request');
+const { getLoggerInstance, addLogs } = require('../util/logger');
+
 let logger;
 
 function iniatlizeLogger(fileName) {
-  fileName = parseInt(Math.random()*10000)+fileName; 
+  fileName = `${parseInt(Math.random() * 10000)}${fileName}`;
   logger = getLoggerInstance(fileName);
   return logger;
 }
@@ -36,7 +37,7 @@ async function publishConsumer(entryObj, config) {
     }
   } catch (error) {
     console.log(chalk.red(`entry could not be published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale} ${JSON.stringify(error.message || error)}`));
-    addLogs(logger, { options: entryObj, 'api_key':config.apikey });
+    addLogs(logger, { options: entryObj, api_key: config.apikey });
   }
 }
 
@@ -64,7 +65,7 @@ async function publishAsset(assetobj, config) {
     }
   } catch (error) {
     console.log(chalk.red(`Could not publish Error ${JSON.stringify(error)}`));
-    addLogs(logger, { options: assetobj, 'api_key':config.apikey });
+    addLogs(logger, { options: assetobj, api_key: config.apikey });
   }
 }
 
@@ -97,7 +98,7 @@ async function bulkPublish(bulkPublishObj, config) {
         }
       } catch (error) {
         console.log(chalk.red(`Bulk entries ${JSON.stringify(bulkPublishObj.entries)} failed to publish with error ${JSON.stringify(error)}`));
-        addLogs(logger, { options: bulkPublishObj, 'api_key':config.apikey });
+        addLogs(logger, { options: bulkPublishObj, api_key: config.apikey });
       }
       break;
     case 'asset':
@@ -125,7 +126,7 @@ async function bulkPublish(bulkPublishObj, config) {
         }
       } catch (error) {
         console.log(chalk.red(`Bulk assets ${JSON.stringify(bulkPublishObj.assets)} failed to publish with error ${JSON.stringify(error.message || error)}`));
-        addLogs(logger, { options: bulkPublishObj, 'api_key':config.apikey });
+        addLogs(logger, { options: bulkPublishObj, api_key: config.apikey });
       }
       break;
     default:

@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config');
+let config = require('../../config/stag');
 const req = require('../util/request');
 const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -22,14 +22,6 @@ if (config.publish_entries.bulkPublish) {
 
 iniatlizeLogger(logFileName);
 
-process.on('exit', () => {
-  if (allContentTypes.length > 0) {
-    console.log('Following contentTypes are yet to be taken for publish');
-    console.log(allContentTypes);
-  }
-});
-
-
 async function getEntries(contentType, locale, skip = 0) {
   skipCount = skip;
   try {
@@ -42,7 +34,6 @@ async function getEntries(contentType, locale, skip = 0) {
     };
     const entriesResponse = await req(conf);
     skipCount += entriesResponse.entries.length;
-    console.log(skipCount+"  "+entriesResponse.count)
     entriesResponse.entries.forEach((entry, index) => {
       if (config.publish_entries.bulkPublish) {
         if (bulkPublishSet.length < 10) {
