@@ -19,8 +19,8 @@ module.exports = {
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset
   },
   publish_entries: {
-    contentTypes: ['helloworld'],
-    locales: ['en-us'],
+    contentTypes: ['destinations'],
+    locales: ['en'],
     environments: ['bulktest'],
     bulkPublish: true,
     publishAllContentTypes: false,
