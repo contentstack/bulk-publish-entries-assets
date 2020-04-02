@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config');
+let config = require('../../config/stag');
 const req = require('../util/request');
 const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -29,41 +29,42 @@ async function getEntries(contentType, locale, skip = 0) {
       uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}`,
       headers: {
         api_key: config.apikey,
-        access_token: config.access_token,
+        authorization: config.manageToken,
       },
     };
     const entriesResponse = await req(conf);
     skipCount += entriesResponse.entries.length;
-    entriesResponse.entries.forEach((entry, index) => {
-      if (config.publish_entries.bulkPublish) {
-        if (bulkPublishSet.length < 10) {
-          bulkPublishSet.push({
-            uid: entry.uid,
-            content_type: contentType,
-            locale,
-          });
-        }
+    console.log(entriesResponse.count+" "+skipCount)
+    // entriesResponse.entries.forEach((entry, index) => {
+    //   if (config.publish_entries.bulkPublish) {
+    //     if (bulkPublishSet.length < 10) {
+    //       bulkPublishSet.push({
+    //         uid: entry.uid,
+    //         content_type: contentType,
+    //         locale,
+    //       });
+    //     }
 
-        if (bulkPublishSet.length === 10) {
-          queue.Enqueue({
-            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
-          });
-          bulkPublishSet = [];
-          return;
-        }
+    //     if (bulkPublishSet.length === 10) {
+    //       queue.Enqueue({
+    //         entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
+    //       });
+    //       bulkPublishSet = [];
+    //       return;
+    //     }
 
-        if (index === entriesResponse.entries.length - 1 && bulkPublishSet.length <= 10) {
-          queue.Enqueue({
-            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
-          });
-          bulkPublishSet = [];
-        }
-      } else {
-        queue.Enqueue({
-          content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
-        });
-      }
-    });
+    //     if (index === entriesResponse.entries.length - 1 && bulkPublishSet.length <= 10) {
+    //       queue.Enqueue({
+    //         entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
+    //       });
+    //       bulkPublishSet = [];
+    //     } //bulkPublish
+    //   } else {
+    //     queue.Enqueue({
+    //       content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
+    //     });
+    //   }
+    // });
     if (entriesResponse.count === skipCount) {
       bulkPublishSet = [];
       return Promise.resolve();
@@ -81,7 +82,7 @@ async function getContentTypes(skip = 0, contentTypes = []) {
     uri: `${config.cdnEndPoint}/v3/content_types?include_count=true&skip=${skipCount}`,
     headers: {
       api_key: config.apikey,
-      access_token: config.access_token,
+      authorization: config.manageToken,
     },
   };
   try {
