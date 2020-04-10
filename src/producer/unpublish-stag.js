@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config/');
+let config = require('../../config/stag');
 const req = require('../util/request');
 const { publishConsumer, bulkUnPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -48,7 +48,7 @@ async function getSyncEntries(locale,queryParams,paginationToken=null) {
 }
 
 function bulkAction(items){
-    console.log(items.length)
+
     items.forEach((entry, index) => {
         if (bulkUnPublishSet.length < 10) {
           bulkUnPublishSet.push({
@@ -67,7 +67,7 @@ function bulkAction(items){
         }
 
         if (index === items.length - 1 && bulkUnPublishSet.length <= 10) {
-      bulkUnPublish({
+      bulkPublish({
             entries: bulkUnPublishSet, locale:"en-us", Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
           },config);
                   count = count + bulkUnPublishSet.length;
