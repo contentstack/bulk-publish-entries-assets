@@ -25,6 +25,15 @@ module.exports = {
     bulkPublish: true,
     publishAllContentTypes: false,
   },
+  bulkUnpublish :{
+    filter:{
+      environment: 'bulktest', //source environment
+      content_type_uid: '', //contentType filters
+      locale: 'en-us', //locale filters
+      type:'entry_published'
+    },
+    deliveryToken:'' //deliveryToken of the environment
+  }
 };
 
 // apiEndPoint:'https://api.contentstack.io',
