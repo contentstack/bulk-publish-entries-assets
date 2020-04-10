@@ -95,7 +95,28 @@ $ module.exports = {
 ```sh
 $ npm run publish_entries
 ```
+#### Case 4) UnPublish all entries of the stack published on particular
 
+**Specify case details in config file**
+
+```sh
+$ module.exports = {
+	bulkUnpublish :{
+    filter:{
+      environment: 'bulktest', //source environment
+      content_type_uid: '', //contentType filters
+      locale: 'en-us', //locale filters
+      type:'entry_published'
+    },
+    deliveryToken:'' //deliveryToken of the environment
+  }
+}  
+```
+**Start publishing**
+
+```sh
+$ npm run unpublish
+```
 
 #### Retrying failed Entries 
 entries which failed to publish are stored in logs directory with unique name. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it

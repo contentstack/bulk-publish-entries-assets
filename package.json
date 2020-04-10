@@ -7,7 +7,8 @@
     "test": "jest",
     "publish_assets": "node src/producer/publish_assets.js",
     "publish_entries": "node src/producer/publish_entries.js",
-    "publish_unpublish": "node src/producer/publish_unpublished_env.js"
+    "publish_unpublish": "node src/producer/publish_unpublished_env.js",
+    "unpublish":"node src/producer/unpublish_entries.js"
   },
   "author": "",
   "license": "ISC",
