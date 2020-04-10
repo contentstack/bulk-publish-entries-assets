@@ -26,7 +26,7 @@ async function getEntries(contentType, locale, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}`,
+      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}&include_publish_details=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -35,36 +35,36 @@ async function getEntries(contentType, locale, skip = 0) {
     const entriesResponse = await req(conf);
     skipCount += entriesResponse.entries.length;
     console.log(entriesResponse.count+" "+skipCount)
-    // entriesResponse.entries.forEach((entry, index) => {
-    //   if (config.publish_entries.bulkPublish) {
-    //     if (bulkPublishSet.length < 10) {
-    //       bulkPublishSet.push({
-    //         uid: entry.uid,
-    //         content_type: contentType,
-    //         locale,
-    //       });
-    //     }
+    entriesResponse.entries.forEach((entry, index) => {
+      if (config.publish_entries.bulkPublish) {
+        if (bulkPublishSet.length < 10) {
+          bulkPublishSet.push({
+            uid: entry.uid,
+            content_type: contentType,
+            locale          
+          });
+        }
 
-    //     if (bulkPublishSet.length === 10) {
-    //       queue.Enqueue({
-    //         entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
-    //       });
-    //       bulkPublishSet = [];
-    //       return;
-    //     }
+        if (bulkPublishSet.length === 10) {
+          queue.Enqueue({
+            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
+          });
+          bulkPublishSet = [];
+          return;
+        }
 
-    //     if (index === entriesResponse.entries.length - 1 && bulkPublishSet.length <= 10) {
-    //       queue.Enqueue({
-    //         entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
-    //       });
-    //       bulkPublishSet = [];
-    //     } //bulkPublish
-    //   } else {
-    //     queue.Enqueue({
-    //       content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
-    //     });
-    //   }
-    // });
+        if (index === entriesResponse.entries.length - 1 && bulkPublishSet.length <= 10) {
+          queue.Enqueue({
+            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
+          });
+          bulkPublishSet = [];
+        } //bulkPublish
+      } else {
+        queue.Enqueue({
+          content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
+        });
+      }
+    });
     if (entriesResponse.count === skipCount) {
       bulkPublishSet = [];
       return Promise.resolve();
