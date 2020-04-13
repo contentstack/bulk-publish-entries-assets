@@ -181,7 +181,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
         },
         body: JSON.stringify({
           assets: bulkUnPublishObj.assets,
-          locales: ['en-us'],
+          locales: [bulkUnPublishObj.locale || "en-us"],
           environments: bulkUnPublishObj.environments,
         }),
       };
