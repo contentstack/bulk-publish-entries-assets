@@ -46,7 +46,7 @@ function bulkAction(items) {
 
     if (bulkUnPulishAssetSet.length === 10) {
       queue.Enqueue({
-        assets: bulkUnPulishAssetSet, Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
+        assets: bulkUnPulishAssetSet, Type: 'asset',locale:config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
       });
       count += bulkUnPulishAssetSet.length;
       bulkUnPulishAssetSet = [];
@@ -64,7 +64,7 @@ function bulkAction(items) {
 
     if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length > 0) {
       queue.Enqueue({
-        assets: bulkUnPulishAssetSet, Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
+        assets: bulkUnPulishAssetSet, Type: 'asset',locale:config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
       });
       count += bulkUnPulishAssetSet.length;
       bulkUnPulishAssetSet = [];
@@ -121,7 +121,7 @@ setConfig(config);
 
 async function start() {
   const queryParams = getQueryParams(config.bulkUnpublish.filter);
-  await getSyncEntries('en-us', queryParams);
+  await getSyncEntries(config.bulkUnpublish.filter.locale, queryParams);
   // bulkAction(syncResponse)
 }
 
