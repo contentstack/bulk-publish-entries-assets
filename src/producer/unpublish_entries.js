@@ -8,6 +8,7 @@ const queue = new Queue();
 
 let logFileName;
 let bulkUnPublishSet = [];
+let bulkUnPulishAssetSet = [];
 queue.consumer = bulkUnPublish;
 logFileName = 'bulkUnPublishEntries';
 
@@ -25,56 +26,89 @@ function getQueryParams(filter) {
 }
 
 let count = 0;
-let itemsSet = [];
-async function getSyncEntries(locale,queryParams,paginationToken=null) {
+const itemsSet = [];
+async function getSyncEntries(locale, queryParams, paginationToken = null) {
   try {
     const conf = {
-      uri:`${config.cdnEndPoint}/v3/stacks/sync?${paginationToken?`pagination_token=${paginationToken}`:'init=true'}${queryParams}`,
-      headers:{
+      uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
+      headers: {
         api_key: config.apikey,
         access_token: config.bulkUnpublish.deliveryToken,
       },
     };
     const entriesResponse = await req(conf);
-    itemsSet = [...itemsSet,...entriesResponse.items]
-    if (!entriesResponse.pagination_token) {
-      return Promise.resolve(itemsSet);
+    
+    if(entriesResponse.items.length > 0){
+
+       bulkAction(entriesResponse.items);
+
+    }
+
+    if (entriesResponse.items.length == 0) {
+      return Promise.resolve();
     }else {
-      return await getSyncEntries(locale, queryParams,entriesResponse.pagination_token)
-    };
+      setTimeout(function(){
+        getSyncEntries(locale, queryParams, null);
+      },3000)
+    } 
+ 
   } catch (Err) {
     console.log(Err);
   }
 }
 
-function bulkAction(items){
-    console.log(items.length)
-    items.forEach((entry, index) => {
-        if (bulkUnPublishSet.length < 10) {
-          bulkUnPublishSet.push({
-            uid: entry.data.uid,
-            content_type: entry.content_type_uid,
-            locale:entry.data.locale          
-          });
-        }
-        if (bulkUnPublishSet.length === 10) {
-          bulkUnPublish({
-            entries: bulkUnPublishSet, locale:"en-us", Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
-          },config);
-          count = count + bulkUnPublishSet.length;
-          bulkUnPublishSet = [];
-          return;
-        }
+function bulkAction(items) {
+  items.forEach((entry, index) => {
+    if (bulkUnPublishSet.length < 10 && entry.type === 'entry_published') {
+      bulkUnPublishSet.push({
+        uid: entry.data.uid,
+        content_type: entry.content_type_uid,
+        locale: entry.data.locale,
+      });
+    }
 
-        if (index === items.length - 1 && bulkUnPublishSet.length <= 10) {
-      bulkUnPublish({
-            entries: bulkUnPublishSet, locale:"en-us", Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
-          },config);
-                  count = count + bulkUnPublishSet.length;
-          bulkUnPublishSet = [];
-        } //bulkPublish
-    });
+    if(bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published'){
+      bulkUnPulishAssetSet.push({
+        uid:entry.data.uid
+      })
+    }
 
+    if(bulkUnPulishAssetSet.length ===10){
+     queue.Enqueue({
+        assets: bulkUnPulishAssetSet,Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
+      });
+      count += bulkUnPulishAssetSet.length;
+      bulkUnPulishAssetSet = [];
+      return;
+    }
+
+    if (bulkUnPublishSet.length === 10) {
+      queue.Enqueue({
+        entries: bulkUnPublishSet, locale: 'en-us', Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
+      });
+      count += bulkUnPublishSet.length;
+      bulkUnPublishSet = [];
+      return;
+    }
+
+    if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length >0) {
+     queue.Enqueue({
+        assets: bulkUnPulishAssetSet,Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
+      });
+      count += bulkUnPulishAssetSet.length;
+      bulkUnPulishAssetSet = [];
+      return;
+    } 
+
+    if (index === items.length - 1 && bulkUnPublishSet.length <= 10 && bulkUnPublishSet.length>0) {
+      queue.Enqueue({
+        entries: bulkUnPublishSet, locale: 'en-us', Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
+      });
+      count += bulkUnPublishSet.length;
+      bulkUnPublishSet = [];
+    } // bulkPublish
+  });
+  //process.exit(0);
 }
 
 function setConfig(conf) {
@@ -85,9 +119,9 @@ function setConfig(conf) {
 setConfig(config);
 
 async function start() {
-  let queryParams = getQueryParams(config.bulkUnpublish.filter)
-  let syncResponse = await getSyncEntries("en-us",queryParams);
-  bulkAction(syncResponse)
+  const queryParams = getQueryParams(config.bulkUnpublish.filter);
+  await getSyncEntries('en-us', queryParams);
+  // bulkAction(syncResponse)
 }
 
 module.exports = {

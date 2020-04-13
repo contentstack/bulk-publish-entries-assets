@@ -188,7 +188,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
       try {
         const bulkUnPublishAssetsResponse = await req(conf);
         if (bulkUnPublishAssetsResponse.notice && !bulkUnPublishAssetsResponse.error_message) {
-          console.log(`Bulk assets sent for Unpublish ${JSON.stringify(bulkPublishObj)}`);
+          console.log(chalk.green(`Bulk assets sent for Unpublish ${JSON.stringify(bulkUnPublishObj)}`));
           addLogs(logger, { options: bulkUnPublishObj, api_key: config.apikey },'info');
         } else {
           throw bulkUnPublishAssetsResponse;
