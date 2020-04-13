@@ -1,16 +1,15 @@
 const Queue = require('../util/queue');
-let config = require('../../config/');
+let config = require('../../config/stag');
 const req = require('../util/request');
-const { publishConsumer, bulkUnPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkUnPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
 
-let logFileName;
 let bulkUnPublishSet = [];
 let bulkUnPulishAssetSet = [];
 queue.consumer = bulkUnPublish;
-logFileName = 'bulkUnPublishEntries';
+const logFileName = 'bulkUnPublish';
 
 iniatlizeLogger(logFileName);
 
@@ -26,37 +25,6 @@ function getQueryParams(filter) {
 }
 
 let count = 0;
-const itemsSet = [];
-async function getSyncEntries(locale, queryParams, paginationToken = null) {
-  try {
-    const conf = {
-      uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
-      headers: {
-        api_key: config.apikey,
-        access_token: config.bulkUnpublish.deliveryToken,
-      },
-    };
-    const entriesResponse = await req(conf);
-    
-    if(entriesResponse.items.length > 0){
-
-       bulkAction(entriesResponse.items);
-
-    }
-
-    if (entriesResponse.items.length == 0) {
-      return Promise.resolve();
-    }else {
-      setTimeout(function(){
-        getSyncEntries(locale, queryParams, null);
-      },3000)
-    } 
- 
-  } catch (Err) {
-    console.log(Err);
-  }
-}
-
 function bulkAction(items) {
   items.forEach((entry, index) => {
     if (bulkUnPublishSet.length < 10 && entry.type === 'entry_published') {
@@ -67,15 +35,15 @@ function bulkAction(items) {
       });
     }
 
-    if(bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published'){
+    if (bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published') {
       bulkUnPulishAssetSet.push({
-        uid:entry.data.uid
-      })
+        uid: entry.data.uid,
+      });
     }
 
-    if(bulkUnPulishAssetSet.length ===10){
-     queue.Enqueue({
-        assets: bulkUnPulishAssetSet,Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
+    if (bulkUnPulishAssetSet.length === 10) {
+      queue.Enqueue({
+        assets: bulkUnPulishAssetSet, Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
       });
       count += bulkUnPulishAssetSet.length;
       bulkUnPulishAssetSet = [];
@@ -91,16 +59,16 @@ function bulkAction(items) {
       return;
     }
 
-    if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length >0) {
-     queue.Enqueue({
-        assets: bulkUnPulishAssetSet,Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
+    if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length > 0) {
+      queue.Enqueue({
+        assets: bulkUnPulishAssetSet, Type: 'asset', environments: [config.bulkUnpublish.filter.environment],
       });
       count += bulkUnPulishAssetSet.length;
       bulkUnPulishAssetSet = [];
       return;
-    } 
+    }
 
-    if (index === items.length - 1 && bulkUnPublishSet.length <= 10 && bulkUnPublishSet.length>0) {
+    if (index === items.length - 1 && bulkUnPublishSet.length <= 10 && bulkUnPublishSet.length > 0) {
       queue.Enqueue({
         entries: bulkUnPublishSet, locale: 'en-us', Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
       });
@@ -108,8 +76,36 @@ function bulkAction(items) {
       bulkUnPublishSet = [];
     } // bulkPublish
   });
-  //process.exit(0);
+  // process.exit(0);
 }
+
+async function getSyncEntries(locale, queryParams, paginationToken = null) {
+  try {
+    const conf = {
+      uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
+      headers: {
+        api_key: config.apikey,
+        access_token: config.bulkUnpublish.deliveryToken,
+      },
+    };
+    const entriesResponse = await req(conf);
+
+    if (entriesResponse.items.length > 0) {
+      bulkAction(entriesResponse.items);
+    }
+
+    if (entriesResponse.items.length === 0) {
+      return Promise.resolve();
+    }
+    setTimeout(() => {
+      getSyncEntries(locale, queryParams, null);
+    }, 3000);
+  } catch (Err) {
+    console.log(Err);
+  }
+  return true;
+}
+
 
 function setConfig(conf) {
   config = conf;
