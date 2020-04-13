@@ -9,6 +9,8 @@ const queue = new Queue();
 let bulkUnPublishSet = [];
 let bulkUnPulishAssetSet = [];
 queue.consumer = bulkUnPublish;
+let changedFlag = false;
+
 const logFileName = 'bulkUnPublish';
 
 iniatlizeLogger(logFileName);
@@ -27,6 +29,7 @@ function getQueryParams(filter) {
 let count = 0;
 function bulkAction(items) {
   items.forEach((entry, index) => {
+    changedFlag = true;
     if (bulkUnPublishSet.length < 10 && entry.type === 'entry_published') {
       bulkUnPublishSet.push({
         uid: entry.data.uid,
@@ -52,7 +55,7 @@ function bulkAction(items) {
 
     if (bulkUnPublishSet.length === 10) {
       queue.Enqueue({
-        entries: bulkUnPublishSet, locale: 'en-us', Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
+        entries: bulkUnPublishSet, locale: config.bulkUnpublish.filter.locale, Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
       });
       count += bulkUnPublishSet.length;
       bulkUnPublishSet = [];
@@ -70,7 +73,7 @@ function bulkAction(items) {
 
     if (index === items.length - 1 && bulkUnPublishSet.length <= 10 && bulkUnPublishSet.length > 0) {
       queue.Enqueue({
-        entries: bulkUnPublishSet, locale: 'en-us', Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
+        entries: bulkUnPublishSet, locale: config.bulkUnpublish.filter.locale, Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
       });
       count += bulkUnPublishSet.length;
       bulkUnPublishSet = [];
@@ -95,6 +98,8 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
     }
 
     if (entriesResponse.items.length === 0) {
+      if(!changedFlag)
+        console.log("No Entries/Assets Found published on specified environment");
       return Promise.resolve();
     }
     setTimeout(() => {
