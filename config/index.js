@@ -16,7 +16,7 @@ module.exports = {
     environments: ['stag'],
     locales: ['en-us'],
     bulkPublish: true,
-    folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset
+    folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
   },
   publish_entries: {
     contentTypes: ['destinations'],
@@ -30,7 +30,7 @@ module.exports = {
       environment: 'bulktest', //source environment
       content_type_uid: '', //contentType filters
       locale: 'en-us', //locale filters
-      type:'entry_published'
+      type:'asset_published,entry_published'
     },
     deliveryToken:'' //deliveryToken of the environment
   }
