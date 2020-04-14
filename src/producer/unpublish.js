@@ -26,7 +26,6 @@ function getQueryParams(filter) {
   return queryString;
 }
 
-let count = 0;
 function bulkAction(items) {
   items.forEach((entry, index) => {
     changedFlag = true;
@@ -46,9 +45,8 @@ function bulkAction(items) {
 
     if (bulkUnPulishAssetSet.length === 10) {
       queue.Enqueue({
-        assets: bulkUnPulishAssetSet, Type: 'asset',locale:config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
+        assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
       });
-      count += bulkUnPulishAssetSet.length;
       bulkUnPulishAssetSet = [];
       return;
     }
@@ -57,16 +55,14 @@ function bulkAction(items) {
       queue.Enqueue({
         entries: bulkUnPublishSet, locale: config.bulkUnpublish.filter.locale, Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
       });
-      count += bulkUnPublishSet.length;
       bulkUnPublishSet = [];
       return;
     }
 
     if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length > 0) {
       queue.Enqueue({
-        assets: bulkUnPulishAssetSet, Type: 'asset',locale:config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
+        assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
       });
-      count += bulkUnPulishAssetSet.length;
       bulkUnPulishAssetSet = [];
       return;
     }
@@ -75,11 +71,9 @@ function bulkAction(items) {
       queue.Enqueue({
         entries: bulkUnPublishSet, locale: config.bulkUnpublish.filter.locale, Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
       });
-      count += bulkUnPublishSet.length;
       bulkUnPublishSet = [];
-    } // bulkPublish
+    }
   });
-  // process.exit(0);
 }
 
 async function getSyncEntries(locale, queryParams, paginationToken = null) {
@@ -92,14 +86,11 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
       },
     };
     const entriesResponse = await req(conf);
-
     if (entriesResponse.items.length > 0) {
       bulkAction(entriesResponse.items);
     }
-
     if (entriesResponse.items.length === 0) {
-      if(!changedFlag)
-        console.log("No Entries/Assets Found published on specified environment");
+      if (!changedFlag) console.log('No Entries/Assets Found published on specified environment');
       return Promise.resolve();
     }
     setTimeout(() => {
@@ -122,7 +113,6 @@ setConfig(config);
 async function start() {
   const queryParams = getQueryParams(config.bulkUnpublish.filter);
   await getSyncEntries(config.bulkUnpublish.filter.locale, queryParams);
-  // bulkAction(syncResponse)
 }
 
 module.exports = {
@@ -130,17 +120,17 @@ module.exports = {
   setConfig,
 };
 
-// if (process.argv.slice(2)[0] === '-retryFailed') {
-//   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-//     if (logFileName === 'bulkPublishEntries') {
-//       retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
-//     } else {
-//       retryFailedLogs(process.argv.slice(2)[1], queue);
-//     }
-//   }
-// } else {
-//   start();
-// }
+if (process.argv.slice(2)[0] === '-retryFailed') {
+  if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+    if (logFileName === 'bulkPublishEntries') {
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], queue);
+    }
+  }
+} else {
+  start();
+}
 
 
 start();

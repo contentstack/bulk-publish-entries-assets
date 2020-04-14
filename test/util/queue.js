@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const Queue = require('../../src/util/queue');
 
 const queue = new Queue();
