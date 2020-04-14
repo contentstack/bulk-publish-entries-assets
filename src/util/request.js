@@ -1,8 +1,6 @@
-
 const Bluebird = require('bluebird');
 const request = Bluebird.promisify(require('request'));
 const debug = require('debug')('requests');
-// var pkg = require('../../package');
 
 const MAX_RETRY_LIMIT = 8;
 
@@ -47,6 +45,3 @@ var makeCall = module.exports = function (req, RETRY) {
 };
 
 
-// module.exports = {
-//   req
-// };
