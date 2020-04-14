@@ -64,8 +64,6 @@ async function getEntries(contentType, locale, skip = 0) {
         });
       }
     });
-
-    console.log(`${skipCount}---${entriesResponse.count}`);
     if (entriesResponse.count === skipCount) {
       bulkPublishSet = [];
       return Promise.resolve();
