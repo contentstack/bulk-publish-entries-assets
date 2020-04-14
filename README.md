@@ -100,11 +100,11 @@ $ npm run publish_entries
 ```sh
 $ module.exports = {
 	bulkUnpublish :{
-    filter:{
-      environment: 'bulktest', //source environment
-      content_type_uid: '', //contentType filters
-      locale: 'en-us', //locale filters
-      type:'entry_published,asset_published'
+    	filter:{
+      	environment: 'bulktest', //source environment
+      	content_type_uid: '', //contentType filters
+      	locale: 'en-us', //locale filters
+      	type:'entry_published,asset_published'
     },
     deliveryToken:'' //deliveryToken of the  source environment
   }
