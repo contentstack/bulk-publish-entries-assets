@@ -27,7 +27,7 @@ async function getAssets(folder = 'cs_root', skip = 0) {
     uri: `${config.apiEndPoint}/v3/assets?folder=${folder}&skip=${skipCount}&include_count=true&include_folders=true`,
     headers: {
       api_key: config.apikey,
-      access_token: config.access_token,
+      authorization: config.manageToken,
     },
   };
   try {

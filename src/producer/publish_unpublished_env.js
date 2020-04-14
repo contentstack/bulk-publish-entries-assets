@@ -27,7 +27,7 @@ async function getEnvironment(environmentName) {
       url: `${config.cdnEndPoint}/v3/environments/${environmentName}`,
       headers: {
         api_key: config.apikey,
-        authtoken: config.authToken,
+        authorization: config.manageToken,
       },
     };
     const environment = await req(options);
@@ -50,7 +50,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
       },
       headers: {
         api_key: config.apikey,
-        access_token: config.access_token,
+        authorization: config.manageToken,
       },
     };
     const responseEntries = await req(conf);
@@ -93,7 +93,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
         });
       });
     }
-    console.log(responseEntries.count, skipCount);
+
     if (responseEntries.count === skipCount) {
       if (!changedFlag) console.log(`No Draft Entries of contentType ${contentType} was found`);
       bulkPublishSet = [];

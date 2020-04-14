@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config/stag');
+let config = require('../../config');
 const req = require('../util/request');
 const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -34,14 +34,13 @@ async function getEntries(contentType, locale, skip = 0) {
     };
     const entriesResponse = await req(conf);
     skipCount += entriesResponse.entries.length;
-    console.log(entriesResponse.count+" "+skipCount)
     entriesResponse.entries.forEach((entry, index) => {
       if (config.publish_entries.bulkPublish) {
         if (bulkPublishSet.length < 10) {
           bulkPublishSet.push({
             uid: entry.uid,
             content_type: contentType,
-            locale          
+            locale,
           });
         }
 
@@ -58,13 +57,15 @@ async function getEntries(contentType, locale, skip = 0) {
             entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_entries.environments,
           });
           bulkPublishSet = [];
-        } //bulkPublish
+        } // bulkPublish
       } else {
         queue.Enqueue({
           content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
         });
       }
     });
+
+    console.log(`${skipCount}---${entriesResponse.count}`);
     if (entriesResponse.count === skipCount) {
       bulkPublishSet = [];
       return Promise.resolve();
@@ -73,6 +74,7 @@ async function getEntries(contentType, locale, skip = 0) {
   } catch (Err) {
     console.log(Err);
   }
+  return true;
 }
 
 async function getContentTypes(skip = 0, contentTypes = []) {
@@ -118,15 +120,13 @@ async function start() {
     }
     for (let loc = 0; loc < config.publish_entries.locales.length; loc += 1) {
       for (let i = 0; i < allContentTypes.length; i += 1) {
-        while (allContentTypes.length !== 0) {
-          const ct = allContentTypes.shift();
-          try {
-            /* eslint-disable no-await-in-loop */
-            await getEntries(ct.uid || ct, config.publish_entries.locales[loc]);
-            /* eslint-enable no-await-in-loop */
-          } catch (err) {
-            console.log(err);
-          }
+        try {
+          /* eslint-disable no-await-in-loop */
+          await getEntries(allContentTypes[i].uid || allContentTypes[i], config.publish_entries.locales[loc]);
+          // console.log("+++++++++++++++++++++++"+config.publish_entries.locales[loc]+"&&&&&&&&&&"+loc+"d"+config.publish_entries.locales)
+          /* eslint-enable no-await-in-loop */
+        } catch (err) {
+          console.log(err);
         }
       }
     }

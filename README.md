@@ -4,13 +4,12 @@ Contentstack is a headless CMS with an API-first approach. It is a CMS that deve
 
 ## Contentstack publishing script
 
-Contentstack publishing script lets you publish auto publish your entries and assets depending upon the cases given below
+Contentstack publishing script lets you auto publish your entries and assets depending upon the cases given below
 
-- Publish the unpublished/draft entries on a particular environment
-- Publish the assets of a stack
+- Publish the unpublished/draft entries
+- Publish the assets of a stack 
 - Publish the entries of a stack
-
-**Note:Currently We do not have revert script for entries published using this script**
+- Unpublish entries/assets of a stack
 
 ### Usage
 #### Install dependencies:
@@ -24,10 +23,8 @@ $ npm install
 ```sh
 $ module.exports = {
 	apikey:'', //api key of the stack
-	access_token:'', //access token of the stack
 	apiEndPoint:'https://api.contentstack.io',
 	cdnEndPoint:'https://cdn.contentstack.io',
-	authToken:'',  
 	manageToken:'',//management token for the stack
 }
 ```
@@ -66,6 +63,7 @@ $ module.exports = {
 		environments:['bulktest'],
 		locales :['en-us'],
 		bulkPublish:true //if you want to bulk publish assets
+		folderUid:"cs_root" //Id of the folder to be published, cs_root for assets
 	}
 }  
 ```
@@ -95,7 +93,7 @@ $ module.exports = {
 ```sh
 $ npm run publish_entries
 ```
-#### Case 4) UnPublish all entries of the stack published on particular
+#### Case 4) UnPublish all entries/assets of the stack published on particular Environment
 
 **Specify case details in config file**
 
@@ -106,9 +104,9 @@ $ module.exports = {
       environment: 'bulktest', //source environment
       content_type_uid: '', //contentType filters
       locale: 'en-us', //locale filters
-      type:'entry_published'
+      type:'entry_published,asset_published'
     },
-    deliveryToken:'' //deliveryToken of the environment
+    deliveryToken:'' //deliveryToken of the  source environment
   }
 }  
 ```
@@ -119,12 +117,12 @@ $ npm run unpublish
 ```
 
 #### Retrying failed Entries 
-entries which failed to publish are stored in logs directory with unique name. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it
+Entries which failed to publish are stored in logs directory with unique name ending with .error. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it
 ```sh
 $ npm run publish_entries -- -retryFailed ${logFilename} 
 ```
 for example
-//npm run pubish_entries -- -retryFailed 2777bulkPublishAssets
+//npm run pubish_entries - - -retryFailed 18003bulkPublishEntries.error
 
 
 #### Known Limitations:
@@ -133,11 +131,3 @@ for example
 ##### Case 2:NA
 ##### Case 3:
 - For less publish failure of entries we recommend you to try one contenttype at a time
-
-
-Currently success logs are not getting stored. If required u can use any other methods to store it. For example
-**npm run publish_entries >> addlogs.txt**
-
-### Coming soon:
-- Support for successful publish logging
-- Support for unpublish published entries
