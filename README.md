@@ -100,12 +100,12 @@ $ npm run publish_entries
 ```sh
 $ module.exports = {
 	bulkUnpublish :{
-    	filter:{
-      	environment: 'bulktest', //source environment
-      	content_type_uid: '', //contentType filters
-      	locale: 'en-us', //locale filters
-      	type:'entry_published,asset_published'
-    },
+		filter:{
+		environment: 'bulktest', //source environment
+		content_type_uid: '', //contentType filters
+		locale: 'en-us', //locale filters
+		type:'entry_published,asset_published'
+    	},
     deliveryToken:'' //deliveryToken of the  source environment
   }
 }  
@@ -131,3 +131,4 @@ for example
 ##### Case 2:NA
 ##### Case 3:
 - For less publish failure of entries we recommend you to try one contenttype at a time
+##### Case 4:NA
