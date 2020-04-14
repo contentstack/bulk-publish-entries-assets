@@ -123,7 +123,6 @@ async function start() {
         try {
           /* eslint-disable no-await-in-loop */
           await getEntries(allContentTypes[i].uid || allContentTypes[i], config.publish_entries.locales[loc]);
-          // console.log("+++++++++++++++++++++++"+config.publish_entries.locales[loc]+"&&&&&&&&&&"+loc+"d"+config.publish_entries.locales)
           /* eslint-enable no-await-in-loop */
         } catch (err) {
           console.log(err);
