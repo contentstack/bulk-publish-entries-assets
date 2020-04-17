@@ -20,11 +20,10 @@ if (config.publish_assets.bulkPublish) {
 
 iniatlizeLogger(logFileName);
 
-
 async function getAssets(folder = 'cs_root', skip = 0) {
   skipCount = skip;
   const conf = {
-    uri: `${config.apiEndPoint}/v3/assets?folder=${folder}&skip=${skipCount}&include_count=true&include_folders=true`,
+    uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skipCount}&include_count=true&include_folders=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
@@ -49,7 +48,7 @@ async function getAssets(folder = 'cs_root', skip = 0) {
             bulkPublishSet = [];
           }
 
-          if (assetResponse.assets.length -1 === index) {
+          if (assetResponse.assets.length -1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length <10) {
             queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
             bulkPublishSet = [];
           }
