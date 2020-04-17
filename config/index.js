@@ -4,7 +4,7 @@ module.exports = {
   cdnEndPoint: 'https://cdn.contentstack.io',
   manageToken: 'cs48559a78b104fc5c1761dc0b', // management token of the stack
   publish_unpublished_env: {
-    contentTypes: ['ct_a','ct_b'],
+    contentTypes: ['ct_a',],
     sourceEnv: 'abhnv_test_env_two',
     environments: ['abhnv_test_env_two'],
     locales: ['en-us'],
