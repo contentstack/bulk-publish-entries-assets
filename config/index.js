@@ -1,8 +1,8 @@
 module.exports = {
-  apikey: 'blt9727d0a43a2fa0dd', // api Key of the stack
-  apiEndPoint: 'https://eu-api.contentstack.com',
-  cdnEndPoint: 'https://eu-cdn.contentstack.com',
-  manageToken: '***REMOVED***', // management token of the stack
+  apikey: '', // api Key of the stack
+  apiEndPoint: 'https://api.contentstack.io',
+  cdnEndPoint: 'https://cdn.contentstack.io',
+  manageToken: '', // management token of the stack
   publish_unpublished_env: {
     contentTypes: ['landing_page'],
     sourceEnv: 'development', //source destination
