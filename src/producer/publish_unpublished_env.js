@@ -56,8 +56,8 @@ async function getEntries(contentType, environmentUid, skip = 0) {
     skipCount += responseEntries.entries.length;
     if (responseEntries.entries.length > 0) {
       responseEntries.entries.forEach((entry, index) => {
-        config.publish_unpublished_env.locales.forEach((locale) => {
-          const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
+        let locale = config.publish_unpublished_env.locale || 'en-us';
+         const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
           if (!publishedEntry) {
             changedFlag = true;
             if (bulkPublishSet.length < 10) {
@@ -68,7 +68,6 @@ async function getEntries(contentType, environmentUid, skip = 0) {
               });
             }
           }
-
           if (bulkPublishSet.length === 10) {
             queue.Enqueue({
               entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
@@ -76,14 +75,13 @@ async function getEntries(contentType, environmentUid, skip = 0) {
             bulkPublishSet = [];
             return;
           }
-
           if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
             queue.Enqueue({
               entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
             });
             bulkPublishSet = [];
           }
-        });
+
       });
     }
     if (responseEntries.count === skipCount) {
@@ -119,7 +117,7 @@ async function start() {
       }
     }
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
   }
 }
 
