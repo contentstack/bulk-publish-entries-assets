@@ -6,8 +6,8 @@ module.exports = {
   publish_unpublished_env: {
     contentTypes: ['test'],
     sourceEnv: 'staging',
+    locale:'en-us',
     environments: ['staging'],
-    locales: ['en-us'],
     bulkPublish: true,
   },
   publish_assets: {

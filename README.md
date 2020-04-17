@@ -40,9 +40,9 @@ $ module.exports = {
 $ module.exports = {
 	publish_unpublished_env:{
 		contentTypes:['test'], //list of contentTypes
-		sourceEnv : 'staging', //sourceEnv
-		environments:['testdin1996'],
-		locales:['en-us']
+		locale:'en-us', //source locale
+		sourceEnv : 'staging', //source Environment
+		environments:['test'],
 	}
 }  
 ```
