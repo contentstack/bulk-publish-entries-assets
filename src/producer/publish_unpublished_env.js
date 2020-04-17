@@ -12,14 +12,8 @@ let logFileName = 'publish_unpublished_env';
 let bulkPublishSet = [];
 
 iniatlizeLogger(logFileName);
-
-if (config.publish_unpublished_env.bulkPublish) {
-  queue.consumer = bulkPublish;
-  logFileName = 'bulkPublishEntries';
-} else {
-  queue.consumer = publishConsumer;
-  logFileName = 'publish_unpublished_env';
-}
+queue.consumer = bulkPublish;
+logFileName = 'bulkPublishEntries';
 
 async function getEnvironment(environmentName) {
   try {
@@ -76,7 +70,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
           bulkPublishSet = [];
           return;
         }
-        if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
+        if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {      
           queue.Enqueue({
             entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
           });
@@ -84,7 +78,6 @@ async function getEntries(contentType, environmentUid, skip = 0) {
         }
       });
     }
-
     if (responseEntries.count === skipCount) {
       if (!changedFlag) console.log(`No Draft Entries of contentType ${contentType} was found`);
       bulkPublishSet = [];
@@ -108,6 +101,7 @@ async function start() {
       const environmentDetails = await getEnvironment(config.publish_unpublished_env.sourceEnv);
       for (let i = 0; i < config.publish_unpublished_env.contentTypes.length; i += 1) {
         try {
+          //console.log(config.publish_unpublished_env.contentTypes[i])
           /* eslint-disable no-await-in-loop */
           await getEntries(config.publish_unpublished_env.contentTypes[i], environmentDetails.environment.uid);
           /* eslint-enable no-await-in-loop */
