@@ -44,7 +44,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      url: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries`,
+      url: `${config.apiEndPoint}/v3/content_types/${contentType}/entries`,
       qs: {
         include_count: true,
         skip: skipCount,
@@ -55,10 +55,8 @@ async function getEntries(contentType, environmentUid, skip = 0) {
         authorization: config.manageToken,
       },
     };
-    console.log("$$$$$")
     const responseEntries = await req(conf);
     skipCount += responseEntries.entries.length;
-    console.log(skipCount+" "+responseEntries.count)
     if (responseEntries.entries.length > 0) {
       responseEntries.entries.forEach((entry, index) => {
         entryCounter = entryCounter +=1;
@@ -66,7 +64,6 @@ async function getEntries(contentType, environmentUid, skip = 0) {
           const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
           if (!publishedEntry) {
             changedFlag = true;
-            console.log(entry.uid+"-"+locale+" "+contentType)
             if (config.publish_unpublished_env.bulkPublish) {
               if (bulkPublishSet.length < 10) {
                 bulkPublishSet.push({
@@ -76,8 +73,6 @@ async function getEntries(contentType, environmentUid, skip = 0) {
                 });
               }
 
-              console.log(bulkPublishSet)
-              console.log(entryCounter+"---"+responseEntries.entries.length)
               if (bulkPublishSet.length === 10) {
                 queue.Enqueue({
                   entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
@@ -86,7 +81,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
                 return;
               }
 
-              if (entryCounter === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10) {
+              if (entryCounter === responseEntries.entries.length && bulkPublishSet.length <= 10) {
                 queue.Enqueue({
                   entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
                 });
