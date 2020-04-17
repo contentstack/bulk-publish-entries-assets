@@ -4,11 +4,10 @@ module.exports = {
   cdnEndPoint: 'https://cdn.contentstack.io',
   manageToken: '', // management token of the stack
   publish_unpublished_env: {
-    contentTypes: ['test'],
-    sourceEnv: 'staging',
-    locale:'en-us',
-    environments: ['staging'],
-    bulkPublish: true,
+    contentTypes: ['ct_b','ct_a'],
+    sourceEnv: 'test', //source destination
+    locale:'en-us',// source environment
+    environments: ['test'],
   },
   publish_assets: {
     environments: ['test'],
