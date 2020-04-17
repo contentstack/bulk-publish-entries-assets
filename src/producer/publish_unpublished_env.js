@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config/');
+let config = require('../../config');
 const req = require('../util/request');
 const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -37,9 +37,6 @@ async function getEnvironment(environmentName) {
   }
 }
 
-let entryCounter = 0;
-
-
 async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
   try {
@@ -59,67 +56,41 @@ async function getEntries(contentType, environmentUid, skip = 0) {
     skipCount += responseEntries.entries.length;
     if (responseEntries.entries.length > 0) {
       responseEntries.entries.forEach((entry, index) => {
-        //console.log(index)
-        entryCounter = entryCounter +=1;
-        //console.log(entryCounter)
         config.publish_unpublished_env.locales.forEach((locale) => {
           const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
           if (!publishedEntry) {
             changedFlag = true;
-            if (config.publish_unpublished_env.bulkPublish) {
-              if (bulkPublishSet.length < 10) {
-                bulkPublishSet.push({
-                  uid: entry.uid,
-                  content_type: contentType,
-                  locale,
-                });
-              }
-
-              //console.log(bulkPublishSet)
-              //console.log(entryCounter+"==="+responseEntries.entries.length)
-              if (bulkPublishSet.length === 10) {
-                queue.Enqueue({
-                  entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-                });
-                bulkPublishSet = [];
-                return;
-              }
-
-              if (entryCounter === responseEntries.entries.length && bulkPublishSet.length <= 10) {
-                queue.Enqueue({
-                  entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-                });
-                bulkPublishSet = [];
-              }
-            } else {
-              queue.Enqueue({
-                content_type: contentType, entryUid: entry.uid, locale, environments: config.publish_unpublished_env.environments,
+            if (bulkPublishSet.length < 10) {
+              bulkPublishSet.push({
+                uid: entry.uid,
+                content_type: contentType,
+                locale,
               });
             }
           }
 
-    if( bulkPublishSet.length>0 && bulkPublishSet.length<=10){
-      queue.Enqueue({
-                  entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-      });
-      bulkPublishSet = [];
+          if (bulkPublishSet.length === 10) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+            });
+            bulkPublishSet = [];
+            return;
+          }
 
-    }
-
-
-        
-
+          if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+            });
+            bulkPublishSet = [];
+          }
         });
       });
     }
-
-
     if (responseEntries.count === skipCount) {
       if (!changedFlag) console.log(`No Draft Entries of contentType ${contentType} was found`);
       bulkPublishSet = [];
       return Promise.resolve();
     }
-    entryCounter =0
     return await getEntries(contentType, environmentUid, skipCount);
   } catch (error) {
     return Promise.reject(error);
