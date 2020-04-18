@@ -2,7 +2,7 @@ module.exports = {
   apikey: 'blt22ec27e4a9805c70', // api Key of the stack
   apiEndPoint: 'https://api.contentstack.io',
   cdnEndPoint: 'https://cdn.contentstack.io',
-  manageToken: 'cs48559a78b104fc5c1761dc0b', // management token of the stack
+  manageToken: 'csbb25ea40e753d50790269c4c', // management token of the stack
   publish_unpublished_env: {
     contentTypes: ['ct_b'],
     sourceEnv: 'abhnv_test_env_two',
@@ -51,6 +51,19 @@ module.exports = {
     contentTypes: ['testdin'],
     environments: ['production'], //publishing Environments
     bulkPublish: true,
+  },
+  addFields: {
+    deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
+    locales: ['en-us'],
+    contentTypes: ['helloworld'],
+    environments: ['test'],
+    defaults: {
+      number: null,
+      boolean: false,
+      isodate: [],
+      file: null,
+      reference: [],
+    },
   },
 };
 

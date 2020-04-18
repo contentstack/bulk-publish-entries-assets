@@ -11,7 +11,7 @@ let bulkUnPulishAssetSet = [];
 queue.consumer = bulkPublish;
 let changedFlag = false;
 
-const logFileName = 'bulkUnPublish';
+const logFileName = 'cross_publish';
 
 iniatlizeLogger(logFileName);
 
