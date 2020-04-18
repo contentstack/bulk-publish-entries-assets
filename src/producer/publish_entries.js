@@ -22,6 +22,10 @@ if (config.publish_entries.bulkPublish) {
 
 iniatlizeLogger(logFileName);
 
+function removePublishDetails(elements) {
+  return elements.map(({publish_details, ...rest}) => rest);
+}
+
 async function getEntries(contentType, locale, skip = 0) {
   skipCount = skip;
   try {
@@ -41,6 +45,7 @@ async function getEntries(contentType, locale, skip = 0) {
             uid: entry.uid,
             content_type: contentType,
             locale,
+            publish_details:entry.publish_details
           });
         }
 

@@ -11,6 +11,10 @@ function iniatlizeLogger(fileName) {
   return logger;
 }
 
+function removePublishDetails(elements) {
+  return elements.map(({publish_details, ...rest}) => rest);
+}
+
 async function publishConsumer(entryObj, config) {
   const lang = [];
   lang.push(entryObj.locale);

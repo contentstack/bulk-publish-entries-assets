@@ -9,6 +9,7 @@ module.exports.getLoggerInstance = (fileName) => {
     transports: [
       new winston.transports.File({ filename: `${filename}.error`, level: 'error' }),
       new winston.transports.File({ filename: `${filename}.sucess`, levelL: 'info' }),
+      new winston.transports.File({ filename: `${filename}.pubLog`, levelL: 'plog' }),
     ],
   });
   return logger;
