@@ -15,13 +15,8 @@ let bulkPublishSet = [];
 
 iniatlizeLogger(logFileName);
 
-if (config.publish_unpublished_env.bulkPublish) {
-  queue.consumer = bulkPublish;
-  logFileName = 'bulkPublishEntries';
-} else {
-  queue.consumer = publishConsumer;
-  logFileName = 'publish_edits_on_env';
-}
+queue.consumer = bulkPublish;
+logFileName = 'bulkPublishEntries';
 
 async function getEnvironment(environmentName) {
   try {
@@ -29,7 +24,7 @@ async function getEnvironment(environmentName) {
       uri: `${config.cdnEndPoint}/v3/environments/${environmentName}`,
       headers: {
         api_key: config.apikey,
-        authtoken: config.authToken,
+        authorization: config.manageToken,
       },
     };
     const environment = await req(options);
@@ -52,7 +47,7 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
       },
       headers: {
         api_key: config.apikey,
-        access_token: config.access_token,
+        authorization: config.manageToken,
       },
     };
     const responseEntries = await req(conf);
@@ -62,35 +57,28 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
         const publishedEntry = entry.publish_details.find((publishEnv) => publishEnv.environment === environmentUid && publishEnv.locale === locale);
         if (publishedEntry && publishedEntry.version < entry._version) {
           changedFlag = true;
-
-          if (config.publish_unpublished_env.bulkPublish) {
-            if (bulkPublishSet.length < 10) {
-              bulkPublishSet.push({
-                uid: entry.uid,
-                content_type: contentType,
-                locale,
-              });
-            }
-
-            if (bulkPublishSet.length === 10) {
-              queue.Enqueue({
-                entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_edits_on_env.environments,
-              });
-              bulkPublishSet = [];
-              return;
-            }
-
-            if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10) {
-              queue.Enqueue({
-                entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_edits_on_env.environments,
-              });
-              bulkPublishSet = [];
-            }
-          } else {
-            queue.Enqueue({
-              content_type: contentType, entryUid: entry.uid, locale, environments: config.publish_edits_on_env.environments,
+          if (bulkPublishSet.length < 10) {
+            bulkPublishSet.push({
+              uid: entry.uid,
+              content_type: contentType,
+              locale,
             });
           }
+        }
+        
+        if (bulkPublishSet.length === 10) {
+          queue.Enqueue({
+            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_edits_on_env.environments,
+          });
+          bulkPublishSet = [];
+          return;
+        }
+
+        if (index === responseEntries.entries.length - 1 && bulkPublishSet.length > 0 && bulkPublishSet.length <= 10) {
+          queue.Enqueue({
+            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_edits_on_env.environments,
+          });
+          bulkPublishSet = [];
         }
       });
     }
@@ -115,12 +103,13 @@ setConfig(config);
 async function start() {
   if (config.publish_edits_on_env.sourceEnv) {
     try {
-      const environmentDetails = await getEnvironment(config.publish_edits_on_env.sourceEnv);
+      // const environmentDetails = await getEnvironment(config.publish_edits_on_env.sourceEnv);
       for (let i = 0; i < config.publish_edits_on_env.contentTypes.length; i += 1) {
         for (let j = 0; j < config.publish_edits_on_env.locales.length; j += 1) {
           try {
+            console.log(`${config.publish_edits_on_env.contentTypes[i]}---${config.publish_edits_on_env.locales[j]}`);
             /* eslint-disable no-await-in-loop */
-            await getEntries(config.publish_edits_on_env.contentTypes[i], environmentDetails.environment.uid, config.publish_edits_on_env.locales[j]);
+            // await getEntries(config.publish_edits_on_env.contentTypes[i], environmentDetails.environment.uid, config.publish_edits_on_env.locales[j]);
             /* eslint-enable no-await-in-loop */
           } catch (err) {
             console.log(err);

@@ -12,8 +12,6 @@ module.exports = {
   },
   publish_assets: {
     environments: ['test'],
-    locales: ['en-us'],
-    bulkPublish: true,
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
   },
   publish_entries: {
@@ -31,6 +29,28 @@ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: '', // deliveryToken of the environment
+  },
+  cross_env_publish:{
+     filter: {
+      environment: 'bulktest', // source environment
+      content_type_uid: '', // contentType filters
+      locale: 'en-us', // locale filters
+      type: 'asset_published,entry_published',
+    },
+    deliveryToken: '', // deliveryToken of the source environment
+    destEnv:'' //environment where it needs to be published
+  },
+  publish_edits_on_env: {
+    contentTypes: ['test','helloworld'],
+    sourceEnv: 'test',
+    environments: ['test'],
+    locales: ['en-us',],
+  },
+  nonlocalized_field_changes: {
+    sourceEnv: 'production', //source Environment
+    contentTypes: ['testdin'],
+    environments: ['production'], //publishing Environments
+    bulkPublish: true,
   },
 };
 

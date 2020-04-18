@@ -8,7 +8,9 @@
     "publish_assets": "node src/producer/publish_assets.js",
     "publish_entries": "node src/producer/publish_entries.js",
     "publish_unpublish": "node src/producer/publish_unpublished_env.js",
-    "unpublish": "node src/producer/unpublish.js"
+    "unpublish": "node src/producer/unpublish.js",
+    "publish_edits": "node src/producer/publish_edits.js",
+    "cross_publish": "node src/producer/cross_publish.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +18,7 @@
     "bluebird": "^3.7.2",
     "chalk": "^3.0.0",
     "debug": "^4.1.1",
+    "lodash": "^4.17.15",
     "request": "^2.88.2",
     "winston": "^3.2.1"
   },
