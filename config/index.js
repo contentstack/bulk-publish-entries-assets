@@ -11,8 +11,6 @@ module.exports = {
   },
   publish_assets: {
     environments: ['test'],
-    locales: ['en-us'],
-    bulkPublish: true,
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
   },
   publish_entries: {

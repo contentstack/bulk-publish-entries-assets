@@ -6,24 +6,17 @@ const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
 queue.consumer = bulkPublish;
-let skipCount;
 let logFileName;
 let bulkPublishSet = [];
 
-if (config.publish_assets.bulkPublish) {
-  queue.consumer = bulkPublish;
-  logFileName = 'bulkPublishAssets';
-} else {
-  queue.consumer = publishAsset;
-  logFileName = 'publishAssets';
-}
+queue.consumer = bulkPublish;
+logFileName = 'bulkPublishAssets';
 
 iniatlizeLogger(logFileName);
 
 async function getAssets(folder = 'cs_root', skip = 0) {
-  skipCount = skip;
   const conf = {
-    uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skipCount}&include_count=true&include_folders=true`,
+    uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
@@ -32,12 +25,11 @@ async function getAssets(folder = 'cs_root', skip = 0) {
   try {
     const assetResponse = await req(conf);
     if (assetResponse && assetResponse.assets.length) {
-      skipCount += assetResponse.assets.length;
+      skip += assetResponse.assets.length;
       assetResponse.assets.forEach((asset, index) => {
         if (asset.is_dir === true) {
           return getAssets(asset.uid, 0);
         }
-        if (config.publish_assets.bulkPublish) {
           if (bulkPublishSet.length < 10) {
             bulkPublishSet.push({
               uid: asset.uid,
@@ -52,15 +44,13 @@ async function getAssets(folder = 'cs_root', skip = 0) {
             queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
             bulkPublishSet = [];
           }
-        } else {
-          queue.Enqueue({ assetUid: asset.uid, environments: config.publish_assets.environments });
-        }
+         
         return true;
       });
-      if (skipCount === assetResponse.count) {
+      if (skip === assetResponse.count) {
         return true;
       }
-      return getAssets(folder, skipCount);
+      return getAssets(folder, skip);
     }
   } catch (error) {
     console.log(error);
