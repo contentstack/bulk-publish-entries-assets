@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config/stag');
+let config = require('../../config/');
 const req = require('../util/request');
 const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -12,13 +12,9 @@ let contentTypesList = [];
 let allContentTypes = [];
 let bulkPublishSet = [];
 
-if (config.publish_entries.bulkPublish) {
   queue.consumer = bulkPublish;
   logFileName = 'bulkPublishEntries';
-} else {
-  queue.consumer = publishConsumer;
-  logFileName = 'publishEntries';
-}
+
 
 iniatlizeLogger(logFileName);
 
@@ -39,7 +35,7 @@ async function getEntries(contentType, locale, skip = 0) {
     const entriesResponse = await req(conf);
     skipCount += entriesResponse.entries.length;
     entriesResponse.entries.forEach((entry, index) => {
-      if (config.publish_entries.bulkPublish) {
+     
         if (bulkPublishSet.length < 10) {
           bulkPublishSet.push({
             uid: entry.uid,
@@ -63,11 +59,7 @@ async function getEntries(contentType, locale, skip = 0) {
           });
           bulkPublishSet = [];
         } // bulkPublish
-      } else {
-        queue.Enqueue({
-          content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
-        });
-      }
+      
     });
 
     console.log(`${skipCount}---${entriesResponse.count}`);

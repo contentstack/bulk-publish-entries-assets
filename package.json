@@ -10,7 +10,8 @@
     "publish_unpublish": "node src/producer/publish_unpublished_env.js",
     "unpublish": "node src/producer/unpublish.js",
     "publish_edits": "node src/producer/publish_edits.js",
-    "cross_publish": "node src/producer/cross_publish.js"
+    "cross_publish": "node src/producer/cross_publish.js",
+    "revert": "node src/producer/revert.js"
   },
   "author": "",
   "license": "ISC",

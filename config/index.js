@@ -15,11 +15,10 @@ module.exports = {
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
   },
   publish_entries: {
-    contentTypes: ['test'],
+    contentTypes: ['helloworld'],
     locales: ['en-us'],
-    environments: ['testEnv'],
-    bulkPublish: true,
-    publishAllContentTypes: true,
+    environments: ['d96'],
+    publishAllContentTypes: false,
   },
   bulkUnpublish: {
     filter: {
@@ -50,7 +49,6 @@ module.exports = {
     sourceEnv: 'production', //source Environment
     contentTypes: ['testdin'],
     environments: ['production'], //publishing Environments
-    bulkPublish: true,
   },
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],

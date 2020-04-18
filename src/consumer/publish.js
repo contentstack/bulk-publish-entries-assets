@@ -1,5 +1,7 @@
 const chalk = require('chalk');
 const req = require('../util/request');
+const _ = require('lodash');
+
 const { getLoggerInstance, addLogs } = require('../util/logger');
 
 let logger;
@@ -88,7 +90,7 @@ async function bulkPublish(bulkPublishObj, config) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          entries: bulkPublishObj.entries,
+          entries: removePublishDetails(bulkPublishObj.entries),
           locales: [bulkPublishObj.locale],
           environments: bulkPublishObj.environments,
         }),
@@ -96,8 +98,18 @@ async function bulkPublish(bulkPublishObj, config) {
       try {
         const bulkPublishEntriesResponse = await req(conf);
         if (bulkPublishEntriesResponse.notice && !bulkPublishEntriesResponse.error_message) {
+
+          let temp = _.cloneDeep(bulkPublishObj)
+
+           //addLogs(logger, { options: temp, api_key: config.apikey }, 'plog');
+           temp.entries = removePublishDetails(bulkPublishObj.entries)
+
           console.log(chalk.green(`Bulk entries sent for publish  ${JSON.stringify(bulkPublishObj.entries)}`));
-          addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'info');
+          //addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'plog');
+          //bulkPublishObj.entries = removePublishDetails(bulkPublishObj.entries)
+          addLogs(logger, { options: temp, api_key: config.apikey }, 'info');
+
+        
         } else {
           throw bulkPublishEntriesResponse;
         }
@@ -116,7 +128,7 @@ async function bulkPublish(bulkPublishObj, config) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          assets: bulkPublishObj.assets,
+          assets: removePublishDetails(bulkPublishObj.assets),
           locales: ['en-us'],
           environments: bulkPublishObj.environments,
         }),
@@ -125,6 +137,8 @@ async function bulkPublish(bulkPublishObj, config) {
         const bulkPublishAssetsResponse = await req(conf);
         if (bulkPublishAssetsResponse.notice && !bulkPublishAssetsResponse.error_message) {
           console.log(chalk.green(`Bulk assets sent for publish ${JSON.stringify(bulkPublishObj.assets)}`));
+          addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'plog');
+          bulkPublishObj.assets = removePublishDetails(bulkPublishObj.assets)
           addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'info');
         } else {
           throw bulkPublishAssetsResponse;
