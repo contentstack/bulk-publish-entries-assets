@@ -61,8 +61,6 @@ $ npm run publish_unpublish
 $ module.exports = {
 	publish_assets:{
 		environments:['bulktest'],
-		locales :['en-us'],
-		bulkPublish:true //if you want to bulk publish assets
 		folderUid:"cs_root" //Id of the folder to be published, cs_root for assets
 	}
 }  
