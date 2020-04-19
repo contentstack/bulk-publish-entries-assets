@@ -44,9 +44,9 @@ function bulkAction(items) {
     }
 
     if (bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published') {
-                if(entry.data.publish_details){
+        if(entry.data.publish_details){
             entry.data.publish_details['version'] = entry.data['_version']
-          }
+        }
 
       bulkUnPulishAssetSet.push({
         uid: entry.data.uid,
@@ -133,11 +133,7 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (logFileName === 'bulkPublishEntries') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
-    }
+    retryFailedLogs(process.argv.slice(2)[1], queue);
   }
 } else {
   start();

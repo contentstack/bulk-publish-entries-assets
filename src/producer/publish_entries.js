@@ -140,11 +140,7 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (logFileName === 'bulkPublishEntries') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
-    }
+     retryFailedLogs(process.argv.slice(2)[1], queue);
   }
 } else {
   start();

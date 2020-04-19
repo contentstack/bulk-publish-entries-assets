@@ -278,11 +278,7 @@ module.exports = {
 // start();
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    if (logFileName === 'bulkPublishAssets') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
-    }
+    retryFailedLogs(process.argv.slice(2)[1], queue);
   }
 } else {
   start();

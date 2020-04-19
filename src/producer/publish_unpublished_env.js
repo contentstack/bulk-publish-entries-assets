@@ -58,6 +58,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
       responseEntries.entries.forEach((entry, index) => {
         let locale = config.publish_unpublished_env.locale || 'en-us';
          const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
+          
           if (!publishedEntry) {
             changedFlag = true;
             if (bulkPublishSet.length < 10) {
@@ -130,11 +131,7 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    if (logFileName === 'bulkPublishEntries') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
-    }
+    retryFailedLogs(process.argv.slice(2)[1], queue);
   }
 } else {
   start();
