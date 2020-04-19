@@ -164,13 +164,13 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
       try {
         const bulkUnPublishEntriesResponse = await req(conf);
         if (bulkUnPublishEntriesResponse.notice && !bulkUnPublishEntriesResponse.error_message) {
-          console.log(chalk.green(`Bulk entries sent for Unpublish  ${JSON.stringify(bulkUnPublishObj.entries)}`));
+          console.log(chalk.green(`Bulk entries sent for Unpublish  ${JSON.stringify(removePublishDetails(bulkUnPublishObj.entries))}`));
           addLogs(logger, { options: bulkUnPublishObj, api_key: config.apikey }, 'info');
         } else {
           throw bulkUnPublishEntriesResponse;
         }
       } catch (error) {
-        console.log(chalk.red(`Bulk entries ${JSON.stringify(bulkUnPublishObj.entries)} failed to Unpublish with error ${JSON.stringify(error)}`));
+        console.log(chalk.red(`Bulk entries ${JSON.stringify(removePublishDetails(bulkUnPublishObj.entries))} failed to Unpublish with error ${JSON.stringify(error)}`));
         addLogs(logger, { options: bulkUnPublishObj, api_key: config.apikey }, 'error');
       }
       break;

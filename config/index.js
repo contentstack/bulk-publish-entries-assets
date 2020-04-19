@@ -1,8 +1,8 @@
 module.exports = {
-  apikey: 'bltc1dc25eda1ece559', // api Key of the stack
+  apikey: 'blt22ec27e4a9805c70', // api Key of the stack
   apiEndPoint: 'https://api.contentstack.io',
   cdnEndPoint: 'https://cdn.contentstack.io',
-  manageToken: 'csc23550e50cb5ce0df773b9a1', // management token of the stack
+  manageToken: 'cs9cd7a13a2ac9ab9311d2f898', // management token of the stack
   publish_unpublished_env: {
     contentTypes: ['ct_b'],
     sourceEnv: 'abhnv_test_env_two',
@@ -15,9 +15,9 @@ module.exports = {
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
   },
   publish_entries: {
-    contentTypes: ['test'],
+    contentTypes: ['404'],
     locales: ['en-us'],
-    environments: ['test'],
+    environments: ['d96'],
     publishAllContentTypes: false,
   },
   bulkUnpublish: {
@@ -40,9 +40,9 @@ module.exports = {
     destEnv:[''] //environment where it needs to be published
   },
   publish_edits_on_env: {
-    contentTypes: ['test','helloworld'],
-    sourceEnv: 'test',
-    environments: ['test'],
+    contentTypes: ['404'],
+    sourceEnv: 'd96',
+    environments: ['d96'],
     locales: ['en-us',],
   },
   nonlocalized_field_changes: {
