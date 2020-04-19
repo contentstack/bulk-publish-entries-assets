@@ -30,11 +30,6 @@ function bulkAction(items) {
   items.forEach((entry, index) => {
     changedFlag = true;
     if (bulkUnPublishSet.length < 10 && entry.type === 'entry_published') {
-
-      if(entry.data.publish_details){
-            entry.data.publish_details['version'] = entry.data['_version']
-      }
-
       bulkUnPublishSet.push({
         uid: entry.data.uid,
         content_type: entry.content_type_uid,
@@ -44,9 +39,6 @@ function bulkAction(items) {
     }
 
     if (bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published') {
-        if(entry.data.publish_details){
-            entry.data.publish_details['version'] = entry.data['_version']
-        }
 
       bulkUnPulishAssetSet.push({
         uid: entry.data.uid,

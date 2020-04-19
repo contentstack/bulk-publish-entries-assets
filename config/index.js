@@ -37,7 +37,7 @@ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: '', // deliveryToken of the source environment
-    destEnv:'' //environment where it needs to be published
+    destEnv:[''] //environment where it needs to be published
   },
   publish_edits_on_env: {
     contentTypes: ['test','helloworld'],
