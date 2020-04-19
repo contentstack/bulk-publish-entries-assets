@@ -203,7 +203,6 @@ async function getEntries(schema, contentType, locale, skip = 0) {
       if (updatedEntry.changedFlag) {
         updatedEntry = removeUnwanted(entry, config.addFields.deleteFields);
         const flag = await updateEntry(updatedEntry, contentType, locale);
-
         if (flag) {
           if (bulkPublishSet.length < 10) {
             bulkPublishSet.push({
@@ -220,6 +219,8 @@ async function getEntries(schema, contentType, locale, skip = 0) {
             bulkPublishSet = [];
             return;
           }
+        }else {
+          console.log(`Update Failed for entry ${entry.uid} with contentType ${contentType}`)
         }
       } else {
         console.log(`No change Observed for contentType ${contentType} with entry ${entry.uid}`);
