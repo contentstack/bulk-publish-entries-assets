@@ -1,5 +1,5 @@
 const Queue = require('../util/queue');
-let config = require('../../config/stag');
+let config = require('../../config/');
 const req = require('../util/request');
 const { bulkUnPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
@@ -30,27 +30,26 @@ function bulkAction(items) {
   items.forEach((entry, index) => {
     changedFlag = true;
     if (bulkUnPublishSet.length < 10 && entry.type === 'entry_published') {
-
-      if(entry.data.publish_details){
-            entry.data.publish_details['version'] = entry.data['_version']
+      if (entry.data.publish_details) {
+        entry.data.publish_details.version = entry.data._version;
       }
 
       bulkUnPublishSet.push({
         uid: entry.data.uid,
         content_type: entry.content_type_uid,
         locale: entry.data.locale,
-        publish_details:[entry.data.publish_details] || []
+        publish_details: [entry.data.publish_details] || [],
       });
     }
 
     if (bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published') {
-        if(entry.data.publish_details){
-            entry.data.publish_details['version'] = entry.data['_version']
-        }
+      if (entry.data.publish_details) {
+        entry.data.publish_details.version = entry.data._version;
+      }
 
       bulkUnPulishAssetSet.push({
         uid: entry.data.uid,
-        publish_details:[entry.data.publish_details] || []
+        publish_details: [entry.data.publish_details] || [],
       });
     }
 

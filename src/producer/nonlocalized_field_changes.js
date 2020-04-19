@@ -1,13 +1,12 @@
 const _ = require('lodash');
 const Queue = require('../util/queue');
-let config = require('../../config/stag');
+let config = require('../../config/');
 const req = require('../util/request');
-const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 let changedFlag = false;
 const queue = new Queue();
-queue.consumer = publishConsumer;
 let skipCount;
 let logFileName = 'nonlocalized_field_changes';
 let bulkPublishSet = [];
@@ -252,7 +251,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
                   uid: entry.uid,
                   content_type: contentType,
                   locale: locale.code,
-                  publish_details:localizedEntry.publish_details || []
+                  publish_details: localizedEntry.publish_details || [],
                 });
               }
               if (bulkPublishSet.length === 10) {
@@ -360,7 +359,7 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-        retryFailedLogs(process.argv.slice(2)[1], queue);
+    retryFailedLogs(process.argv.slice(2)[1], queue);
   }
 } else {
   start();

@@ -1,11 +1,10 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { publishAsset, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
-queue.consumer = bulkPublish;
 let logFileName;
 let bulkPublishSet = [];
 
@@ -30,22 +29,22 @@ async function getAssets(folder = 'cs_root', skip = 0) {
         if (asset.is_dir === true) {
           return getAssets(asset.uid, 0);
         }
-          if (bulkPublishSet.length < 10) {
-            bulkPublishSet.push({
-              uid: asset.uid,
-              publish_details:asset.publish_details || []
-            });
-          }
-          if (bulkPublishSet.length === 10) {
-            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
-            bulkPublishSet = [];
-          }
+        if (bulkPublishSet.length < 10) {
+          bulkPublishSet.push({
+            uid: asset.uid,
+            publish_details: asset.publish_details || [],
+          });
+        }
+        if (bulkPublishSet.length === 10) {
+          queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
+          bulkPublishSet = [];
+        }
 
-          if (assetResponse.assets.length -1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length <10) {
-            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
-            bulkPublishSet = [];
-          }
-         
+        if (assetResponse.assets.length - 1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length < 10) {
+          queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
+          bulkPublishSet = [];
+        }
+
         return true;
       });
       if (skip === assetResponse.count) {

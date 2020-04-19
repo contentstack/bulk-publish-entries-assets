@@ -6,7 +6,7 @@ module.exports = {
   publish_unpublished_env: {
     contentTypes: ['ct_b'],
     sourceEnv: 'abhnv_test_env_two',
-    locale:'ar-dz',
+    locale: 'ar-dz',
     environments: ['abhnv_test_env_two'],
     bulkPublish: true,
   },
@@ -22,33 +22,33 @@ module.exports = {
   },
   bulkUnpublish: {
     filter: {
-      environment: 'bulktest', // source environment
+      environment: 'd96', // source environment
       content_type_uid: '', // contentType filters
       locale: 'en-us', // locale filters
-      type: 'asset_published,entry_published',
+      type: 'asset_published',
     },
-    deliveryToken: '', // deliveryToken of the environment
+    deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the environment
   },
-  cross_env_publish:{
-     filter: {
+  cross_env_publish: {
+    filter: {
       environment: 'bulktest', // source environment
       content_type_uid: '', // contentType filters
       locale: 'en-us', // locale filters
       type: 'asset_published,entry_published',
     },
     deliveryToken: '', // deliveryToken of the source environment
-    destEnv:[''] //environment where it needs to be published
+    destEnv: [''], // environment where it needs to be published
   },
   publish_edits_on_env: {
     contentTypes: ['404'],
     sourceEnv: 'd96',
     environments: ['d96'],
-    locales: ['en-us',],
+    locales: ['en-us'],
   },
   nonlocalized_field_changes: {
-    sourceEnv: 'production', //source Environment
+    sourceEnv: 'production', // source Environment
     contentTypes: ['testdin'],
-    environments: ['production'], //publishing Environments
+    environments: ['production'], // publishing Environments
   },
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],

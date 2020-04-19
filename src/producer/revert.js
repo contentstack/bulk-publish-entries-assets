@@ -19,7 +19,7 @@ let logFileName;
 revert_queue.consumer = bulkPublish;
 unpublish_queue.consumer = bulkUnpublish;
 
-logFileName = 'bulkUnpublish';
+logFileName = 'revert';
 
 iniatlizeLogger(logFileName);
 

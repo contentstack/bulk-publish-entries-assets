@@ -6,7 +6,6 @@ const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
 queue.consumer = bulkPublish;
-let skipCount;
 const logFileName = 'addFields';
 let bulkPublishSet = [];
 
@@ -209,7 +208,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
               uid: entry.uid,
               content_type: contentType,
               locale,
-              publish_details:entry.publish_details
+              publish_details: entry.publish_details,
             });
           }
           if (bulkPublishSet.length === 10) {
@@ -219,8 +218,8 @@ async function getEntries(schema, contentType, locale, skip = 0) {
             bulkPublishSet = [];
             return;
           }
-        }else {
-          console.log(`Update Failed for entry ${entry.uid} with contentType ${contentType}`)
+        } else {
+          console.log(`Update Failed for entry ${entry.uid} with contentType ${contentType}`);
         }
       } else {
         console.log(`No change Observed for contentType ${contentType} with entry ${entry.uid}`);

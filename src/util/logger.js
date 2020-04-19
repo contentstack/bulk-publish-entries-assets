@@ -43,7 +43,7 @@ module.exports.addLogs = (logger, data, Type) => {
   switch (Type) {
     case 'error':
       logger.error(data);
-      break;   
+      break;
     case 'info':
       logger.info(data);
       break;

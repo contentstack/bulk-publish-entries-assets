@@ -1,22 +1,18 @@
 const Queue = require('../util/queue');
 const req = require('../util/request');
-const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
-
 let config = require('../../config');
 
 let skipCount;
 const queue = new Queue();
-queue.consumer = publishConsumer;
-let logFileName = 'publish_edits_on_env';
 let changedFlag = false;
 let bulkPublishSet = [];
-
+const logFileName = 'publish_edits_on_env';
 
 iniatlizeLogger(logFileName);
 
 queue.consumer = bulkPublish;
-logFileName = 'bulkPublishEntries';
 
 async function getEnvironment(environmentName) {
   try {
@@ -44,7 +40,7 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
         skip: skipCount,
         include_publish_details: true,
         locale,
-        publish_details:true
+        publish_details: true,
       },
       headers: {
         api_key: config.apikey,
@@ -63,11 +59,11 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
               uid: entry.uid,
               content_type: contentType,
               locale,
-              publish_details:entry.publish_details || []
+              publish_details: entry.publish_details || [],
             });
           }
         }
-        
+
         if (bulkPublishSet.length === 10) {
           queue.Enqueue({
             entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_edits_on_env.environments,
