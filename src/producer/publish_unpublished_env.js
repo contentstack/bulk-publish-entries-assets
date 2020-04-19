@@ -36,7 +36,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      url: `${config.apiEndPoint}/v3/content_types/${contentType}/entries`,
+      url: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries`,
       qs: {
         include_count: true,
         skip: skipCount,
@@ -120,6 +120,7 @@ module.exports = {
   getEntries,
   getEnvironment,
   setConfig,
+  start
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {

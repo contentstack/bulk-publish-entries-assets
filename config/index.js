@@ -25,7 +25,7 @@ module.exports = {
       environment: 'd96', // source environment
       content_type_uid: '', // contentType filters
       locale: 'en-us', // locale filters
-      type: 'asset_published',
+      type: 'asset_published,entry_published',
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the environment
   },

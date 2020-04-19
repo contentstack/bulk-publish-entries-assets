@@ -128,6 +128,7 @@ async function start() {
 module.exports = {
   getSyncEntries,
   setConfig,
+  getQueryParams
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {

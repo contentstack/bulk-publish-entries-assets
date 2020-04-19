@@ -1,4 +1,4 @@
-const yesno = require('yesno');
+//const yesno = require('yesno');
 const path = require('path');
 const { getAllLogs, getRecentlyCreatedLogByType, logFileNames } = require('../util/logger');
 const Queue = require('../util/queue');
