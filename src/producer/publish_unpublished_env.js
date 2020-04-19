@@ -65,6 +65,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
                 uid: entry.uid,
                 content_type: contentType,
                 locale,
+                publish_details:entry.publish_details || []
               });
             }
           }

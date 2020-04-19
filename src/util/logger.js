@@ -3,22 +3,12 @@ const winston = require('winston');
 
 let filename;
 
-const myCustomLevels = {
-  levels: {
-    info: 0,
-    error: 1,
-    plog: 2,
-  },
-};
-
 module.exports.getLoggerInstance = (fileName) => {
   filename = path.join(__dirname, '../', '../', 'logs', fileName);
   const logger = winston.createLogger({
-    levels: myCustomLevels.levels, 
     transports: [
       new winston.transports.File({ filename: `${filename}.error`, level: 'error' }),
       new winston.transports.File({ filename: `${filename}.sucess`, level: 'info' }),
-      new winston.transports.File({ filename: `${filename}.pubLog`, level: 'plog' }),
     ],
   });
   return logger;
@@ -50,14 +40,9 @@ module.exports.getAllLogs = (fname) => new Promise((resolve, reject) => {
 });
 
 module.exports.addLogs = (logger, data, Type) => {
-
-  console.log(Type)
   switch (Type) {
     case 'error':
       logger.error(data);
-      break;
-    case 'plog':
-      logger.plog(data);
       break;   
     case 'info':
       logger.info(data);

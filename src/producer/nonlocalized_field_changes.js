@@ -43,7 +43,7 @@ async function getLocalizedEntry(entry, contentType, locale) {
   let conf;
   try {
     conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries/${entry.uid}?locale=${locale}&environment=${config.nonlocalized_field_changes.sourceEnv}`,
+      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries/${entry.uid}?locale=${locale}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_publish_details=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -252,6 +252,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
                   uid: entry.uid,
                   content_type: contentType,
                   locale: locale.code,
+                  publish_details:localizedEntry.publish_details || []
                 });
               }
               if (bulkPublishSet.length === 10) {

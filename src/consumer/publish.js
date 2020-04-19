@@ -98,18 +98,9 @@ async function bulkPublish(bulkPublishObj, config) {
       try {
         const bulkPublishEntriesResponse = await req(conf);
         if (bulkPublishEntriesResponse.notice && !bulkPublishEntriesResponse.error_message) {
-
-          let temp = _.cloneDeep(bulkPublishObj)
-
-           //addLogs(logger, { options: temp, api_key: config.apikey }, 'plog');
-           temp.entries = removePublishDetails(bulkPublishObj.entries)
-
           console.log(chalk.green(`Bulk entries sent for publish  ${JSON.stringify(bulkPublishObj.entries)}`));
-          //addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'plog');
-          //bulkPublishObj.entries = removePublishDetails(bulkPublishObj.entries)
-          addLogs(logger, { options: temp, api_key: config.apikey }, 'info');
+          addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'info');
 
-        
         } else {
           throw bulkPublishEntriesResponse;
         }
@@ -137,8 +128,6 @@ async function bulkPublish(bulkPublishObj, config) {
         const bulkPublishAssetsResponse = await req(conf);
         if (bulkPublishAssetsResponse.notice && !bulkPublishAssetsResponse.error_message) {
           console.log(chalk.green(`Bulk assets sent for publish ${JSON.stringify(bulkPublishObj.assets)}`));
-          addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'plog');
-          bulkPublishObj.assets = removePublishDetails(bulkPublishObj.assets)
           addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'info');
         } else {
           throw bulkPublishAssetsResponse;

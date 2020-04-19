@@ -16,7 +16,7 @@ iniatlizeLogger(logFileName);
 
 async function getAssets(folder = 'cs_root', skip = 0) {
   const conf = {
-    uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true`,
+    uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true&include_publish_details=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
@@ -33,6 +33,7 @@ async function getAssets(folder = 'cs_root', skip = 0) {
           if (bulkPublishSet.length < 10) {
             bulkPublishSet.push({
               uid: asset.uid,
+              publish_details:asset.publish_details || []
             });
           }
           if (bulkPublishSet.length === 10) {

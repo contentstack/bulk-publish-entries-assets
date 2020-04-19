@@ -44,6 +44,7 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
         skip: skipCount,
         include_publish_details: true,
         locale,
+        publish_details:true
       },
       headers: {
         api_key: config.apikey,
@@ -62,6 +63,7 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
               uid: entry.uid,
               content_type: contentType,
               locale,
+              publish_details:entry.publish_details || []
             });
           }
         }
