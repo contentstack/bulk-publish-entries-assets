@@ -16,6 +16,9 @@ Contentstack publishing script lets you auto publish your entries and assets dep
 - Update and publish entries when a new field is added to content type
 - Revert published entries through script from logs
 
+*NOTE:* **Publishing process will fail if Required/Mandatory fields are empty**
+
+***
 ### Usage
 #### Install dependencies:
 

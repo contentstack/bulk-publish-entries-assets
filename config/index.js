@@ -15,7 +15,7 @@ module.exports = {
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
   },
   publish_entries: {
-    contentTypes: ['404'],
+    contentTypes: ['redirect_rule'],
     locales: ['en-us'],
     environments: ['d96'],
     publishAllContentTypes: false,

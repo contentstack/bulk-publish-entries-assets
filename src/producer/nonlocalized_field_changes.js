@@ -200,31 +200,6 @@ function checkNonLocalizedFieldChanges(contentType, entry, localizedEntry, isNon
   return changedFlag;
 }
 
-// function triggerNonLocalizedFieldChecks(schema, entry, contentType, languages) {
-//   return new Promise((resolve, reject) => {
-//     languages.forEach(async (locale, index) => {
-//       try {
-//         let localizedEntry = await getLocalizedEntry(entry, contentType, locale.code);
-//         localizedEntry = localizedEntry || {};
-//         if (checkNonLocalizedFieldChanges(schema, entry, localizedEntry)) {
-//           queue.Enqueue({
-//             content_type: contentType, entryUid: entry.uid, locale: locale.code, environments: config.nonlocalized_field_changes.environments,
-//           });
-//         } else {
-//           console.log(`No Change in NonLocalized field for contentType ${contentType} entryUid ${entry.uid} with locale ${locale.code}`);
-//         }
-//         changedFlag = false;
-//       } catch (err) {
-//         console.log(err);
-//         return reject(err);
-//       }
-//       if (index === languages.length - 1) {
-//         resolve();
-//       }
-//     });
-//   });
-// }
-
 async function getEntries(schema, contentType, languages, masterLocale, skip = 0) {
   skipCount = skip;
   try {
@@ -288,26 +263,6 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
   }
   return Promise.resolve();
 }
-
-
-// async function getMasterLocale() {
-//   try {
-//     const conf = {
-//       uri: `${config.cdnEndPoint}/v3/stacks/`,
-//       method: 'GET',
-//       headers: {
-//         api_key: config.apikey,
-//         authtoken: config.nonlocalized_field_changes.authToken,
-//       },
-//     };
-//     console.log(conf);
-//     const stackDetails = await req(conf);
-//     return stackDetails.stack.master_locale;
-//   } catch (err) {
-//     return Promise.reject(err);
-//   }
-//   return true;
-// }
 
 async function getLanguages() {
   try {

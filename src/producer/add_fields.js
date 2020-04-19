@@ -173,12 +173,8 @@ async function updateEntry(updatedEntry, contentType, locale) {
   };
   try {
     const update = await req(conf);
-    // console.log(update, '======');
     if (update.notice) {
       return Promise.resolve(true);
-      // queue.Enqueue({
-      //   content_type: contentType, entryUid: update.entry.uid, locale, environments: config.addFields.environments,
-      // });
     }
     return Promise.resolve(false);
   } catch (err) {
@@ -219,7 +215,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
             return;
           }
         } else {
-          console.log(`Update Failed for entry ${entry.uid} with contentType ${contentType}`);
+          console.log(`Update Failed for entryUid ${entry.uid} with contentType ${contentType}`);
         }
       } else {
         console.log(`No change Observed for contentType ${contentType} with entry ${entry.uid}`);
@@ -231,12 +227,14 @@ async function getEntries(schema, contentType, locale, skip = 0) {
         });
         bulkPublishSet = [];
       }
-
-      if (skip === entriesResponse.count) {
-        return Promise.resolve();
-      }
-      return getEntries(schema, contentType, locale, skip);
     });
+
+    if (skip === entriesResponse.count) {
+      return Promise.resolve();
+    }
+    return setTimeout(async function(){
+      return await getEntries(contentType, locale, skipCount);
+    },2000)
   } catch (err) {
     console.log(err);
   }

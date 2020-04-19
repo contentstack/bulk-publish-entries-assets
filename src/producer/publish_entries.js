@@ -18,9 +18,6 @@ logFileName = 'bulkPublishEntries';
 
 iniatlizeLogger(logFileName);
 
-function removePublishDetails(elements) {
-  return elements.map(({ publish_details, ...rest }) => rest);
-}
 
 async function getEntries(contentType, locale, skip = 0) {
   skipCount = skip;
