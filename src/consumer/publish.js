@@ -156,7 +156,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          entries: bulkUnPublishObj.entries,
+          entries: removePublishDetails(bulkUnPublishObj.entries),
           locales: [bulkUnPublishObj.locale],
           environments: bulkUnPublishObj.environments,
         }),
@@ -184,7 +184,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          assets: bulkUnPublishObj.assets,
+          assets: removePublishDetails(bulkUnPublishObj.assets),
           locales: [bulkUnPublishObj.locale || 'en-us'],
           environments: bulkUnPublishObj.environments,
         }),
