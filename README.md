@@ -10,6 +10,11 @@ Contentstack publishing script lets you auto publish your entries and assets dep
 - Publish the assets of a stack 
 - Publish the entries of a stack
 - Unpublish entries/assets of a stack
+- Publish edits made on entries on particular environment
+- Publish entries/assets from one environment to other
+- Publish Localized entries when nonlocalized field of master Entry is updated
+- Update and publish entries when a new field is added to content type
+- Revert published entries through script from logs
 
 ### Usage
 #### Install dependencies:
@@ -22,10 +27,10 @@ $ npm install
 #### Specify Stack details in config file(config/index.js)
 ```sh
 $ module.exports = {
-	apikey:'', //api key of the stack
-	apiEndPoint:'https://api.contentstack.io',
-	cdnEndPoint:'https://cdn.contentstack.io',
-	manageToken:'',//management token for the stack
+  apikey:'', //api key of the stack
+  apiEndPoint:'https://api.contentstack.io',
+  cdnEndPoint:'https://cdn.contentstack.io',
+  manageToken:'',//management token for the stack
 }
 ```
 
@@ -38,12 +43,12 @@ $ module.exports = {
 
 ```sh
 $ module.exports = {
-	publish_unpublished_env:{
-		contentTypes:['test'], //list of contentTypes
-		sourceEnv : 'staging', //sourceEnv
-		environments:['testdin1996'],
-		locales:['en-us']
-	}
+  publish_unpublished_env:{
+    contentTypes:['test'], //list of contentTypes
+    sourceEnv : 'staging', //sourceEnv
+    environments:['testdin1996'],
+    locales:['en-us']
+  }
 }  
 ```
 **Start publishing**
@@ -59,10 +64,10 @@ $ npm run publish_unpublish
 
 ```sh
 $ module.exports = {
-	publish_assets:{
-		environments:['bulktest'],
-		folderUid:"cs_root" //Id of the folder to be published, cs_root for assets
-	}
+  publish_assets:{
+    environments:['bulktest'],
+    folderUid:"cs_root" //Id of the folder to be published, cs_root for assets
+  }
 }  
 ```
 **Start publishing**
@@ -77,13 +82,13 @@ $ npm run publish_assets
 
 ```sh
 $ module.exports = {
-	publish_entries:{
-		contentTypes:['redirect_rule'], //list of contentTypes which needs to be published
-		locales:['en-us'], //list of locales which need to be considered for mentioned CTs
-		environments:['bulktest'], // destination publish environments
-		bulkPublish:true, //flag to bulk publish entries(uses bulk publish apis)
-		publishAllContentTypes : false //if you want to publish entire contentTypes
-	}	
+  publish_entries:{
+    contentTypes:['redirect_rule'], //list of contentTypes which needs to be published
+    locales:['en-us'], //list of locales which need to be considered for mentioned CTs
+    environments:['bulktest'], // destination publish environments
+    bulkPublish:true, //flag to bulk publish entries(uses bulk publish apis)
+    publishAllContentTypes : false //if you want to publish entire contentTypes
+  } 
 }  
 ```
 **Start publishing**
@@ -97,7 +102,7 @@ $ npm run publish_entries
 
 ```sh
 $ module.exports = {
-	bulkUnpublish :{
+  bulkUnpublish :{
     filter:{
       environment: 'bulktest', //source environment
       content_type_uid: '', //contentType filters
@@ -113,6 +118,104 @@ $ module.exports = {
 ```sh
 $ npm run unpublish
 ```
+#### Case 5) Publish edits made on entries published to specific environment
+
+**Specify case details in config file**
+
+```sh
+$ module.exports = {
+    publish_edits_on_env: {
+    contentTypes: ['test','helloworld'], 
+    sourceEnv: 'test',
+    environments: ['test'],
+    locales: ['en-us',],
+  },
+}  
+```
+**Start publishing**
+
+```sh
+$ npm run publish_edits
+```
+#### Case 6) Publish entries and assets from one environment to other
+
+**Specify case details in config file**
+
+```sh
+$ module.exports = {
+  cross_env_publish:{
+     filter: {
+      environment: 'bulktest', // source environment
+      content_type_uid: '', // contentType filters
+      locale: 'en-us', // locale filters
+      type: 'asset_published,entry_published',
+    },
+    deliveryToken: '', // deliveryToken of the source environment
+    destEnv:'' //environment where it needs to be published
+  }
+}  
+```
+**Start publishing**
+
+```sh
+$ npm run cross_publish
+```
+#### Case 7) Publish Localized entries when nonlocalized field of master Entry is updated
+
+**Specify case details in config file**
+
+```sh
+$ module.exports = {
+  nonlocalized_field_changes: {
+    sourceEnv: 'production', //source Environment
+    contentTypes: ['testdin'],
+    environments: ['production'], //publishing Environments
+  },
+}  
+```
+
+**Start publishing**
+
+```sh
+$ npm run publish_localized
+```
+#### Case 8) Update and publish entries when a new field is added to contentType
+
+**Specify case details in config file**
+
+```sh
+$ module.exports = {
+  addFields: {
+    deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
+    locales: ['en-us'],
+    contentTypes: ['helloworld'], // list to contentType entries to be updated
+    environments: ['test'], // list of environments where it needs to be published
+    defaults: {
+      number: null,
+      boolean: false,
+      isodate: [],
+      file: null,
+      reference: [],
+    },
+  },
+}  
+```
+**Start publishing**
+
+```sh
+$ npm run add_fields
+```
+
+#### Case 9) Restore/unpublishe entries published through script using logs
+
+**Start publishing**
+
+```sh
+$ npm run revert ${logFilename}
+```
+**logFilename is success logs of particular execution** 
+
+**For example npm run revert 1587270350288.bulkPublishEntries.sucess**
 
 #### Retrying failed Entries 
 Entries which failed to publish are stored in logs directory with unique name ending with .error. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it
@@ -129,3 +232,10 @@ for example
 ##### Case 2:NA
 ##### Case 3:
 - For less publish failure of entries we recommend you to try one contenttype at a time
+##### Case 4:NA
+##### Case 5:NA
+##### Case 6:NA
+##### Case 7:NA
+##### Case 8:
+- Does not work on custom field 
+- Does not work on mandatory fields
