@@ -31,13 +31,13 @@ module.exports = {
   },
   cross_env_publish: {
     filter: {
-      environment: 'bulktest', // source environment
+      environment: 'd96', // source environment
       content_type_uid: '', // contentType filters
       locale: 'en-us', // locale filters
       type: 'asset_published,entry_published',
     },
-    deliveryToken: '', // deliveryToken of the source environment
-    destEnv: [''], // environment where it needs to be published
+    deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the source environment
+    destEnv: ['d96'], // environment where it needs to be published
   },
   publish_edits_on_env: {
     contentTypes: ['404'],

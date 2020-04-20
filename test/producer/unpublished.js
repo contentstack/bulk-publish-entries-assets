@@ -100,7 +100,7 @@ describe('testing unpublish case', () => {
   it('testing syncEntries call', async () => {
 
     let queryParams = getQueryParams(dummyConfig.bulkUnpublish.filter)
-    expect(await getSyncEntries("en-us",queryParams)).toBeTruthy()
+    expect(await getSyncEntries("en-us",queryParams)).toBeUndefined()
 
   });
 

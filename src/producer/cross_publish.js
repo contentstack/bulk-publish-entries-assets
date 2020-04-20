@@ -27,28 +27,30 @@ function getQueryParams(filter) {
 }
 
 function bulkAction(items) {
-  items.forEach((entry, index) => {
+  items.forEach((item, index) => {
     changedFlag = true;
-    if (bulkUnPublishSet.length < 10 && entry.type === 'entry_published') {
-      if (entry.data.publish_details) {
-        entry.data.publish_details.version = entry.data._version;
+    if (bulkUnPublishSet.length < 10 && item.type === 'entry_published') {
+      if (item.data.publish_details) {
+        item.data.publish_details.version = item.data._version;
       }
       bulkUnPublishSet.push({
-        uid: entry.data.uid,
-        content_type: entry.content_type_uid,
-        locale: entry.data.locale,
-        publish_details: [entry.data.publish_details] || [],
+        uid: item.data.uid,
+        content_type: item.content_type_uid,
+        locale: item.data.locale,
+        version:item.data['_version'],
+        publish_details: [item.data.publish_details] || [],
       });
     }
 
-    if (bulkUnPulishAssetSet.length < 10 && entry.type === 'asset_published') {
-      if (entry.data.publish_details) {
-        entry.data.publish_details.version = entry.data._version;
+    if (bulkUnPulishAssetSet.length < 10 && item.type === 'asset_published') {
+      if (item.data.publish_details) {
+        item.data.publish_details.version = item.data._version;
       }
 
       bulkUnPulishAssetSet.push({
-        uid: entry.data.uid,
-        publish_details: [entry.data.publish_details] || [],
+        uid: item.data.uid,
+        version:item.data['_version'],
+        publish_details: [item.data.publish_details] || [],
       });
     }
 
