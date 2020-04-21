@@ -18,7 +18,6 @@ Contentstack publishing script lets you auto publish your entries and assets dep
 
 *NOTE:* **Publishing process will fail if Required/Mandatory fields are empty**
 
-***
 ### Usage
 #### Install dependencies:
 
@@ -210,6 +209,7 @@ $ npm run add_fields
 ```
 
 #### Case 9) Restore/unpublishe entries published through script using logs
+##### In this case, the published entries will be reverted back to their previous state.
 
 **Start publishing**
 
@@ -242,3 +242,4 @@ for example
 ##### Case 8:
 - Does not work on custom field 
 - Does not work on mandatory fields
+

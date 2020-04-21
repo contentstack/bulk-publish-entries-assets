@@ -8,7 +8,6 @@ module.exports = {
     sourceEnv: 'abhnv_test_env_two',
     locale: 'ar-dz',
     environments: ['abhnv_test_env_two'],
-    bulkPublish: true,
   },
   publish_assets: {
     environments: ['test'],

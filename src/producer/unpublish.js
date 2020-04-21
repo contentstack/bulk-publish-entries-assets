@@ -97,6 +97,8 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
         access_token: config.bulkUnpublish.deliveryToken,
       },
     };
+
+    console.log(conf)
     const entriesResponse = await req(conf);
     if (entriesResponse.items.length > 0) {
       bulkAction(entriesResponse.items);
@@ -120,12 +122,6 @@ function setConfig(conf) {
   queue.config = conf;
 }
 
-setConfig(config);
-
-async function start() {
-  const queryParams = getQueryParams(config.bulkUnpublish.filter);
-  await getSyncEntries(config.bulkUnpublish.filter.locale, queryParams);
-}
 
 module.exports = {
   getSyncEntries,
@@ -133,12 +129,20 @@ module.exports = {
   getQueryParams
 };
 
+setConfig(config);
+
+async function start() {
+  const queryParams = getQueryParams(config.bulkUnpublish.filter);
+  await getSyncEntries(config.bulkUnpublish.filter.locale, queryParams);
+}
+
+
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
     retryFailedLogs(process.argv.slice(2)[1], queue);
   }
 } else {
-  start();
+  //start();
 }
 
-start();
+//start();

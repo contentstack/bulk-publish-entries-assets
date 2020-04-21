@@ -1,9 +1,10 @@
 module.exports = {
-  apikey: 'dummyApiKey',
+  apikey: 'tt',
   contentTypes: ['test'],
   apiEndPoint: 'https://api.localhost.com',
   manageToken: 'dummyManageToken',
   cdnEndPoint: 'https://cdn.localhost.com',
+  deliveryToken:'dummydeliveryToken',
   publish_unpublished_env: {
     contentTypes: ['dummyContentType'],
     sourceEnv: 'dummyEnvironment',
@@ -28,7 +29,7 @@ module.exports = {
       locale: 'en-us', // locale filters
       type: 'asset_published,entry_published',
     },
-    deliveryToken: 'dummyDeliveryToken', // deliveryToken of the environment
+    deliveryToken: 'dummydeliveryToken', // deliveryToken of the environment
   },
   cross_env_publish: {
     filter: {

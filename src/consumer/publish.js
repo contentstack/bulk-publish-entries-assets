@@ -39,13 +39,13 @@ async function bulkPublish(bulkPublishObj, config) {
       try {
         const bulkPublishEntriesResponse = await req(conf);
         if (bulkPublishEntriesResponse.notice && !bulkPublishEntriesResponse.error_message) {
-          console.log(chalk.green(`Bulk entries sent for publish  ${JSON.stringify(bulkPublishObj.entries)}`));
+          console.log(chalk.green(`Bulk entries sent for publish  ${JSON.stringify(removePublishDetails(bulkPublishObj.entries))}`));
           addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'info');
         } else {
           throw bulkPublishEntriesResponse;
         }
       } catch (error) {
-        console.log(chalk.red(`Bulk entries ${JSON.stringify(bulkPublishObj.entries)} failed to publish with error ${JSON.stringify(error)}`));
+        console.log(chalk.red(`Bulk entries ${JSON.stringify(removePublishDetails(bulkPublishObj.entries))} failed to publish with error ${JSON.stringify(error)}`));
         addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
       }
       break;
@@ -67,13 +67,13 @@ async function bulkPublish(bulkPublishObj, config) {
       try {
         const bulkPublishAssetsResponse = await req(conf);
         if (bulkPublishAssetsResponse.notice && !bulkPublishAssetsResponse.error_message) {
-          console.log(chalk.green(`Bulk assets sent for publish ${JSON.stringify(bulkPublishObj.assets)}`));
+          console.log(chalk.green(`Bulk assets sent for publish ${JSON.stringify(removePublishDetails(bulkPublishObj.assets))}`));
           addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'info');
         } else {
           throw bulkPublishAssetsResponse;
         }
       } catch (error) {
-        console.log(chalk.red(`Bulk assets ${JSON.stringify(bulkPublishObj.assets)} failed to publish with error ${JSON.stringify(error.message || error)}`));
+        console.log(chalk.red(`Bulk assets ${JSON.stringify(removePublishDetails(bulkPublishObj.assets))} failed to publish with error ${JSON.stringify(error.message || error)}`));
         addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
       }
       break;
@@ -138,7 +138,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
           throw bulkUnPublishAssetsResponse;
         }
       } catch (error) {
-        console.log(chalk.red(`Bulk assets ${JSON.stringify(bulkUnPublishObj.assets)} failed to Unpublish with error ${JSON.stringify(error)}`));
+        console.log(chalk.red(`Bulk assets ${JSON.stringify(removePublishDetails(bulkUnPublishObj.assets))} failed to Unpublish with error ${JSON.stringify(error)}`));
         addLogs(logger, { options: bulkUnPublishObj, api_key: config.apikey }, 'error');
       }
       break;

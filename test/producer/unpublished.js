@@ -15,18 +15,20 @@ describe('testing unpublish case', () => {
 
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
-        api_key: dummyConfig.apikey,
-        access_token: dummyConfig.bulkUnpublish.deliveryToken,
+        api_key: 'tt',
+        access_token: 'tt',
       },
     })
     .get('/v3/stacks/sync')
     .query({
       init:true,
-      type:'entry_publised,asset_published',
+      type:'asset_published,entry_publised',
       locale:'en-us',
       environment:'dummyEnvironment'
     })
     .reply(200, syncEntriesResponse);
+
+
 
     // nock(dummyConfig.cdnEndPoint, {
     //   reqheaders: {
@@ -95,13 +97,12 @@ describe('testing unpublish case', () => {
   });
 
 
-  setConfig(dummyConfig);
 
   it('testing syncEntries call', async () => {
+          setConfig(dummyConfig);
 
     let queryParams = getQueryParams(dummyConfig.bulkUnpublish.filter)
-    expect(await getSyncEntries("en-us",queryParams)).toBeUndefined()
-
+    expect(await getSyncEntries("en-us",queryParams)).toBeTruthy();
   });
 
 

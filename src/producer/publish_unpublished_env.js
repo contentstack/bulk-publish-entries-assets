@@ -13,7 +13,6 @@ let bulkPublishSet = [];
 iniatlizeLogger(logFileName);
 
 queue.consumer = bulkPublish;
-logFileName = 'publish_unpublished_env';
 
 
 async function getEnvironment(environmentName) {
