@@ -11,6 +11,8 @@ Contentstack publishing script lets you auto publish your entries and assets dep
 - Publish the entries of a stack
 - Unpublish entries/assets of a stack
 
+##### This script currently use Bulk API to publish the content. So,in order to run this you need to have Bulk publish feature enabled in your plan.
+
 ### Usage
 #### Install dependencies:
 
@@ -91,7 +93,8 @@ $ module.exports = {
 ```sh
 $ npm run publish_entries
 ```
-#### Case 4) UnPublish all entries/assets of the stack published on particular Environment
+#### Case 4) UnPublish all entries/assets of the stack published on particular Environment.
+###### If you want to unpublish only entries of specific contentType specify its uid in content_type_uid filter and to unpublish only assets or entries at a time, remove entry_published for assets and asset_published for entries from type filter
 
 **Specify case details in config file**
 
@@ -100,9 +103,9 @@ $ module.exports = {
 	bulkUnpublish :{
 		filter:{
 		environment: 'bulktest', //source environment
-		content_type_uid: '', //contentType filters
-		locale: 'en-us', //locale filters
-		type:'entry_published,asset_published'
+		content_type_uid: '', //contentType to be unpublished
+		locale: 'en-us', //locale filter
+		type:'entry_published,asset_published' 
     	},
     deliveryToken:'' //deliveryToken of the  source environment
   }
@@ -130,3 +133,11 @@ for example
 ##### Case 3:
 - For less publish failure of entries we recommend you to try one contenttype at a time
 ##### Case 4:NA
+
+#### Upcoming additions
+- Publish edits made on entries on particular environment
+- Publish entries/assets from one environment to other
+- Publish Localized entries when nonlocalized field of master Entry is updated
+- Update and publish entries when a new field is added to content type
+- Revert published entries through script from logs
+- publishing without using bulk publish api
