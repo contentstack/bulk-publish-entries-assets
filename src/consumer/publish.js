@@ -17,6 +17,135 @@ function removePublishDetails(elements) {
   return elements.map(({ publish_details, ...rest }) => rest);
 }
 
+async function publishEntry(entryObj, config) {
+  const lang = [];
+  lang.push(entryObj.locale);
+  const conf = {
+    url: `${config.apiEndPoint}/v3/content_types/${entryObj.content_type}/entries/${entryObj.entryUid}/publish?locale=${entryObj.locale ? entryObj.locale : 'en-us'}`,
+    method: 'POST',
+    headers: {
+      api_key: config.apikey,
+      authorization: config.manageToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      entry: {
+        environments: entryObj.environments,
+        locales: lang,
+      },
+    }),
+  };
+
+  try {
+    const publishEntryResponse = await req(conf);
+    if (!publishEntryResponse.error_message){
+      console.log(`entry published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`);
+      addLogs(logger, { options: entryObj, api_key: config.apikey },'info')
+    } 
+    else {
+      throw publishEntryResponse;
+    }
+  } catch (error) {
+    console.log(chalk.red(`entry could not be published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale} ${JSON.stringify(error.message || error)}`));
+    addLogs(logger, { options: entryObj, api_key: config.apikey },'error');
+  }
+}
+
+async function publishAsset(assetobj, config) {
+  const conf = {
+    uri: `${config.apiEndPoint}/v3/assets/${assetobj.assetUid}/publish`,
+    method: 'POST',
+    headers: {
+      api_key: config.apikey,
+      authorization: config.manageToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      asset: {
+        environments: assetobj.environments,
+        locales: [assetobj.locale || "en-us"],
+      },
+    }),
+  };
+  try {
+    const publishAssetResponse = await req(conf);
+    if (!publishAssetResponse.error_message){
+      console.log(`asset published with asset Uid =${assetobj.assetUid}`);
+      addLogs(logger, { options: assetobj, api_key: config.apikey },'info');
+    } 
+    else {
+      throw publishAssetResponse;
+    }
+  } catch (error) {
+    console.log(chalk.red(`Could not publish Error ${JSON.stringify(error)}`));
+    addLogs(logger, { options: assetobj, api_key: config.apikey },'error');
+  }
+}
+
+async function UnpublishEntry(entryObj, config) {
+  const lang = [];
+  lang.push(entryObj.locale);
+  const conf = {
+    url: `${config.apiEndPoint}/v3/content_types/${entryObj.content_type}/entries/${entryObj.entryUid}/unpublish?locale=${entryObj.locale ? entryObj.locale : 'en-us'}`,
+    method: 'POST',
+    headers: {
+      api_key: config.apikey,
+      authorization: config.manageToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      entry: {
+        environments: entryObj.environments,
+        locales: lang,
+      },
+    }),
+  };
+
+  try {
+    const publishEntryResponse = await req(conf);
+    if (!publishEntryResponse.error_message){
+      console.log(`entry Unpublished with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`);
+      addLogs(logger, { options: entryObj, api_key: config.apikey },'info')
+    } 
+    else {
+      throw publishEntryResponse;
+    }
+  } catch (error) {
+    console.log(chalk.red(`entry could not be Unpublished with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale} ${JSON.stringify(error.message || error)}`));
+    addLogs(logger, { options: entryObj, api_key: config.apikey },'error');
+  }
+}
+async function UnpublishAsset(assetobj, config) {
+  const conf = {
+    uri: `${config.apiEndPoint}/v3/assets/${assetobj.assetUid}/unpublish`,
+    method: 'POST',
+    headers: {
+      api_key: config.apikey,
+      authorization: config.manageToken,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      asset: {
+        environments: assetobj.environments,
+        locales: [assetobj.locale || "en-us"],
+      },
+    }),
+  };
+  try {
+    const publishAssetResponse = await req(conf);
+    if (!publishAssetResponse.error_message){
+      console.log(`asset Unpublished with asset Uid =${assetobj.assetUid}`);
+      addLogs(logger, { options: assetobj, api_key: config.apikey },'info');
+    } 
+    else {
+      throw publishAssetResponse;
+    }
+  } catch (error) {
+    console.log(chalk.red(`Could not Unpublish Error ${JSON.stringify(error)}`));
+    addLogs(logger, { options: assetobj, api_key: config.apikey },'error');
+  }
+}
+
 async function bulkPublish(bulkPublishObj, config) {
   let conf;
   // addLogs(logger,bulkPublishObj);
@@ -151,4 +280,8 @@ module.exports = {
   bulkPublish,
   bulkUnPublish,
   iniatlizeLogger,
+  publishEntry,
+  publishAsset,
+  UnpublishEntry,
+  UnpublishAsset
 };

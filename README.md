@@ -88,7 +88,6 @@ $ module.exports = {
     contentTypes:['redirect_rule'], //list of contentTypes which needs to be published
     locales:['en-us'], //list of locales which need to be considered for mentioned CTs
     environments:['bulktest'], // destination publish environments
-    bulkPublish:true, //flag to bulk publish entries(uses bulk publish apis)
     publishAllContentTypes : false //if you want to publish entire contentTypes
   } 
 }  
@@ -153,7 +152,7 @@ $ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: '', // deliveryToken of the source environment
-    destEnv:'' //environment where it needs to be published
+    destEnv:['']     //environments where it needs to be published
   }
 }  
 ```

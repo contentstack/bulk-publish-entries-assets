@@ -1,15 +1,21 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishAsset, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
 let logFileName;
 let bulkPublishSet = [];
 
-queue.consumer = bulkPublish;
-logFileName = 'bulkPublishAssets';
+if (config.publish_assets.bulkPublish) {
+  queue.consumer = bulkPublish;
+  logFileName = 'bulkPublishAssets';
+} else {
+  queue.consumer = publishAsset;
+  logFileName = 'PublishAssets';
+}
+
 
 iniatlizeLogger(logFileName);
 
@@ -29,22 +35,25 @@ async function getAssets(folder = 'cs_root', skip = 0) {
         if (asset.is_dir === true) {
           return getAssets(asset.uid, 0);
         }
-        if (bulkPublishSet.length < 10) {
-          bulkPublishSet.push({
-            uid: asset.uid,
-            publish_details: asset.publish_details || [],
-          });
-        }
-        if (bulkPublishSet.length === 10) {
-          queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
-          bulkPublishSet = [];
-        }
+        if (config.publish_assets.bulkPublish) {
+          if (bulkPublishSet.length < 10) {
+            bulkPublishSet.push({
+              uid: asset.uid,
+              publish_details: asset.publish_details || [],
+            });
+          }
+          if (bulkPublishSet.length === 10) {
+            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
+            bulkPublishSet = [];
+          }
 
-        if (assetResponse.assets.length - 1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length < 10) {
-          queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
-          bulkPublishSet = [];
+          if (assetResponse.assets.length - 1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length < 10) {
+            queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
+            bulkPublishSet = [];
+          }
+        } else {
+          queue.Enqueue({ assetUid: asset.uid, publish_details: asset.publish_details, environments: config.publish_assets.environments });
         }
-
         return true;
       });
       if (skip === assetResponse.count) {

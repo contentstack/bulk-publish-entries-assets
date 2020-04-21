@@ -1,7 +1,7 @@
 const Queue = require('../util/queue');
 let config = require('../../config/');
 const req = require('../util/request');
-const { bulkUnPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkUnPublish,UnpublishEntry,UnpublishAsset, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
@@ -11,6 +11,7 @@ let bulkUnPulishAssetSet = [];
 queue.consumer = bulkUnPublish;
 let changedFlag = false;
 
+if(config.)
 const logFileName = 'bulkUnPublish';
 
 iniatlizeLogger(logFileName);
@@ -57,7 +58,7 @@ function bulkAction(items) {
 
     if (bulkUnPulishAssetSet.length === 10) {
       queue.Enqueue({
-        assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
+        assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.Unpublish.filter.locale, environments: [config.Unpublish.filter.environment],
       });
       bulkUnPulishAssetSet = [];
       return;
@@ -65,7 +66,7 @@ function bulkAction(items) {
 
     if (bulkUnPublishSet.length === 10) {
       queue.Enqueue({
-        entries: bulkUnPublishSet, locale: config.bulkUnpublish.filter.locale, Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
+        entries: bulkUnPublishSet, locale: config.Unpublish.filter.locale, Type: 'entry', environments: [config.Unpublish.filter.environment],
       });
       bulkUnPublishSet = [];
       return;
@@ -73,7 +74,7 @@ function bulkAction(items) {
 
     if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length > 0) {
       queue.Enqueue({
-        assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.bulkUnpublish.filter.locale, environments: [config.bulkUnpublish.filter.environment],
+        assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.Unpublish.filter.locale, environments: [config.Unpublish.filter.environment],
       });
       bulkUnPulishAssetSet = [];
       return;
@@ -81,7 +82,7 @@ function bulkAction(items) {
 
     if (index === items.length - 1 && bulkUnPublishSet.length <= 10 && bulkUnPublishSet.length > 0) {
       queue.Enqueue({
-        entries: bulkUnPublishSet, locale: config.bulkUnpublish.filter.locale, Type: 'entry', environments: [config.bulkUnpublish.filter.environment],
+        entries: bulkUnPublishSet, locale: config.Unpublish.filter.locale, Type: 'entry', environments: [config.Unpublish.filter.environment],
       });
       bulkUnPublishSet = [];
     }
@@ -94,11 +95,9 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
       uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
       headers: {
         api_key: config.apikey,
-        access_token: config.bulkUnpublish.deliveryToken,
+        access_token: config.Unpublish.deliveryToken,
       },
     };
-
-    console.log(conf)
     const entriesResponse = await req(conf);
     if (entriesResponse.items.length > 0) {
       bulkAction(entriesResponse.items);
@@ -132,8 +131,8 @@ module.exports = {
 setConfig(config);
 
 async function start() {
-  const queryParams = getQueryParams(config.bulkUnpublish.filter);
-  await getSyncEntries(config.bulkUnpublish.filter.locale, queryParams);
+  const queryParams = getQueryParams(config.Unpublish.filter);
+  await getSyncEntries(config.Unpublish.filter.locale, queryParams);
 }
 
 

@@ -1,7 +1,7 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
@@ -10,9 +10,15 @@ let changedFlag = false;
 let logFileName = 'publish_unpublished_env';
 let bulkPublishSet = [];
 
-iniatlizeLogger(logFileName);
+if (config.publish_unpublished_env.bulkPublish) {
+  logFileName = 'Bulk_publish_draft';
+  queue.consumer = bulkPublish;
+} else {
+  logFileName = 'publish_draft';
+  queue.consumer = publishEntry;
+}
 
-queue.consumer = bulkPublish;
+iniatlizeLogger(logFileName);
 
 
 async function getEnvironment(environmentName) {
@@ -35,7 +41,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      url: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries`,
+      url: `${config.apiEndPoint}/v3/content_types/${contentType}/entries`,
       qs: {
         include_count: true,
         skip: skipCount,
@@ -54,27 +60,35 @@ async function getEntries(contentType, environmentUid, skip = 0) {
         const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
         if (!publishedEntry) {
           changedFlag = true;
-          if (bulkPublishSet.length < 10) {
-            bulkPublishSet.push({
-              uid: entry.uid,
-              content_type: contentType,
-              locale,
-              publish_details: entry.publish_details || [],
+          if (config.publish_unpublished_env.bulkPublish) {
+            if (bulkPublishSet.length < 10) {
+              bulkPublishSet.push({
+                uid: entry.uid,
+                content_type: contentType,
+                locale,
+                publish_details: entry.publish_details || [],
+              });
+            }
+          } else {
+            queue.Enqueue({
+              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
             });
           }
         }
-        if (bulkPublishSet.length === 10) {
-          queue.Enqueue({
-            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-          });
-          bulkPublishSet = [];
-          return;
-        }
-        if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
-          queue.Enqueue({
-            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-          });
-          bulkPublishSet = [];
+        if (config.publish_unpublished_env.bulkPublish) {
+          if (bulkPublishSet.length === 10) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+            });
+            bulkPublishSet = [];
+            return;
+          }
+          if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+            });
+            bulkPublishSet = [];
+          }
         }
       });
     }
@@ -119,7 +133,7 @@ module.exports = {
   getEntries,
   getEnvironment,
   setConfig,
-  start
+  start,
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {

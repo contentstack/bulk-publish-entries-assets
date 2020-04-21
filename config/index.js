@@ -4,18 +4,21 @@ module.exports = {
   cdnEndPoint: 'https://cdn.contentstack.io',
   manageToken: 'cs9cd7a13a2ac9ab9311d2f898', // management token of the stack
   publish_unpublished_env: {
-    contentTypes: ['ct_b'],
-    sourceEnv: 'abhnv_test_env_two',
+    contentTypes: ['helloworld'],
+    sourceEnv: 'd96',
     locale: 'ar-dz',
-    environments: ['abhnv_test_env_two'],
+    environments: ['d96'],
+    bulkPublish:false,
   },
   publish_assets: {
-    environments: ['test'],
-    folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
+    environments: ['d96'],
+    folderUid: 'blt0829fdfd03dfabc5', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
+    bulkPublish: false,
   },
   publish_entries: {
-    contentTypes: ['redirect_rule'],
+    contentTypes: ['extensions'],
     locales: ['en-us'],
+    bulkPublish:false,
     environments: ['d96'],
     publishAllContentTypes: false,
   },
@@ -27,6 +30,7 @@ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the environment
+    bulkUnpublish:false,
   },
   cross_env_publish: {
     filter: {
