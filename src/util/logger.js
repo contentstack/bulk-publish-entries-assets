@@ -8,7 +8,7 @@ module.exports.getLoggerInstance = (fileName) => {
   const logger = winston.createLogger({
     transports: [
       new winston.transports.File({ filename: `${filename}.error`, level: 'error' }),
-      new winston.transports.File({ filename: `${filename}.sucess`, levelL: 'info' }),
+      new winston.transports.File({ filename: `${filename}.success`, level: 'info' }),
     ],
   });
   return logger;
