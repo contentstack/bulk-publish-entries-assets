@@ -1,20 +1,26 @@
 const _ = require('lodash');
 const Queue = require('../util/queue');
-let config = require('../../config/');
+let config = require('../../config');
 const req = require('../util/request');
-const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 let changedFlag = false;
 const queue = new Queue();
 let skipCount;
-let logFileName = 'nonlocalized_field_changes';
+let logFileName;
 let bulkPublishSet = [];
 
 iniatlizeLogger(logFileName);
 
-queue.consumer = bulkPublish;
-logFileName = 'nonlocalized_field_changes';
+if (config.nonlocalized_field_changes.bulkPublish) {
+  logFileName = 'bulk_nonlocalized_field_changes';
+  queue.consumer = bulkPublish;
+} else {
+  logFileName = 'nonlocalized_field_changes';
+  queue.consumer = publishEntry;
+}
+
 
 function setConfig(conf) {
   config = conf;
@@ -221,20 +227,26 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
             let localizedEntry = await getLocalizedEntry(entry, contentType, locale.code);
             localizedEntry = localizedEntry || {};
             if (checkNonLocalizedFieldChanges(schema, entry, localizedEntry)) {
-              if (bulkPublishSet.length < 10) {
-                bulkPublishSet.push({
-                  uid: entry.uid,
-                  content_type: contentType,
-                  locale: locale.code,
-                  publish_details: localizedEntry.publish_details || [],
-                });
-              }
-              if (bulkPublishSet.length === 10) {
+              if (config.nonlocalized_field_changes.bulkPublish) {
+                if (bulkPublishSet.length < 10) {
+                  bulkPublishSet.push({
+                    uid: entry.uid,
+                    content_type: contentType,
+                    locale: locale.code,
+                    publish_details: localizedEntry.publish_details || [],
+                  });
+                }
+                if (bulkPublishSet.length === 10) {
+                  queue.Enqueue({
+                    entries: bulkPublishSet, locale: locale.code, Type: 'entry', environments: config.nonlocalized_field_changes.environments,
+                  });
+                  bulkPublishSet = [];
+                  return;
+                }
+              } else {
                 queue.Enqueue({
-                  entries: bulkPublishSet, locale: locale.code, Type: 'entry', environments: config.nonlocalized_field_changes.environments,
+                  content_type: contentType, publish_details: entry.publish_details || [], environments: config.nonlocalized_field_changes.environments, entryUid: entry.uid, locale: locale.code,Type: 'entry'
                 });
-                bulkPublishSet = [];
-                return;
               }
             } else {
               console.log(`No Change in NonLocalized field for contentType ${contentType} entryUid ${entry.uid} with locale ${locale.code}`);
@@ -314,7 +326,11 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    retryFailedLogs(process.argv.slice(2)[1], queue);
+    if (config.nonlocalized_field_changes.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
+    }else {
+      retryFailedLogs(process.argv.slice(2)[1],{entryQueue:queue},'publish');
+    }
   }
 } else {
   start();

@@ -67,9 +67,8 @@ async function getEntries(contentType, locale, skip = 0) {
           bulkPublishSet = [];
         } // bulkPublish
       } else {
-        console.log(index)
         queue.Enqueue({
-          content_type: contentType, publish_details:entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
+          content_type: contentType, publish_details:entry.publish_details || [], environments: config.publish_entries.environments, entryUid: entry.uid, locale,Type: 'entry'
         });
       }
     });
@@ -152,7 +151,11 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    retryFailedLogs(process.argv.slice(2)[1], queue);
+    if (config.nonlocalized_field_changes.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
+    }else {
+      retryFailedLogs(process.argv.slice(2)[1], {entryQueue:queue},'publish');
+    }
   }
 } else {
   start();

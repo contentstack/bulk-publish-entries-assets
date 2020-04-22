@@ -21,7 +21,7 @@ async function publishEntry(entryObj, config) {
   const lang = [];
   lang.push(entryObj.locale);
   const conf = {
-    url: `${config.apiEndPoint}/v3/content_types/${entryObj.content_type}/entries/${entryObj.entryUid}/publish?locale=${entryObj.locale ? entryObj.locale : 'en-us'}`,
+    url: `${config.cdnEndPoint}/v3/content_types/${entryObj.content_type}/entries/${entryObj.entryUid}/publish?locale=${entryObj.locale ? entryObj.locale : 'en-us'}`,
     method: 'POST',
     headers: {
       api_key: config.apikey,
@@ -39,7 +39,7 @@ async function publishEntry(entryObj, config) {
   try {
     const publishEntryResponse = await req(conf);
     if (!publishEntryResponse.error_message){
-      console.log(`entry published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`);
+      console.log(chalk.green(`entry published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`));
       addLogs(logger, { options: entryObj, api_key: config.apikey },'info')
     } 
     else {
@@ -53,7 +53,7 @@ async function publishEntry(entryObj, config) {
 
 async function publishAsset(assetobj, config) {
   const conf = {
-    uri: `${config.apiEndPoint}/v3/assets/${assetobj.assetUid}/publish`,
+    uri: `${config.cdnEndPoint}/v3/assets/${assetobj.assetUid}/publish`,
     method: 'POST',
     headers: {
       api_key: config.apikey,
@@ -70,7 +70,7 @@ async function publishAsset(assetobj, config) {
   try {
     const publishAssetResponse = await req(conf);
     if (!publishAssetResponse.error_message){
-      console.log(`asset published with asset Uid =${assetobj.assetUid}`);
+      console.log(chalk.green(`asset published with asset Uid =${assetobj.assetUid}`));
       addLogs(logger, { options: assetobj, api_key: config.apikey },'info');
     } 
     else {
@@ -104,7 +104,7 @@ async function UnpublishEntry(entryObj, config) {
   try {
     const publishEntryResponse = await req(conf);
     if (!publishEntryResponse.error_message){
-      console.log(`entry Unpublished with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`);
+      console.log(chalk.green(`entry Unpublished with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`));
       addLogs(logger, { options: entryObj, api_key: config.apikey },'info')
     } 
     else {
@@ -275,6 +275,179 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
       console.log('No such type');
   }
 }
+// short-term fix for reverting to previous versions 
+async function publishUsingVersion(bulkPublishObj, config) {
+  let conf;
+  let successfullyPublished = [];
+  let failedToPublish = [];
+  let counter = 0;
+  // addLogs(logger,bulkPublishObj);
+  switch (bulkPublishObj.Type) {
+    case 'entry':
+      successfullyPublished = [];
+      failedToPublish = [];
+      counter = 0;
+      let aggregatedEntries = {
+        ...bulkPublishObj
+      };
+      bulkPublishObj.entries.forEach(async (entry, entryIndex) => {
+        conf = {
+          uri: `${config.cdnEndPoint}/v3/content_types/${entry.content_type}/entries/${entry.uid}/publish`,
+          method: 'POST',
+          headers: {
+            api_key: config.apikey,
+            authorization: config.manageToken,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "entry": {
+              "environments": bulkPublishObj.environments,
+              "locales": [bulkPublishObj.locale]
+            },
+            locale: bulkPublishObj.locale,
+            version: entry.version
+          })
+        }
+
+        const publishEntriesResponse = await req(conf);
+        try {
+          if (publishEntriesResponse.notice && !publishEntriesResponse.error_message) {
+            console.log(chalk.green(`Entry sent for publish ${JSON.stringify(entry)}`));
+
+            ++counter;
+
+            successfullyPublished.push({
+              ...entry
+            });
+
+            if (counter === bulkPublishObj.entries.length) {
+              if (successfullyPublished.length > 0) {
+                aggregatedEntries.entries = successfullyPublished;
+                addLogs(logger, { options: aggregatedEntries, api_key: config.apikey }, 'info');
+              }
+
+              if (failedToPublish.length > 0) {
+                aggregatedEntries.entries = failedToPublish;
+                addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
+              }
+            }
+
+          } else {
+
+            failedToPublish.push({
+              ...entry
+            })
+
+            // throw bulkPublishEntriesResponse;
+          }
+        } catch (error) {
+
+          ++counter;
+          failedToPublish.push({
+            ...entry
+          })
+
+          if (counter === bulkPublishObj.entries.length) {
+            if (successfullyPublished.length > 0) {
+              aggregatedEntries.entries = successfullyPublished
+              addLogs(logger, { options: aggregatedEntries, api_key: config.apikey }, 'info');
+            }
+
+            if (failedToPublish.length > 0) {
+              aggregatedEntries.entries = failedToPublish;
+              addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
+            }
+          }
+
+          console.log(chalk.red(`Entry ${JSON.stringify(entry)} failed to publish with error ${JSON.stringify(error)}`));
+        }
+      });
+
+      break;
+    case 'asset':
+      successfullyPublished = [];
+      failedToPublish = [];
+      counter = 0;
+      let aggregatedAssets = {
+        ...bulkPublishObj
+      };
+      bulkPublishObj.assets.forEach(async (asset, assetIndex) => {
+        conf = {
+          uri: `${config.cdnEndPoint}/v3/assets/${asset.uid}/publish`,
+          method: 'POST',
+          headers: {
+            api_key: config.apikey,
+            authorization: config.manageToken,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            "asset": {
+              "environments": bulkPublishObj.environments,
+              "locales": [bulkPublishObj.locale]
+            },
+            version: asset.version
+          })
+        }
+
+        try {
+          const publishAssetsResponse = await req(conf);
+          if (publishAssetsResponse.notice && !publishAssetsResponse.error_message) {
+            console.log(chalk.green(`Asset sent for publish ${JSON.stringify(asset)}`));
+
+            ++counter;
+
+            successfullyPublished.push({
+              ...asset
+            });
+
+            if (counter === bulkPublishObj.assets.length) {
+              if (successfullyPublished.length > 0) {
+                aggregatedAssets.assets = successfullyPublished;
+                addLogs(logger, { options: aggregatedAssets, api_key: config.apikey }, 'info');
+              }
+
+              if (failedToPublish.length > 0) {
+                aggregatedAssets.assets = failedToPublish;
+                addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
+              }
+            }
+
+          } else {
+
+            failedToPublish.push({
+              ...asset
+            })
+
+            // throw bulkPublishAssetsResponse;
+          }
+        } catch (error) {
+
+          ++counter;
+          failedToPublish.push({
+            ...asset
+          })
+
+          if (counter === bulkPublishObj.assets.length) {
+            if (successfullyPublished.length > 0) {
+              aggregatedAssets.assets = successfullyPublished
+              addLogs(logger, { options: aggregatedAssets, api_key: config.apikey }, 'info');
+            }
+
+            if (failedToPublish.length > 0) {
+              aggregatedAssets.assets = failedToPublish;
+              addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
+            }
+          }
+
+          console.log(chalk.red(`Asset ${JSON.stringify(asset)} failed to publish with error ${JSON.stringify(error)}`));
+        }
+      });
+
+      break;
+    default:
+      console.log('No such type');
+  }
+}
 
 module.exports = {
   bulkPublish,
@@ -283,5 +456,6 @@ module.exports = {
   publishEntry,
   publishAsset,
   UnpublishEntry,
-  UnpublishAsset
+  UnpublishAsset,
+  publishUsingVersion
 };

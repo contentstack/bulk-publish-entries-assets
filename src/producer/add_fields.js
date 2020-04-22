@@ -1,15 +1,23 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
 queue.consumer = bulkPublish;
-const logFileName = 'addFields';
+let logFileName;
 let bulkPublishSet = [];
 
 let changedFlag = false;
+
+if (config.addFields.bulkPublish) {
+  logFileName = 'bulk_add_fields';
+  queue.consumer = bulkPublish;
+} else {
+  logFileName = 'addFields';
+  queue.consumer = publishEntry;
+}
 
 iniatlizeLogger(logFileName);
 
@@ -199,20 +207,26 @@ async function getEntries(schema, contentType, locale, skip = 0) {
         updatedEntry = removeUnwanted(entry, config.addFields.deleteFields);
         const flag = await updateEntry(updatedEntry, contentType, locale);
         if (flag) {
-          if (bulkPublishSet.length < 10) {
-            bulkPublishSet.push({
-              uid: entry.uid,
-              content_type: contentType,
-              locale,
-              publish_details: entry.publish_details,
-            });
-          }
-          if (bulkPublishSet.length === 10) {
+          if (config.addFields.bulkPublish) {
+            if (bulkPublishSet.length < 10) {
+              bulkPublishSet.push({
+                uid: entry.uid,
+                content_type: contentType,
+                locale,
+                publish_details: entry.publish_details,
+              });
+            }
+            if (bulkPublishSet.length === 10) {
+              queue.Enqueue({
+                entries: bulkPublishSet, locale, Type: 'entry', environments: config.addFields.environments,
+              });
+              bulkPublishSet = [];
+              return;
+            }
+          } else {
             queue.Enqueue({
-              entries: bulkPublishSet, locale, Type: 'entry', environments: config.addFields.environments,
+              content_type: contentType, publish_details: entry.publish_details || [], environments: config.addFields.environments, entryUid: entry.uid, locale,Type: 'entry',
             });
-            bulkPublishSet = [];
-            return;
           }
         } else {
           console.log(`Update Failed for entryUid ${entry.uid} with contentType ${contentType}`);
@@ -232,9 +246,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
     if (skip === entriesResponse.count) {
       return Promise.resolve();
     }
-    return setTimeout(async function(){
-      return await getEntries(contentType, locale, skipCount);
-    },2000)
+    return setTimeout(async () => await getEntries(contentType, locale, skipCount), 2000);
   } catch (err) {
     console.log(err);
   }
@@ -276,7 +288,11 @@ module.exports = {
 // start();
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    retryFailedLogs(process.argv.slice(2)[1], queue);
+    if (config.addFields.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
+    }else {
+      retryFailedLogs(process.argv.slice(2)[1], {entryQueue:queue},'publish');
+    }
   }
 } else {
   start();

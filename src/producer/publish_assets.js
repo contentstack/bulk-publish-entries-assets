@@ -52,7 +52,7 @@ async function getAssets(folder = 'cs_root', skip = 0) {
             bulkPublishSet = [];
           }
         } else {
-          queue.Enqueue({ assetUid: asset.uid, publish_details: asset.publish_details, environments: config.publish_assets.environments });
+          queue.Enqueue({ assetUid: asset.uid, publish_details: asset.publish_details || [], environments: config.publish_assets.environments,Type: 'asset' });
         }
         return true;
       });
@@ -87,7 +87,11 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    retryFailedLogs(process.argv.slice(2)[1], queue);
+    if (config.publish_assets.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
+    }else {
+      retryFailedLogs(process.argv.slice(2)[1], {assetQueue:queue},'publish');
+    }
   }
 } else {
   start();

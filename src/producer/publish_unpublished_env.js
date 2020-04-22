@@ -71,7 +71,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
             }
           } else {
             queue.Enqueue({
-              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
+              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale,Type: 'entry'
             });
           }
         }
@@ -83,7 +83,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
             bulkPublishSet = [];
             return;
           }
-          if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
+          if (index === responseEntries.entries.length - 1 && bulkPublishSet.length < 10 && bulkPublishSet.length > 0) {
             queue.Enqueue({
               entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
             });
@@ -138,7 +138,11 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    retryFailedLogs(process.argv.slice(2)[1], queue);
+    if (config.nonlocalized_field_changes.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
+    }else {
+      retryFailedLogs(process.argv.slice(2)[1], {entryQueue:queue},'publish');
+    }
   }
 } else {
   start();

@@ -22,7 +22,7 @@ module.exports = {
     environments: ['d96'],
     publishAllContentTypes: false,
   },
-  bulkUnpublish: {
+  Unpublish: {
     filter: {
       environment: 'd96', // source environment
       content_type_uid: '', // contentType filters
@@ -30,7 +30,7 @@ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the environment
-    bulkUnpublish:false,
+    bulkUnpublish:true,
   },
   cross_env_publish: {
     filter: {
@@ -40,18 +40,21 @@ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the source environment
-    destEnv: ['d96'], // environment where it needs to be published
+    destEnv: ['h'], // environment where it needs to be published
+    bulkPublish: false
   },
   publish_edits_on_env: {
     contentTypes: ['404'],
-    sourceEnv: 'd96',
-    environments: ['d96'],
+    sourceEnv: 'staging',
+    environments: ['staging'],
     locales: ['en-us'],
+    bulkPublish:false
   },
   nonlocalized_field_changes: {
     sourceEnv: 'production', // source Environment
     contentTypes: ['testdin'],
     environments: ['production'], // publishing Environments
+    bulkPublish:true
   },
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
@@ -66,6 +69,7 @@ module.exports = {
       reference: [],
     },
   },
+  bulkPublish:true
 };
 
 // apiEndPoint:'https://api.contentstack.io',
