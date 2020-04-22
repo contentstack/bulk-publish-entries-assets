@@ -18,7 +18,7 @@ Contentstack publishing script lets you auto publish your entries and assets dep
 
 *NOTE:* **Publishing process will fail if Required/Mandatory fields are empty**
 
-**This Script uses Bulk Publish api to publish the contents, However if the bulk Operation is not enabled for your organization, set the bulkPublish/Unpublish flag in config to false.We recommend using Bulk publish to avoid slow/less failed publishing due to single publish api**
+**This Script uses Bulk Publish api to publish the contents, However if the bulk Operation is not enabled for your organization, set the bulkPublish/Unpublish flag in config to false.We recommend using Bulk publish to avoid slow/less failed publishing due to single entry/asset publish api.**
 
 
 ### Usage
@@ -247,7 +247,7 @@ for example
 ##### Case 1:NA
 ##### Case 2:NA
 ##### Case 3:
-- For less publish failure of entries we recommend you to try one contenttype at a time
+- For less publish failure of entries we recommend you to try one content type at a time
 ##### Case 4:NA
 ##### Case 5:NA
 ##### Case 6:NA

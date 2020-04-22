@@ -31,7 +31,7 @@ async function getEntries(contentType, locale, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}&include_publish_details=true`,
+      uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}&include_publish_details=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,

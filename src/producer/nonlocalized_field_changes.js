@@ -215,7 +215,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
   skipCount = skip;
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${masterLocale || 'en-us'}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_count=true&skip=${skipCount}`,
+      uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${masterLocale || 'en-us'}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_count=true&skip=${skipCount}`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
