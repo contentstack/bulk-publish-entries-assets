@@ -326,12 +326,12 @@ async function mapSeries(iterable, action) {
 setConfig(config);
 
 async function start() {
-  // const ok = await yesno({
-  //   question: `Are you sure you want to revert using the file "${logfilenameProvidedByUser}" ?`
-  // })
-  // if (ok) {
+  const ok = await yesno({
+    question: `Are you sure you want to revert using the file "${logfilenameProvidedByUser}" ?`
+  })
+  if (ok) {
   revertUsingLogs(logfilenameProvidedByUser);
-  // }
+  }
 }
 
 module.exports = {
