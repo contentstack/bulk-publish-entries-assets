@@ -252,8 +252,9 @@ for example
 ##### Case 5:NA
 ##### Case 6:NA
 ##### Case 7:NA
-##### Case 8:NA
-##### Case 9:
-- To publish to a specific version we are using single entry/asset publish api instead of bulkpublish
+##### Case 8:
 - Does not work on custom fields
 - Does not work on mandatory fields
+##### Case 9:
+- To publish to a specific version we are using single entry/asset publish api instead of bulkpublish
+
