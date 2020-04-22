@@ -8,16 +8,16 @@ module.exports = {
     sourceEnv: 'd96',
     locale: 'ar-dz',
     environments: ['d96'],
-    bulkPublish: false, //keep this flag as false if bulkPublish feature is not present in your plan
+    bulkPublish: true, //keep this flag as false if bulkPublish feature is not present in your plan
   },
   publish_assets: {
     environments: ['d96'],
     folderUid: 'blt0829fdfd03dfabc5', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
-    bulkPublish: false,
+    bulkPublish: true,
   },
   publish_entries: {
-    contentTypes: ['extensions'],
-    locales: ['en-us'],
+    contentTypes: ['redirect_rule'],
+    locales: ['en-us','fr-fr'],
     bulkPublish: false,
     environments: ['d96'],
     publishAllContentTypes: false,
@@ -41,14 +41,14 @@ module.exports = {
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the source environment
     destEnv: ['h'], // environment where it needs to be published
-    bulkPublish: false,
+    bulkPublish: true,
   },
   publish_edits_on_env: {
     contentTypes: ['404'],
     sourceEnv: 'staging',
     environments: ['staging'],
     locales: ['en-us'],
-    bulkPublish: false,
+    bulkPublish: true,
   },
   nonlocalized_field_changes: {
     sourceEnv: 'production', // source Environment
@@ -68,8 +68,8 @@ module.exports = {
       file: null,
       reference: [],
     },
+    bulkPublish: true,
   },
-  bulkPublish: true,
 };
 
 // apiEndPoint:'https://api.contentstack.io',

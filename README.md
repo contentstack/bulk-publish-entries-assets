@@ -49,7 +49,8 @@ $ module.exports = {
     contentTypes:['test'], //list of contentTypes
     sourceEnv : 'staging', //sourceEnv
     environments:['testdin1996'],
-    locales:['en-us']
+    locales:['en-us'],
+    bulkPublish: true, //keep this flag as false if bulkPublish feature is not present in your plan
   }
 }  
 ```
@@ -68,7 +69,8 @@ $ npm run publish_unpublish
 $ module.exports = {
   publish_assets:{
     environments:['bulktest'],
-    folderUid:"cs_root" //Id of the folder to be published, cs_root for assets
+    folderUid:"cs_root", //Id of the folder to be published, cs_root for assets
+    bulkPublish: true,
   }
 }  
 ```
@@ -88,7 +90,8 @@ $ module.exports = {
     contentTypes:['redirect_rule'], //list of contentTypes which needs to be published
     locales:['en-us'], //list of locales which need to be considered for mentioned CTs
     environments:['bulktest'], // destination publish environments
-    publishAllContentTypes : false //if you want to publish entire contentTypes
+    publishAllContentTypes : false, //if you want to publish entire contentTypes
+    bulkPublish:true
   } 
 }  
 ```
@@ -106,11 +109,12 @@ $ module.exports = {
   bulkUnpublish :{
     filter:{
       environment: 'bulktest', //source environment
-      content_type_uid: '', //contentType filters
+      content_type_uid: '', //Add content type uid to be unpublished. Keep this blank to consider all
       locale: 'en-us', //locale filters
-      type:'entry_published,asset_published'
+      type:'entry_published,asset_published' //entries and assets both will be unpublished, remove asset_published if u want to unpublish only entries and vice versa.
     },
-    deliveryToken:'' //deliveryToken of the  source environment
+    deliveryToken:'' //deliveryToken of the  source environment,
+    bulkUnpublish: true,
   }
 }  
 ```
@@ -130,6 +134,7 @@ $ module.exports = {
     sourceEnv: 'test',
     environments: ['test'],
     locales: ['en-us',],
+    bulkPublish: true,
   },
 }  
 ```
@@ -147,12 +152,13 @@ $ module.exports = {
   cross_env_publish:{
      filter: {
       environment: 'bulktest', // source environment
-      content_type_uid: '', // contentType filters
+      content_type_uid: '', // //Add content type uid to be unpublished. Keep this blank to consider all
       locale: 'en-us', // locale filters
-      type: 'asset_published,entry_published',
+      type: 'asset_published,entry_published',  //entries and assets both will be unpublished, remove asset_published if u want to unpublish only entries and vice versa.
     },
     deliveryToken: '', // deliveryToken of the source environment
-    destEnv:['']     //environments where it needs to be published
+    destEnv:[''],     //environments where it needs to be published
+    bulkPublish: true,
   }
 }  
 ```
@@ -171,6 +177,7 @@ $ module.exports = {
     sourceEnv: 'production', //source Environment
     contentTypes: ['testdin'],
     environments: ['production'], //publishing Environments
+    bulkPublish: true,
   },
 }  
 ```
@@ -199,6 +206,8 @@ $ module.exports = {
       reference: [],
     },
   },
+  bulkPublish: true,
+
 }  
 ```
 **Start publishing**
@@ -223,6 +232,8 @@ $ npm run revert ${logFilename}
 Entries which failed to publish are stored in logs directory with unique name ending with .error. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it
 ```sh
 $ npm run publish_entries -- -retryFailed ${logFilename} 
+$ npm run publish_assets -- -retryFailed ${logFilename} 
+
 ```
 for example
 //npm run pubish_entries - - -retryFailed 18003bulkPublishEntries.error
@@ -241,4 +252,3 @@ for example
 ##### Case 8:
 - Does not work on custom field 
 - Does not work on mandatory fields
-
