@@ -2,7 +2,7 @@ const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
 const {
-  bulkUnPublish, UnpublishEntry, UnpublishAsset, iniatlizeLogger,
+  bulkPublish, publishEntry, publishAsset, iniatlizeLogger,
 } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
@@ -12,18 +12,17 @@ const assetQueue = new Queue();
 
 let bulkUnPublishSet = [];
 let bulkUnPulishAssetSet = [];
+let changedFlag = false;
 let logFileName;
 
-let changedFlag = false;
 
-
-if (config.Unpublish.bulkUnpublish) {
-  logFileName = 'bulkUnpublish';
-  queue.consumer = bulkUnPublish;
+if (config.cross_env_publish.bulkPublish) {
+  logFileName = 'bulk_cross_publish';
+  queue.consumer = bulkPublish;
 } else {
-  logFileName = 'Unpublish';
-  entryQueue.consumer = UnpublishEntry;
-  assetQueue.consumer = UnpublishAsset;
+  logFileName = 'cross_publish';
+  entryQueue.consumer = publishEntry;
+  assetQueue.consumer = publishAsset;
 }
 
 
@@ -54,12 +53,12 @@ function bulkAction(items) {
       item.data.publish_details.version = item.data._version;
     }
 
-    if (config.Unpublish.bulkUnpublish) {
+    if (config.cross_env_publish.bulkPublish) {
       if (bulkUnPublishSet.length < 10 && item.type === 'entry_published') {
         bulkUnPublishSet.push({
           uid: item.data.uid,
           content_type: item.content_type_uid,
-          locale: item.data.publish_details.locale || 'en-us',
+          locle: item.data.publish_details.locale || 'en-us',
           version: item.data._version,
           publish_details: [item.data.publish_details] || [],
         });
@@ -75,7 +74,7 @@ function bulkAction(items) {
 
       if (bulkUnPulishAssetSet.length === 10) {
         queue.Enqueue({
-          assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.Unpublish.filter.locale, environments: [config.Unpublish.filter.environment],
+          assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.cross_env_publish.filter.locale, environments: config.cross_env_publish.destEnv,
         });
         bulkUnPulishAssetSet = [];
         return;
@@ -83,14 +82,15 @@ function bulkAction(items) {
 
       if (bulkUnPublishSet.length === 10) {
         queue.Enqueue({
-          entries: bulkUnPublishSet, locale: config.Unpublish.filter.locale, Type: 'entry', environments: [config.Unpublish.filter.environment],
+          entries: bulkUnPublishSet, locale: config.cross_env_publish.filter.locale, Type: 'entry', environments: config.cross_env_publish.destEnv,
         });
         bulkUnPublishSet = [];
         return;
       }
+
       if (index === items.length - 1 && bulkUnPulishAssetSet.length <= 10 && bulkUnPulishAssetSet.length > 0) {
         queue.Enqueue({
-          assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.Unpublish.filter.locale, environments: [config.Unpublish.filter.environment],
+          assets: bulkUnPulishAssetSet, Type: 'asset', locale: config.cross_env_publish.filter.locale, environments: config.cross_env_publish.destEnv,
         });
         bulkUnPulishAssetSet = [];
         return;
@@ -98,44 +98,44 @@ function bulkAction(items) {
 
       if (index === items.length - 1 && bulkUnPublishSet.length <= 10 && bulkUnPublishSet.length > 0) {
         queue.Enqueue({
-          entries: bulkUnPublishSet, locale: config.Unpublish.filter.locale, Type: 'entry', environments: [config.Unpublish.filter.environment],
+          entries: bulkUnPublishSet, locale: config.cross_env_publish.filter.locale, Type: 'entry', environments: config.cross_env_publish.destEnv,
         });
         bulkUnPublishSet = [];
       }
     } else {
       if (item.type === 'entry_published') {
         entryQueue.Enqueue({
-          content_type: item.content_type_uid, publish_details: [item.data.publish_details], environments: [config.Unpublish.filter.environment], entryUid: item.data.uid, locale: item.data.publish_details.locale || 'en-us', Type: 'entry',
+          content_type: item.content_type_uid, publish_details: [item.data.publish_details], environments: config.cross_env_publish.destEnv, entryUid: item.data.uid, locale: item.data.publish_details.locale || 'en-us', Type: 'entry',
         });
       }
       if (item.type === 'asset_published') {
         assetQueue.Enqueue({
-          assetUid: item.data.uid, publish_details: [item.data.publish_details], environments: [config.Unpublish.filter.environment], Type: 'entry',
+          assetUid: item.data.uid, publish_details: [item.data.publish_details], environments: config.cross_env_publish.destEnv, Type: 'asset',
         });
       }
     }
   });
 }
 
-async function getSyncEntries(locale, queryParams, paginationToken = null) {
+async function getSyncEntries(queryParams, paginationToken = null) {
   try {
     const conf = {
       uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
       headers: {
         api_key: config.apikey,
-        access_token: config.Unpublish.deliveryToken,
+        access_token: config.cross_env_publish.deliveryToken,
       },
     };
     const entriesResponse = await req(conf);
     if (entriesResponse.items.length > 0) {
       bulkAction(entriesResponse.items);
     }
-    if (entriesResponse.items.length === 0) {
+    if (!entriesResponse.pagination_token) {
       if (!changedFlag) console.log('No Entries/Assets Found published on specified environment');
       return Promise.resolve();
     }
     setTimeout(() => {
-      getSyncEntries(locale, queryParams, null);
+      getSyncEntries(queryParams, entriesResponse.pagination_token);
     }, 3000);
   } catch (Err) {
     console.log(Err);
@@ -144,23 +144,21 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
 }
 
 
-module.exports = {
-  getSyncEntries,
-  setConfig,
-  getQueryParams,
-};
-
 setConfig(config);
 
 async function start() {
-  const queryParams = getQueryParams(config.Unpublish.filter);
-  await getSyncEntries(config.Unpublish.filter.locale, queryParams);
+  const queryParams = getQueryParams(config.cross_env_publish.filter);
+  await getSyncEntries(queryParams);
 }
 
+module.exports = {
+  getSyncEntries,
+  setConfig,
+};
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (config.Unpublish.bulkPublish) {
+    if (config.cross_env_publish.bulkPublish) {
       retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
     } else {
       retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
@@ -169,5 +167,3 @@ if (process.argv.slice(2)[0] === '-retryFailed') {
 } else {
   start();
 }
-
-// start();
