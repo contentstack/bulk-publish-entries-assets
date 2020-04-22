@@ -196,7 +196,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
   console.log(contentType);
   console.log(locale);
   const conf = {
-    uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skip}&include_publish_details=true`,
+    uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skip}&include_publish_details=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
