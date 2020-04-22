@@ -229,7 +229,7 @@ $ npm run revert ${logFilename}
 ```
 **logFilename is success logs of particular execution** 
 
-**For example npm run revert 1587270350288.bulkPublishEntries.sucess**
+**For example npm run revert 1587270350288.bulkPublishEntries.success**
 
 #### Retrying failed Entries 
 Entries which failed to publish are stored in logs directory with unique name ending with .error. In order to retry entries of those log file, you need execute same script with **retryFailed** flag along with **${logFilename}** which follows after it
