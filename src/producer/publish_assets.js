@@ -1,22 +1,29 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { publishAsset, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishAsset, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
-queue.consumer = bulkPublish;
 let logFileName;
 let bulkPublishSet = [];
 
-queue.consumer = bulkPublish;
-logFileName = 'bulkPublishAssets';
+if (config.publish_assets.bulkPublish) {
+  queue.consumer = bulkPublish;
+  logFileName = 'bulkPublishAssets';
+} else {
+  queue.consumer = publishAsset;
+  logFileName = 'PublishAssets';
+}
+
 
 iniatlizeLogger(logFileName);
 
+/* eslint-disable no-param-reassign */
+
 async function getAssets(folder = 'cs_root', skip = 0) {
   const conf = {
-    uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true`,
+    uri: `${config.apiEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true&include_publish_details=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
@@ -30,9 +37,11 @@ async function getAssets(folder = 'cs_root', skip = 0) {
         if (asset.is_dir === true) {
           return getAssets(asset.uid, 0);
         }
+        if (config.publish_assets.bulkPublish) {
           if (bulkPublishSet.length < 10) {
             bulkPublishSet.push({
               uid: asset.uid,
+              publish_details: asset.publish_details || [],
             });
           }
           if (bulkPublishSet.length === 10) {
@@ -40,11 +49,15 @@ async function getAssets(folder = 'cs_root', skip = 0) {
             bulkPublishSet = [];
           }
 
-          if (assetResponse.assets.length -1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length <10) {
+          if (assetResponse.assets.length - 1 === index && bulkPublishSet.length > 0 && bulkPublishSet.length < 10) {
             queue.Enqueue({ assets: bulkPublishSet, Type: 'asset', environments: config.publish_assets.environments });
             bulkPublishSet = [];
           }
-         
+        } else {
+          queue.Enqueue({
+            assetUid: asset.uid, publish_details: asset.publish_details || [], environments: config.publish_assets.environments, Type: 'asset',
+          });
+        }
         return true;
       });
       if (skip === assetResponse.count) {
@@ -78,10 +91,10 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    if (logFileName === 'bulkPublishAssets') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
+    if (config.publish_assets.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
     } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
+      retryFailedLogs(process.argv.slice(2)[1], { assetQueue: queue }, 'publish');
     }
   }
 } else {
