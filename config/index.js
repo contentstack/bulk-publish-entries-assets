@@ -8,7 +8,7 @@ module.exports = {
     sourceEnv: 'd96',
     locale: 'ar-dz',
     environments: ['d96'],
-    bulkPublish:false,
+    bulkPublish: false, //keep this flag as false if bulkPublish feature is not present in your plan
   },
   publish_assets: {
     environments: ['d96'],
@@ -18,7 +18,7 @@ module.exports = {
   publish_entries: {
     contentTypes: ['extensions'],
     locales: ['en-us'],
-    bulkPublish:false,
+    bulkPublish: false,
     environments: ['d96'],
     publishAllContentTypes: false,
   },
@@ -30,7 +30,7 @@ module.exports = {
       type: 'asset_published,entry_published',
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the environment
-    bulkUnpublish:true,
+    bulkUnpublish: true,
   },
   cross_env_publish: {
     filter: {
@@ -41,20 +41,20 @@ module.exports = {
     },
     deliveryToken: 'cs8b316a54868d382163f58287', // deliveryToken of the source environment
     destEnv: ['h'], // environment where it needs to be published
-    bulkPublish: false
+    bulkPublish: false,
   },
   publish_edits_on_env: {
     contentTypes: ['404'],
     sourceEnv: 'staging',
     environments: ['staging'],
     locales: ['en-us'],
-    bulkPublish:false
+    bulkPublish: false,
   },
   nonlocalized_field_changes: {
     sourceEnv: 'production', // source Environment
     contentTypes: ['testdin'],
     environments: ['production'], // publishing Environments
-    bulkPublish:true
+    bulkPublish: true,
   },
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
@@ -69,7 +69,7 @@ module.exports = {
       reference: [],
     },
   },
-  bulkPublish:true
+  bulkPublish: true,
 };
 
 // apiEndPoint:'https://api.contentstack.io',

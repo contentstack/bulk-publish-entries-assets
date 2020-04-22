@@ -303,6 +303,7 @@ function getLogFileDataType (data) {
 
 function processPublishRequests (data) {
   return sleep(intervalBetweenPublishRequests * 1000).then(() => {
+    data['Type'] = 'entry'   
     publishQueue.Enqueue(data)
   })
 }

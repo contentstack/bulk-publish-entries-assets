@@ -151,7 +151,7 @@ module.exports = {
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (config.nonlocalized_field_changes.bulkPublish) {
+    if (config.publish_entries.bulkPublish) {
       retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
     }else {
       retryFailedLogs(process.argv.slice(2)[1], {entryQueue:queue},'publish');
