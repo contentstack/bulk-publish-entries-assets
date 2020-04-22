@@ -1,7 +1,7 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
@@ -12,21 +12,26 @@ let contentTypesList = [];
 let allContentTypes = [];
 let bulkPublishSet = [];
 
+queue.consumer = bulkPublish;
+logFileName = 'bulkPublishEntries';
+
+
 if (config.publish_entries.bulkPublish) {
   queue.consumer = bulkPublish;
   logFileName = 'bulkPublishEntries';
 } else {
-  queue.consumer = publishConsumer;
-  logFileName = 'publishEntries';
+  queue.consumer = publishEntry;
+  logFileName = 'PublishEntries';
 }
 
 iniatlizeLogger(logFileName);
+
 
 async function getEntries(contentType, locale, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}&include_publish_details=true`,
+      uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skipCount}&include_publish_details=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -41,6 +46,7 @@ async function getEntries(contentType, locale, skip = 0) {
             uid: entry.uid,
             content_type: contentType,
             locale,
+            publish_details: entry.publish_details || [],
           });
         }
 
@@ -60,7 +66,7 @@ async function getEntries(contentType, locale, skip = 0) {
         } // bulkPublish
       } else {
         queue.Enqueue({
-          content_type: contentType, environments: config.publish_entries.environments, entryUid: entry.uid, locale,
+          content_type: contentType, publish_details: entry.publish_details || [], environments: config.publish_entries.environments, entryUid: entry.uid, locale, Type: 'entry',
         });
       }
     });
@@ -136,14 +142,15 @@ module.exports = {
   getEntries,
   setConfig,
   getContentTypes,
+  start,
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (logFileName === 'bulkPublishEntries') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
+    if (config.publish_entries.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
     } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
+      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
     }
   }
 } else {

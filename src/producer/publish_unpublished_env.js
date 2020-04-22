@@ -1,19 +1,25 @@
 const Queue = require('../util/queue');
 let config = require('../../config');
 const req = require('../util/request');
-const { publishConsumer, bulkPublish, iniatlizeLogger } = require('../consumer/publish');
+const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
-queue.consumer = publishConsumer;
 let skipCount;
 let changedFlag = false;
 let logFileName = 'publish_unpublished_env';
 let bulkPublishSet = [];
 
+if (config.publish_unpublished_env.bulkPublish) {
+  logFileName = 'Bulk_publish_draft';
+  queue.consumer = bulkPublish;
+} else {
+  logFileName = 'publish_draft';
+  queue.consumer = publishEntry;
+}
+
 iniatlizeLogger(logFileName);
-queue.consumer = bulkPublish;
-logFileName = 'bulkPublishEntries';
+
 
 async function getEnvironment(environmentName) {
   try {
@@ -30,7 +36,6 @@ async function getEnvironment(environmentName) {
     return Promise.reject(err);
   }
 }
-
 
 async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
@@ -55,26 +60,35 @@ async function getEntries(contentType, environmentUid, skip = 0) {
         const publishedEntry = entry.publish_details.find((publishEnv) => (publishEnv.environment === environmentUid && publishEnv.locale === locale));
         if (!publishedEntry) {
           changedFlag = true;
-          if (bulkPublishSet.length < 10) {
-            bulkPublishSet.push({
-              uid: entry.uid,
-              content_type: contentType,
-              locale,
+          if (config.publish_unpublished_env.bulkPublish) {
+            if (bulkPublishSet.length < 10) {
+              bulkPublishSet.push({
+                uid: entry.uid,
+                content_type: contentType,
+                locale,
+                publish_details: entry.publish_details || [],
+              });
+            }
+          } else {
+            queue.Enqueue({
+              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale, Type: 'entry',
             });
           }
         }
-        if (bulkPublishSet.length === 10) {
-          queue.Enqueue({
-            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-          });
-          bulkPublishSet = [];
-          return;
-        }
-        if (index === responseEntries.entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {      
-          queue.Enqueue({
-            entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
-          });
-          bulkPublishSet = [];
+        if (config.publish_unpublished_env.bulkPublish) {
+          if (bulkPublishSet.length === 10) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+            });
+            bulkPublishSet = [];
+            return;
+          }
+          if (index === responseEntries.entries.length - 1 && bulkPublishSet.length < 10 && bulkPublishSet.length > 0) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale, Type: 'entry', environments: config.publish_unpublished_env.environments,
+            });
+            bulkPublishSet = [];
+          }
         }
       });
     }
@@ -101,7 +115,6 @@ async function start() {
       const environmentDetails = await getEnvironment(config.publish_unpublished_env.sourceEnv);
       for (let i = 0; i < config.publish_unpublished_env.contentTypes.length; i += 1) {
         try {
-          //console.log(config.publish_unpublished_env.contentTypes[i])
           /* eslint-disable no-await-in-loop */
           await getEntries(config.publish_unpublished_env.contentTypes[i], environmentDetails.environment.uid);
           /* eslint-enable no-await-in-loop */
@@ -112,7 +125,7 @@ async function start() {
       }
     }
   } catch (err) {
-    console.log(err.message || err);
+    console.log(err);
   }
 }
 
@@ -120,14 +133,15 @@ module.exports = {
   getEntries,
   getEnvironment,
   setConfig,
+  start,
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
-    if (logFileName === 'bulkPublishEntries') {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulkPublish');
+    if (config.publish_unpublished_env.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
     } else {
-      retryFailedLogs(process.argv.slice(2)[1], queue);
+      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
     }
   }
 } else {
