@@ -44,6 +44,8 @@ async function getContentTypeSchema(contentType) {
   return true;
 }
 
+/* eslint-disable consistent-return */
+
 async function getLocalizedEntry(entry, contentType, locale) {
   let conf;
   try {
@@ -206,6 +208,9 @@ function checkNonLocalizedFieldChanges(contentType, entry, localizedEntry, isNon
   return changedFlag;
 }
 
+/* eslint-disable consistent-return */
+/* eslint-disable no-await-in-loop */
+
 async function getEntries(schema, contentType, languages, masterLocale, skip = 0) {
   skipCount = skip;
   try {
@@ -245,7 +250,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
                 }
               } else {
                 queue.Enqueue({
-                  content_type: contentType, publish_details: entry.publish_details || [], environments: config.nonlocalized_field_changes.environments, entryUid: entry.uid, locale: locale.code,Type: 'entry'
+                  content_type: contentType, publish_details: entry.publish_details || [], environments: config.nonlocalized_field_changes.environments, entryUid: entry.uid, locale: locale.code, Type: 'entry',
                 });
               }
             } else {
@@ -327,9 +332,9 @@ module.exports = {
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
     if (config.nonlocalized_field_changes.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
-    }else {
-      retryFailedLogs(process.argv.slice(2)[1],{entryQueue:queue},'publish');
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
     }
   }
 } else {

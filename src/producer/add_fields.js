@@ -188,11 +188,15 @@ async function updateEntry(updatedEntry, contentType, locale) {
   } catch (err) {
     console.log(err);
   }
+  return Promise.resolve(false);
 }
 
+/* eslint-disable no-param-reassign */
 async function getEntries(schema, contentType, locale, skip = 0) {
+  console.log(contentType);
+  console.log(locale);
   const conf = {
-    uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skip}&include_publish_details=true`,
+    uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skip}&include_publish_details=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
@@ -225,7 +229,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
             }
           } else {
             queue.Enqueue({
-              content_type: contentType, publish_details: entry.publish_details || [], environments: config.addFields.environments, entryUid: entry.uid, locale,Type: 'entry',
+              content_type: contentType, publish_details: entry.publish_details || [], environments: config.addFields.environments, entryUid: entry.uid, locale, Type: 'entry',
             });
           }
         } else {
@@ -242,14 +246,14 @@ async function getEntries(schema, contentType, locale, skip = 0) {
         bulkPublishSet = [];
       }
     });
-
     if (skip === entriesResponse.count) {
       return Promise.resolve();
     }
-    return setTimeout(async () => await getEntries(contentType, locale, skipCount), 2000);
+    return setTimeout(async () => getEntries(schema, contentType, locale, skip), 2000);
   } catch (err) {
     console.log(err);
   }
+  return true;
 }
 
 function setConfig(conf) {
@@ -258,6 +262,9 @@ function setConfig(conf) {
 }
 
 setConfig(config);
+
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-loop-func */
 
 function start() {
   for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
@@ -289,9 +296,9 @@ module.exports = {
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
     if (config.addFields.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
-    }else {
-      retryFailedLogs(process.argv.slice(2)[1], {entryQueue:queue},'publish');
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
     }
   }
 } else {

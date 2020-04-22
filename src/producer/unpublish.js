@@ -7,8 +7,8 @@ const {
 const retryFailedLogs = require('../util/retryfailed');
 
 const queue = new Queue();
-let entryQueue = new Queue();
-let assetQueue = new Queue();
+const entryQueue = new Queue();
+const assetQueue = new Queue();
 
 let bulkUnPublishSet = [];
 let bulkUnPulishAssetSet = [];
@@ -105,11 +105,13 @@ function bulkAction(items) {
     } else {
       if (item.type === 'entry_published') {
         entryQueue.Enqueue({
-          content_type: item.content_type_uid, publish_details: [item.data.publish_details], environments: [config.Unpublish.filter.environment], entryUid: item.data.uid, locale: item.data.publish_details.locale || 'en-us',Type: 'entry'
+          content_type: item.content_type_uid, publish_details: [item.data.publish_details], environments: [config.Unpublish.filter.environment], entryUid: item.data.uid, locale: item.data.publish_details.locale || 'en-us', Type: 'entry',
         });
       }
       if (item.type === 'asset_published') {
-        assetQueue.Enqueue({ assetUid: item.data.uid, publish_details: [item.data.publish_details], environments: [config.Unpublish.filter.environment],Type: 'entry'});
+        assetQueue.Enqueue({
+          assetUid: item.data.uid, publish_details: [item.data.publish_details], environments: [config.Unpublish.filter.environment], Type: 'entry',
+        });
       }
     }
   });
@@ -159,9 +161,9 @@ async function start() {
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
     if (config.Unpublish.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
-    }else {
-      retryFailedLogs(process.argv.slice(2)[1], {entryQueue,assetQueue},'publish');
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
     }
   }
 } else {

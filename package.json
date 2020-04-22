@@ -11,8 +11,8 @@
     "unpublish": "node src/producer/unpublish.js",
     "publish_edits": "node src/producer/publish_edits.js",
     "cross_publish": "node src/producer/cross_publish.js",
-    "publish_localized":"node src/producer/nonlocalized_field_changes.js",
-    "add_fields":"node src/producer/add_fields.js",
+    "publish_localized": "node src/producer/nonlocalized_field_changes.js",
+    "add_fields": "node src/producer/add_fields.js",
     "revert": "node src/producer/revert.js"
   },
   "author": "",
@@ -23,7 +23,8 @@
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
     "request": "^2.88.2",
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "yesno": "^0.3.1"
   },
   "jest": {
     "testEnvironment": "node",
@@ -37,6 +38,6 @@
     "eslint-plugin-import": "^2.20.1",
     "jest": "^25.1.0",
     "jest-html-reporter": "^2.8.1",
-    "nock": "^12.0.1"
+    "nock": "^12.0.3"
   }
 }

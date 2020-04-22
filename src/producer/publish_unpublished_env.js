@@ -71,7 +71,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
             }
           } else {
             queue.Enqueue({
-              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale,Type: 'entry'
+              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale, Type: 'entry',
             });
           }
         }
@@ -139,9 +139,9 @@ module.exports = {
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
     if (config.publish_unpublished_env.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
-    }else {
-      retryFailedLogs(process.argv.slice(2)[1], {entryQueue:queue},'publish');
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
     }
   }
 } else {

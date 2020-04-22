@@ -8,7 +8,7 @@ module.exports = {
     sourceEnv: 'd96',
     locale: 'ar-dz',
     environments: ['d96'],
-    bulkPublish: true, //keep this flag as false if bulkPublish feature is not present in your plan
+    bulkPublish: true, // keep this flag as false if bulkPublish feature is not present in your plan
   },
   publish_assets: {
     environments: ['d96'],
@@ -17,7 +17,7 @@ module.exports = {
   },
   publish_entries: {
     contentTypes: ['redirect_rule'],
-    locales: ['en-us','fr-fr'],
+    locales: ['en-us', 'fr-fr'],
     bulkPublish: false,
     environments: ['d96'],
     publishAllContentTypes: false,
@@ -59,7 +59,7 @@ module.exports = {
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
     locales: ['en-us'],
-    contentTypes: ['helloworld'],
+    contentTypes: ['redirect_rule'],
     environments: ['test'],
     defaults: {
       number: null,

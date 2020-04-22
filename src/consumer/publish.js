@@ -13,6 +13,7 @@ function iniatlizeLogger(fileName) {
   return logger;
 }
 
+/* eslint-disable camelcase */
 function removePublishDetails(elements) {
   return elements.map(({ publish_details, ...rest }) => rest);
 }
@@ -38,16 +39,15 @@ async function publishEntry(entryObj, config) {
 
   try {
     const publishEntryResponse = await req(conf);
-    if (!publishEntryResponse.error_message){
+    if (!publishEntryResponse.error_message) {
       console.log(chalk.green(`entry published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`));
-      addLogs(logger, { options: entryObj, api_key: config.apikey },'info')
-    } 
-    else {
+      addLogs(logger, { options: entryObj, api_key: config.apikey }, 'info');
+    } else {
       throw publishEntryResponse;
     }
   } catch (error) {
     console.log(chalk.red(`entry could not be published with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale} ${JSON.stringify(error.message || error)}`));
-    addLogs(logger, { options: entryObj, api_key: config.apikey },'error');
+    addLogs(logger, { options: entryObj, api_key: config.apikey }, 'error');
   }
 }
 
@@ -63,22 +63,21 @@ async function publishAsset(assetobj, config) {
     body: JSON.stringify({
       asset: {
         environments: assetobj.environments,
-        locales: [assetobj.locale || "en-us"],
+        locales: [assetobj.locale || 'en-us'],
       },
     }),
   };
   try {
     const publishAssetResponse = await req(conf);
-    if (!publishAssetResponse.error_message){
+    if (!publishAssetResponse.error_message) {
       console.log(chalk.green(`asset published with asset Uid =${assetobj.assetUid}`));
-      addLogs(logger, { options: assetobj, api_key: config.apikey },'info');
-    } 
-    else {
+      addLogs(logger, { options: assetobj, api_key: config.apikey }, 'info');
+    } else {
       throw publishAssetResponse;
     }
   } catch (error) {
     console.log(chalk.red(`Could not publish Error ${JSON.stringify(error)}`));
-    addLogs(logger, { options: assetobj, api_key: config.apikey },'error');
+    addLogs(logger, { options: assetobj, api_key: config.apikey }, 'error');
   }
 }
 
@@ -103,16 +102,15 @@ async function UnpublishEntry(entryObj, config) {
 
   try {
     const publishEntryResponse = await req(conf);
-    if (!publishEntryResponse.error_message){
+    if (!publishEntryResponse.error_message) {
       console.log(chalk.green(`entry Unpublished with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale}`));
-      addLogs(logger, { options: entryObj, api_key: config.apikey },'info')
-    } 
-    else {
+      addLogs(logger, { options: entryObj, api_key: config.apikey }, 'info');
+    } else {
       throw publishEntryResponse;
     }
   } catch (error) {
     console.log(chalk.red(`entry could not be Unpublished with contentType Uid =${entryObj.content_type} entry Uid =${entryObj.entryUid} locale =${entryObj.locale} ${JSON.stringify(error.message || error)}`));
-    addLogs(logger, { options: entryObj, api_key: config.apikey },'error');
+    addLogs(logger, { options: entryObj, api_key: config.apikey }, 'error');
   }
 }
 async function UnpublishAsset(assetobj, config) {
@@ -127,22 +125,21 @@ async function UnpublishAsset(assetobj, config) {
     body: JSON.stringify({
       asset: {
         environments: assetobj.environments,
-        locales: [assetobj.locale || "en-us"],
+        locales: [assetobj.locale || 'en-us'],
       },
     }),
   };
   try {
     const publishAssetResponse = await req(conf);
-    if (!publishAssetResponse.error_message){
+    if (!publishAssetResponse.error_message) {
       console.log(`asset Unpublished with asset Uid =${assetobj.assetUid}`);
-      addLogs(logger, { options: assetobj, api_key: config.apikey },'info');
-    } 
-    else {
+      addLogs(logger, { options: assetobj, api_key: config.apikey }, 'info');
+    } else {
       throw publishAssetResponse;
     }
   } catch (error) {
     console.log(chalk.red(`Could not Unpublish Error ${JSON.stringify(error)}`));
-    addLogs(logger, { options: assetobj, api_key: config.apikey },'error');
+    addLogs(logger, { options: assetobj, api_key: config.apikey }, 'error');
   }
 }
 
@@ -275,7 +272,8 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
       console.log('No such type');
   }
 }
-// short-term fix for reverting to previous versions 
+// short-term fix for reverting to previous versions
+/* eslint-disable no-case-declarations */
 async function publishUsingVersion(bulkPublishObj, config) {
   let conf;
   let successfullyPublished = [];
@@ -287,10 +285,10 @@ async function publishUsingVersion(bulkPublishObj, config) {
       successfullyPublished = [];
       failedToPublish = [];
       counter = 0;
-      let aggregatedEntries = {
-        ...bulkPublishObj
+      const aggregatedEntries = {
+        ...bulkPublishObj,
       };
-      bulkPublishObj.entries.forEach(async (entry, entryIndex) => {
+      bulkPublishObj.entries.forEach(async (entry) => {
         conf = {
           uri: `${config.cdnEndPoint}/v3/content_types/${entry.content_type}/entries/${entry.uid}/publish`,
           method: 'POST',
@@ -300,24 +298,24 @@ async function publishUsingVersion(bulkPublishObj, config) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            "entry": {
-              "environments": bulkPublishObj.environments,
-              "locales": [bulkPublishObj.locale]
+            entry: {
+              environments: bulkPublishObj.environments,
+              locales: [bulkPublishObj.locale],
             },
             locale: bulkPublishObj.locale,
-            version: entry.version
-          })
-        }
+            version: entry.version,
+          }),
+        };
 
         const publishEntriesResponse = await req(conf);
         try {
           if (publishEntriesResponse.notice && !publishEntriesResponse.error_message) {
             console.log(chalk.green(`Entry sent for publish ${JSON.stringify(entry)}`));
 
-            ++counter;
+            counter += 1;
 
             successfullyPublished.push({
-              ...entry
+              ...entry,
             });
 
             if (counter === bulkPublishObj.entries.length) {
@@ -331,25 +329,23 @@ async function publishUsingVersion(bulkPublishObj, config) {
                 addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
               }
             }
-
           } else {
-
             failedToPublish.push({
-              ...entry
-            })
+              ...entry,
+            });
 
             // throw bulkPublishEntriesResponse;
           }
         } catch (error) {
+          counter += 1;
 
-          ++counter;
           failedToPublish.push({
-            ...entry
-          })
+            ...entry,
+          });
 
           if (counter === bulkPublishObj.entries.length) {
             if (successfullyPublished.length > 0) {
-              aggregatedEntries.entries = successfullyPublished
+              aggregatedEntries.entries = successfullyPublished;
               addLogs(logger, { options: aggregatedEntries, api_key: config.apikey }, 'info');
             }
 
@@ -368,10 +364,10 @@ async function publishUsingVersion(bulkPublishObj, config) {
       successfullyPublished = [];
       failedToPublish = [];
       counter = 0;
-      let aggregatedAssets = {
-        ...bulkPublishObj
+      const aggregatedAssets = {
+        ...bulkPublishObj,
       };
-      bulkPublishObj.assets.forEach(async (asset, assetIndex) => {
+      bulkPublishObj.assets.forEach(async (asset) => {
         conf = {
           uri: `${config.cdnEndPoint}/v3/assets/${asset.uid}/publish`,
           method: 'POST',
@@ -381,23 +377,23 @@ async function publishUsingVersion(bulkPublishObj, config) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            "asset": {
-              "environments": bulkPublishObj.environments,
-              "locales": [bulkPublishObj.locale]
+            asset: {
+              environments: bulkPublishObj.environments,
+              locales: [bulkPublishObj.locale],
             },
-            version: asset.version
-          })
-        }
+            version: asset.version,
+          }),
+        };
 
         try {
           const publishAssetsResponse = await req(conf);
           if (publishAssetsResponse.notice && !publishAssetsResponse.error_message) {
             console.log(chalk.green(`Asset sent for publish ${JSON.stringify(asset)}`));
 
-            ++counter;
+            counter += 1;
 
             successfullyPublished.push({
-              ...asset
+              ...asset,
             });
 
             if (counter === bulkPublishObj.assets.length) {
@@ -411,25 +407,23 @@ async function publishUsingVersion(bulkPublishObj, config) {
                 addLogs(logger, { options: bulkPublishObj, api_key: config.apikey }, 'error');
               }
             }
-
           } else {
-
             failedToPublish.push({
-              ...asset
-            })
+              ...asset,
+            });
 
             // throw bulkPublishAssetsResponse;
           }
         } catch (error) {
+          counter += 1;
 
-          ++counter;
           failedToPublish.push({
-            ...asset
-          })
+            ...asset,
+          });
 
           if (counter === bulkPublishObj.assets.length) {
             if (successfullyPublished.length > 0) {
-              aggregatedAssets.assets = successfullyPublished
+              aggregatedAssets.assets = successfullyPublished;
               addLogs(logger, { options: aggregatedAssets, api_key: config.apikey }, 'info');
             }
 
@@ -457,5 +451,5 @@ module.exports = {
   publishAsset,
   UnpublishEntry,
   UnpublishAsset,
-  publishUsingVersion
+  publishUsingVersion,
 };

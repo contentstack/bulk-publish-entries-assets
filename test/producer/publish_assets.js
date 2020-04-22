@@ -1,16 +1,16 @@
 const nock = require('nock');
 const { setConfig, getAssets } = require('../../src/producer/publish_assets');
 const dummyConfig = require('../dummy/config');
-const bulkassetResponse1 = require('../dummy/bulkasset1')
-const bulkassetResponse2 = require('../dummy/bulkasset2')
+const bulkassetResponse1 = require('../dummy/bulkasset1');
+const bulkassetResponse2 = require('../dummy/bulkasset2');
 
 const assetPublishResponse = require('../dummy/assetpublished');
 
 describe('testing asset bulk publish', () => {
-  //const mockedlog = () => {};
+  // const mockedlog = () => {};
 
   beforeEach(() => {
-    //console.log = mockedlog;
+    // console.log = mockedlog;
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
@@ -23,7 +23,7 @@ describe('testing asset bulk publish', () => {
         include_count: true,
         skip: 0,
         include_folders: true,
-        include_publish_details:true
+        include_publish_details: true,
       })
       .reply(200, bulkassetResponse1);
 
@@ -39,26 +39,25 @@ describe('testing asset bulk publish', () => {
         include_count: true,
         skip: 2,
         include_folders: true,
-        include_publish_details:true
+        include_publish_details: true,
       })
       .reply(200, bulkassetResponse2);
 
-      nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
       },
     })
       .post('/v3/bulk/publish', {
-        assets:[{
-          uid:'dummyAssetId',
-        },{
-          uid:'dummyAssetId2',
+        assets: [{
+          uid: 'dummyAssetId',
+        }, {
+          uid: 'dummyAssetId2',
         }],
-        locales:["en-us"],
-        environments:["dummyEnvironment"]
-      },
-      )
+        locales: ['en-us'],
+        environments: ['dummyEnvironment'],
+      })
       .reply(200, assetPublishResponse);
 
     nock(dummyConfig.cdnEndPoint, {
@@ -73,27 +72,26 @@ describe('testing asset bulk publish', () => {
         include_count: true,
         skip: 3,
         include_folders: true,
-        include_publish_details:true
+        include_publish_details: true,
       })
       .reply(200, bulkassetResponse2);
 
-      nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
       },
     })
       .post('/v3/bulk/publish', {
-        assets:[{
-          uid:'dummyAssetId',
-        },{
-          uid:'dummyAssetId2',
+        assets: [{
+          uid: 'dummyAssetId',
+        }, {
+          uid: 'dummyAssetId2',
         }],
-        locales:["en-us"],
-        environments:["dummyEnvironment"]
-      },
-      )
-      .replyWithError("Some Error");
+        locales: ['en-us'],
+        environments: ['dummyEnvironment'],
+      })
+      .replyWithError('Some Error');
   });
 
   setConfig(dummyConfig);
@@ -102,7 +100,7 @@ describe('testing asset bulk publish', () => {
     expect(await getAssets('cs_root')).toBeTruthy();
   });
 
-  it('testing for errors inside get assets call', async ()=>{
-    expect(await getAssets('cs_root',3)).toBeTruthy();
-  })
+  it('testing for errors inside get assets call', async () => {
+    expect(await getAssets('cs_root', 3)).toBeTruthy();
+  });
 });

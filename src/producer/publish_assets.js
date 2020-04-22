@@ -19,6 +19,8 @@ if (config.publish_assets.bulkPublish) {
 
 iniatlizeLogger(logFileName);
 
+/* eslint-disable no-param-reassign */
+
 async function getAssets(folder = 'cs_root', skip = 0) {
   const conf = {
     uri: `${config.cdnEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true&include_publish_details=true`,
@@ -52,7 +54,9 @@ async function getAssets(folder = 'cs_root', skip = 0) {
             bulkPublishSet = [];
           }
         } else {
-          queue.Enqueue({ assetUid: asset.uid, publish_details: asset.publish_details || [], environments: config.publish_assets.environments,Type: 'asset' });
+          queue.Enqueue({
+            assetUid: asset.uid, publish_details: asset.publish_details || [], environments: config.publish_assets.environments, Type: 'asset',
+          });
         }
         return true;
       });
@@ -88,9 +92,9 @@ module.exports = {
 if (process.argv.slice(2)[0] === '-retryFailed') {
   if (typeof process.argv.slice(2)[1] === 'string') {
     if (config.publish_assets.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue,'bulk');
-    }else {
-      retryFailedLogs(process.argv.slice(2)[1], {assetQueue:queue},'publish');
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], { assetQueue: queue }, 'publish');
     }
   }
 } else {

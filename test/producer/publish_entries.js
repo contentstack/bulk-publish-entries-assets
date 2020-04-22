@@ -1,8 +1,10 @@
 const nock = require('nock');
-const { setConfig, getEntries, getContentTypes, start } = require('../../src/producer/publish_entries');
+const {
+  setConfig, getEntries, getContentTypes,
+} = require('../../src/producer/publish_entries');
 const dummyConfig = require('../dummy/config');
 const bulkentriesResponse1 = require('../dummy/bulkentries1');
-const bulkentriesResponse2 = require('../dummy/bulkentries2')
+const bulkentriesResponse2 = require('../dummy/bulkentries2');
 const entryPublishResponse = require('../dummy/entrypublished');
 const contentTypesResponse = require('../dummy/bulkContentTypeResponse');
 
@@ -21,7 +23,7 @@ describe('testing bulk entries publish', () => {
       .query({
         include_count: true,
         skip: 0,
-        include_publish_details:true,
+        include_publish_details: true,
         locale: 'en-us',
       })
       .reply(200, bulkentriesResponse1);
@@ -36,10 +38,10 @@ describe('testing bulk entries publish', () => {
       .query({
         include_count: true,
         skip: 2,
-        include_publish_details:true,
+        include_publish_details: true,
         locale: 'en-us',
       })
-      .reply(200, bulkentriesResponse2); 
+      .reply(200, bulkentriesResponse2);
 
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
@@ -48,19 +50,18 @@ describe('testing bulk entries publish', () => {
       },
     })
       .post('/v3/bulk/publish', {
-        entries:[{
-          content_type:'dummyContentType',
-          uid:'dummyEntryId',
-          locale:'en-us'
-        },{
-          content_type:'dummyContentType',
-          uid:'dummEntryId2',
-          locale:'en-us'
+        entries: [{
+          content_type: 'dummyContentType',
+          uid: 'dummyEntryId',
+          locale: 'en-us',
+        }, {
+          content_type: 'dummyContentType',
+          uid: 'dummEntryId2',
+          locale: 'en-us',
         }],
-        locales:["en-us"],
-        environments:["dummyEnvironment"]
-      },
-      )
+        locales: ['en-us'],
+        environments: ['dummyEnvironment'],
+      })
       .reply(200, entryPublishResponse);
 
     // nock(dummyConfig.apiEndPoint, {
@@ -89,9 +90,9 @@ describe('testing bulk entries publish', () => {
         include_count: true,
         skip: 0,
       })
-       .reply(200, contentTypesResponse);
+      .reply(200, contentTypesResponse);
 
-       nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
@@ -102,8 +103,7 @@ describe('testing bulk entries publish', () => {
         include_count: true,
         skip: 1,
       })
-      .replyWithError("Some Error"); 
-
+      .replyWithError('Some Error');
   });
 
   setConfig(dummyConfig);
@@ -114,7 +114,7 @@ describe('testing bulk entries publish', () => {
     const contentTypes = await getContentTypes(0);
     expect(Array.isArray(contentTypes)).toBe(true);
   });
-  it('replying with error in get contentTypes call',async ()=>{
-    expect(await getContentTypes(1)).toBeTruthy()
-  })
+  it('replying with error in get contentTypes call', async () => {
+    expect(await getContentTypes(1)).toBeTruthy();
+  });
 });

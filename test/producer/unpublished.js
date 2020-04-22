@@ -1,17 +1,17 @@
 const nock = require('nock');
-const  {getSyncEntries, setConfig, getQueryParams} = require('../../src/producer/unpublish');
-const environmentResponse = require('../dummy/environment');
+const { getSyncEntries, setConfig, getQueryParams } = require('../../src/producer/unpublish');
+// const environmentResponse = require('../dummy/environment');
 const dummyConfig = require('../dummy/config');
-const entriesResponse = require('../dummy/entriesResponse');
-const entryPublishResponse = require('../dummy/entrypublished');
+// const entriesResponse = require('../dummy/entriesResponse');
+// const entryPublishResponse = require('../dummy/entrypublished');
 const syncEntriesResponse = require('../dummy/unpublish_response');
 
 
 describe('testing unpublish case', () => {
-  //const mockedlog = () => {};
+  // const mockedlog = () => {};
 
   beforeEach(() => {
-    //console.log = mockedlog;
+    // console.log = mockedlog;
 
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
@@ -19,15 +19,14 @@ describe('testing unpublish case', () => {
         access_token: 'tt',
       },
     })
-    .get('/v3/stacks/sync')
-    .query({
-      init:true,
-      type:'asset_published,entry_publised',
-      locale:'en-us',
-      environment:'dummyEnvironment'
-    })
-    .reply(200, syncEntriesResponse);
-
+      .get('/v3/stacks/sync')
+      .query({
+        init: true,
+        type: 'asset_published,entry_publised',
+        locale: 'en-us',
+        environment: 'dummyEnvironment',
+      })
+      .reply(200, syncEntriesResponse);
 
 
     // nock(dummyConfig.cdnEndPoint, {
@@ -70,7 +69,7 @@ describe('testing unpublish case', () => {
     //     skip: 3,
     //     include_publish_details:true,
     //   })
-    //   .replyWithError('some error');  
+    //   .replyWithError('some error');
 
     // nock(dummyConfig.cdnEndPoint, {
     //   reqheaders: {
@@ -93,17 +92,13 @@ describe('testing unpublish case', () => {
     //   },
     //   )
     //   .reply(200, entryPublishResponse);
-
   });
-
 
 
   it('testing syncEntries call', async () => {
-          setConfig(dummyConfig);
+    setConfig(dummyConfig);
 
-    let queryParams = getQueryParams(dummyConfig.bulkUnpublish.filter)
-    expect(await getSyncEntries("en-us",queryParams)).toBeTruthy();
+    const queryParams = getQueryParams(dummyConfig.bulkUnpublish.filter);
+    expect(await getSyncEntries('en-us', queryParams)).toBeTruthy();
   });
-
-
 });

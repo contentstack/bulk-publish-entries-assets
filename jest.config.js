@@ -1,5 +1,5 @@
 module.exports = {
-  //preset: 'ts-jest',
+  // preset: 'ts-jest',
   // For a detailed explanation regarding each configuration property, visit:
   // https://jestjs.io/docs/en/configuration.html
 
@@ -32,7 +32,7 @@ module.exports = {
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: [
     'json',
-    'html'
+    'html',
   ],
 
   // An object that configures minimum threshold enforcement for coverage results
@@ -79,8 +79,8 @@ module.exports = {
   reporters: [
     'default',
     ['./node_modules/jest-html-reporter', {
-        pageTitle: 'Test Report'
-    }]
+      pageTitle: 'Test Report',
+    }],
   ],
 
   // Automatically reset mock state between every test
@@ -127,5 +127,5 @@ module.exports = {
   // watchPathIgnorePatterns: [],
 
   // Whether to use watchman for file crawling
-  watchman: true
-}
+  watchman: true,
+};

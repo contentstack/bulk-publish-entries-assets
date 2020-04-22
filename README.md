@@ -18,6 +18,9 @@ Contentstack publishing script lets you auto publish your entries and assets dep
 
 *NOTE:* **Publishing process will fail if Required/Mandatory fields are empty**
 
+**This Script uses Bulk Publish api to publish the contents, However if the bulk Operation is not enabled for your organization, set the bulkPublish/Unpublish flag in config to false.We recommend using Bulk publish to avoid slow/less failed publishing due to single publish api**
+
+
 ### Usage
 #### Install dependencies:
 
@@ -152,9 +155,9 @@ $ module.exports = {
   cross_env_publish:{
      filter: {
       environment: 'bulktest', // source environment
-      content_type_uid: '', // //Add content type uid to be unpublished. Keep this blank to consider all
+      content_type_uid: '', // //Add content type uid to be published. Keep this blank to consider all
       locale: 'en-us', // locale filters
-      type: 'asset_published,entry_published',  //entries and assets both will be unpublished, remove asset_published if u want to unpublish only entries and vice versa.
+      type: 'asset_published,entry_published',  //entries and assets both will be published, remove asset_published if u want to publish only entries and vice versa.
     },
     deliveryToken: '', // deliveryToken of the source environment
     destEnv:[''],     //environments where it needs to be published
@@ -216,7 +219,7 @@ $ module.exports = {
 $ npm run add_fields
 ```
 
-#### Case 9) Restore/unpublishe entries published through script using logs
+#### Case 9) Restore/unpublish entries published through script using logs
 ##### In this case, the published entries will be reverted back to their previous state.
 
 **Start publishing**
@@ -249,6 +252,8 @@ for example
 ##### Case 5:NA
 ##### Case 6:NA
 ##### Case 7:NA
-##### Case 8:
-- Does not work on custom field 
+##### Case 8:NA
+##### Case 9:To publish to a specific version we are using single entry/asset publish api instead of bulkpublish
+
+- Does not work on custom fields
 - Does not work on mandatory fields
