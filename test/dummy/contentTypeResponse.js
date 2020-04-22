@@ -3,7 +3,7 @@ module.exports = {
     created_at: '2020-02-25T05:19:53.403Z',
     updated_at: '2020-03-22T21:59:09.071Z',
     title: 'helloworld',
-    uid: 'helloworld',
+    uid: 'dummyContentType',
     _version: 59,
     inbuilt_class: false,
     schema: [
