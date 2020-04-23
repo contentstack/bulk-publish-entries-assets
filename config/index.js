@@ -2,6 +2,7 @@ module.exports = {
   apikey: '', // api Key of the stack
   apiEndPoint: 'https://api.contentstack.io',
   cdnEndPoint: 'https://cdn.contentstack.io',
+  apiVersion: '3',
   manageToken: '', // management token of the stack
   publish_unpublished_env: {
     contentTypes: ['helloworld'],

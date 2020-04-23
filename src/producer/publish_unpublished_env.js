@@ -24,7 +24,7 @@ iniatlizeLogger(logFileName);
 async function getEnvironment(environmentName) {
   try {
     const options = {
-      url: `${config.cdnEndPoint}/v3/environments/${environmentName}`,
+      url: `${config.cdnEndPoint}/v${config.apiVersion}/environments/${environmentName}`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -41,7 +41,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      url: `${config.apiEndPoint}/v3/content_types/${contentType}/entries`,
+      url: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries`,
       qs: {
         include_count: true,
         skip: skipCount,

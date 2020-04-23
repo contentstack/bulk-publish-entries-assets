@@ -23,7 +23,7 @@ iniatlizeLogger(logFileName);
 
 async function getAssets(folder = 'cs_root', skip = 0) {
   const conf = {
-    uri: `${config.apiEndPoint}/v3/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true&include_publish_details=true`,
+    uri: `${config.apiEndPoint}/v${config.apiVersion}/assets?folder=${folder}&skip=${skip}&include_count=true&include_folders=true&include_publish_details=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,

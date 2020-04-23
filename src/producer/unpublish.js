@@ -120,7 +120,7 @@ function bulkAction(items) {
 async function getSyncEntries(locale, queryParams, paginationToken = null) {
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
       headers: {
         api_key: config.apikey,
         access_token: config.Unpublish.deliveryToken,
