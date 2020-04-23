@@ -19,7 +19,7 @@ describe('testing unpublish case', () => {
         access_token: 'tt',
       },
     })
-      .get('/v3/stacks/sync')
+      .get(`/v${dummyConfig.apiVersion}/stacks/sync`)
       .query({
         init: true,
         type: 'asset_published,entry_publised',
@@ -35,7 +35,7 @@ describe('testing unpublish case', () => {
     //     authorization: dummyConfig.manageToken,
     //   },
     // })
-    // .get('/v3/content_types/dummyContentType/entries')
+    // .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
     // .query({
     //     include_count: true,
     //     skip: 0,
@@ -49,7 +49,7 @@ describe('testing unpublish case', () => {
     //     authorization: dummyConfig.manageToken,
     //   },
     // })
-    //   .get('/v3/content_types/dummyContentType/entries')
+    //   .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
     //   .query({
     //     include_count: true,
     //     skip: 2,
@@ -63,7 +63,7 @@ describe('testing unpublish case', () => {
     //     authorization: dummyConfig.manageToken,
     //   },
     // })
-    //   .get('/v3/content_types/dummyContentType/entries')
+    //   .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
     //   .query({
     //     include_count: true,
     //     skip: 3,
@@ -77,7 +77,7 @@ describe('testing unpublish case', () => {
     //     authorization: dummyConfig.manageToken,
     //   },
     // })
-    //   .post('/v3/bulk/publish', {
+    //   .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
     //     entries:[{
     //       content_type:'dummyContentType',
     //       uid:'dummyEntryId',

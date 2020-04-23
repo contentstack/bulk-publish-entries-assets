@@ -17,7 +17,7 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/assets')
+      .get(`/v${dummyConfig.apiVersion}/assets`)
       .query({
         folder: 'cs_root',
         include_count: true,
@@ -33,7 +33,7 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/assets')
+      .get(`/v${dummyConfig.apiVersion}/assets`)
       .query({
         folder: 'cs_root',
         include_count: true,
@@ -49,7 +49,7 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .post('/v3/bulk/publish', {
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
         assets: [{
           uid: 'dummyAssetId',
         }, {
@@ -66,7 +66,7 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/assets')
+      .get(`/v${dummyConfig.apiVersion}/assets`)
       .query({
         folder: 'cs_root',
         include_count: true,
@@ -82,7 +82,7 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .post('/v3/bulk/publish', {
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
         assets: [{
           uid: 'dummyAssetId',
         }, {

@@ -21,7 +21,7 @@ describe('testing unpublished entries on particular environment', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/environments/dummyEnvironment')
+      .get(`/v${dummyConfig.apiVersion}/environments/dummyEnvironment`)
       .reply(200, environmentResponse);
 
     nock(dummyConfig.cdnEndPoint, {
@@ -30,7 +30,7 @@ describe('testing unpublished entries on particular environment', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types/dummyContentType/entries')
+      .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
       .query({
         include_count: true,
         skip: 0,
@@ -44,7 +44,7 @@ describe('testing unpublished entries on particular environment', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types/dummyContentType/entries')
+      .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
       .query({
         include_count: true,
         skip: 2,
@@ -58,7 +58,7 @@ describe('testing unpublished entries on particular environment', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types/dummyContentType/entries')
+      .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
       .query({
         include_count: true,
         skip: 3,
@@ -72,7 +72,7 @@ describe('testing unpublished entries on particular environment', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .post('/v3/bulk/publish', {
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
         entries: [{
           content_type: 'dummyContentType',
           uid: 'dummyEntryId',

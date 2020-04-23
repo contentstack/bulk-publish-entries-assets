@@ -17,7 +17,7 @@ describe('testing bulk entries publish', () => {
         'Content-Type': 'application/json',
       },
     })
-      .post('/v3/bulk/publish', {
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
         entries: [{
           uid: 'dummyEntryId',
           content_type: 'dummyContentType1',
@@ -40,7 +40,7 @@ describe('testing bulk entries publish', () => {
         'Content-Type': 'application/json',
       },
     })
-      .post('/v3/bulk/publish', {
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
         assets: [{
           uid: 'dummyAssetUid1',
         }, {

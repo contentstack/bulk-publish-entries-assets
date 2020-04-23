@@ -30,7 +30,7 @@ function setConfig(conf) {
 async function getContentTypeSchema(contentType) {
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}?include_global_field_schema=true`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${contentType}?include_global_field_schema=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -50,7 +50,7 @@ async function getLocalizedEntry(entry, contentType, locale) {
   let conf;
   try {
     conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries/${entry.uid}?locale=${locale}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_publish_details=true`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries/${entry.uid}?locale=${locale}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_publish_details=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -215,7 +215,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
   skipCount = skip;
   try {
     const conf = {
-      uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${masterLocale || 'en-us'}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_count=true&skip=${skipCount}`,
+      uri: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries?locale=${masterLocale || 'en-us'}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_count=true&skip=${skipCount}`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -284,7 +284,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
 async function getLanguages() {
   try {
     const conf = {
-      uri: `${config.apiEndPoint}/v3/locales`,
+      uri: `${config.apiEndPoint}/v${config.apiVersion}/locales`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,

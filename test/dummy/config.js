@@ -4,7 +4,8 @@ module.exports = {
   apiEndPoint: 'https://api.localhost.com',
   manageToken: 'dummyManageToken',
   cdnEndPoint: 'https://cdn.localhost.com',
-  deliveryToken:'dummydeliveryToken',
+  deliveryToken: 'dummydeliveryToken',
+  apiVersion: 3,
   publish_unpublished_env: {
     contentTypes: ['dummyContentType'],
     sourceEnv: 'dummyEnvironment',
@@ -21,6 +22,7 @@ module.exports = {
     locales: ['en-us'],
     environments: ['dummyEnvironment'],
     publishAllContentTypes: true,
+    bulkPublish: false,
   },
   bulkUnpublish: {
     filter: {
