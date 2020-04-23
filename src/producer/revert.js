@@ -252,7 +252,7 @@ async function getEnvironmentUids(environments) {
   try {
     const options = {
       method: 'GET',
-      uri: `${config.apiEndPoint}/v3/environments`,
+      uri: `${config.apiEndPoint}/v${config.apiVersion}/environments`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,

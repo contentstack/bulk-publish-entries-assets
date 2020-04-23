@@ -19,7 +19,7 @@ describe('testing bulk entries publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types/dummyContentType/entries')
+      .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
       .query({
         include_count: true,
         skip: 0,
@@ -34,7 +34,7 @@ describe('testing bulk entries publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types/dummyContentType/entries')
+      .get(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries`)
       .query({
         include_count: true,
         skip: 2,
@@ -49,7 +49,7 @@ describe('testing bulk entries publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .post('/v3/bulk/publish', {
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
         entries: [{
           content_type: 'dummyContentType',
           uid: 'dummyEntryId',
@@ -71,7 +71,7 @@ describe('testing bulk entries publish', () => {
     //     'Content-Type': 'application/json',
     //   },
     // })
-    //   .post('/v3/content_types/dummyContentType/entries/dummyEntryId2/publish', {
+    //   .post(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries/dummyEntryId2/publish`, {
     //     entry: {
     //       environments: ['dummyEnvironment'],
     //       locales: ['en-us'],
@@ -85,7 +85,7 @@ describe('testing bulk entries publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types')
+      .get(`/v${dummyConfig.apiVersion}/content_types`)
       .query({
         include_count: true,
         skip: 0,
@@ -98,7 +98,7 @@ describe('testing bulk entries publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/content_types')
+      .get(`/v${dummyConfig.apiVersion}/content_types`)
       .query({
         include_count: true,
         skip: 1,
@@ -107,13 +107,16 @@ describe('testing bulk entries publish', () => {
   });
 
   setConfig(dummyConfig);
+
   it('testing get Entries and publish function', async () => {
     expect(await getEntries('dummyContentType', 'en-us')).toBeUndefined();
   });
+
   it('testing get ContentType call', async () => {
     const contentTypes = await getContentTypes(0);
     expect(Array.isArray(contentTypes)).toBe(true);
   });
+
   it('replying with error in get contentTypes call', async () => {
     expect(await getContentTypes(1)).toBeTruthy();
   });
