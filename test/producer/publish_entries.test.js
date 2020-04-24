@@ -112,6 +112,12 @@ describe('testing bulk entries publish', () => {
     expect(await getEntries('dummyContentType', 'en-us')).toBeUndefined();
   });
 
+  it('testing get Entries and bulkPublish function', async () => {
+    dummyConfig.publish_entries.bulkPublish = true;
+    setConfig(dummyConfig);
+    expect(await getEntries('dummyContentType', 'en-us')).toBeUndefined();
+  });
+
   it('testing get ContentType call', async () => {
     const contentTypes = await getContentTypes(0);
     expect(Array.isArray(contentTypes)).toBe(true);
