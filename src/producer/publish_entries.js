@@ -15,14 +15,19 @@ let bulkPublishSet = [];
 queue.consumer = bulkPublish;
 logFileName = 'bulkPublishEntries';
 
-
-if (config.publish_entries.bulkPublish) {
-  queue.consumer = bulkPublish;
-  logFileName = 'bulkPublishEntries';
-} else {
-  queue.consumer = publishEntry;
-  logFileName = 'PublishEntries';
+function setConfig(conf) {
+  if (conf.publish_entries.bulkPublish) {
+    queue.consumer = bulkPublish;
+    logFileName = 'bulkPublishEntries';
+  } else {
+    queue.consumer = publishEntry;
+    logFileName = 'PublishEntries';
+  }
+  config = conf;
+  queue.config = conf;
 }
+
+setConfig(config);
 
 iniatlizeLogger(logFileName);
 
@@ -107,13 +112,6 @@ async function getContentTypes(skip = 0, contentTypes = []) {
   }
   return true;
 }
-
-function setConfig(conf) {
-  config = conf;
-  queue.config = conf;
-}
-
-setConfig(config);
 
 async function start() {
   try {
