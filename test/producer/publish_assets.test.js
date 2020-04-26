@@ -7,11 +7,11 @@ const bulkassetResponse2 = require('../dummy/bulkasset2');
 const assetPublishResponse = require('../dummy/assetpublished');
 
 describe('testing asset bulk publish', () => {
-  // const mockedlog = () => {};
+  const mockedlog = () => {};
 
   beforeEach(() => {
-    // console.log = mockedlog;
-    nock(dummyConfig.cdnEndPoint, {
+    console.log = mockedlog;
+    nock(dummyConfig.apiEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
@@ -27,7 +27,7 @@ describe('testing asset bulk publish', () => {
       })
       .reply(200, bulkassetResponse1);
 
-    nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.apiEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
@@ -49,18 +49,10 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
-        assets: [{
-          uid: 'dummyAssetId',
-        }, {
-          uid: 'dummyAssetId2',
-        }],
-        locales: ['en-us'],
-        environments: ['dummyEnvironment'],
-      })
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`)
       .reply(200, assetPublishResponse);
 
-    nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.apiEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
@@ -76,27 +68,33 @@ describe('testing asset bulk publish', () => {
       })
       .reply(200, bulkassetResponse2);
 
-    nock(dummyConfig.cdnEndPoint, {
-      reqheaders: {
-        api_key: dummyConfig.apikey,
-        authorization: dummyConfig.manageToken,
-      },
-    })
-      .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
-        assets: [{
-          uid: 'dummyAssetId',
-        }, {
-          uid: 'dummyAssetId2',
-        }],
-        locales: ['en-us'],
-        environments: ['dummyEnvironment'],
-      })
-      .replyWithError('Some Error');
+    // nock(dummyConfig.cdnEndPoint, {
+    //   reqheaders: {
+    //     api_key: dummyConfig.apikey,
+    //     authorization: dummyConfig.manageToken,
+    //   },
+    // })
+    //   .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
+    //     assets: [{
+    //       uid: 'dummyAssetId',
+    //     }, {
+    //       uid: 'dummyAssetId2',
+    //     }],
+    //     locales: ['en-us'],
+    //     environments: ['dummyEnvironment'],
+    //   })
+    //   .replyWithError('Some Error');
   });
 
   setConfig(dummyConfig);
 
   it('testing get Assets and publish function', async () => {
+    expect(await getAssets('cs_root')).toBeTruthy();
+  });
+
+  it('testing get Assets and bulk publish function', async () => {
+    dummyConfig.publish_assets.bulkPublish = true;
+    setConfig(dummyConfig);
     expect(await getAssets('cs_root')).toBeTruthy();
   });
 

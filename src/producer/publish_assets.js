@@ -8,15 +8,19 @@ const queue = new Queue();
 let logFileName;
 let bulkPublishSet = [];
 
-if (config.publish_assets.bulkPublish) {
-  queue.consumer = bulkPublish;
-  logFileName = 'bulkPublishAssets';
-} else {
-  queue.consumer = publishAsset;
-  logFileName = 'PublishAssets';
+function setConfig(conf) {
+  if (conf.publish_assets.bulkPublish) {
+    queue.consumer = bulkPublish;
+    logFileName = 'bulkPublishAssets';
+  } else {
+    queue.consumer = publishAsset;
+    logFileName = 'PublishAssets';
+  }
+  config = conf;
+  queue.config = conf;
 }
 
-
+setConfig(config);
 iniatlizeLogger(logFileName);
 
 /* eslint-disable no-param-reassign */
@@ -61,22 +65,15 @@ async function getAssets(folder = 'cs_root', skip = 0) {
         return true;
       });
       if (skip === assetResponse.count) {
-        return true;
+        return Promise.resolve(true);
       }
-      return getAssets(folder, skip);
+      return await getAssets(folder, skip);
     }
   } catch (error) {
     console.log(error);
   }
   return true;
 }
-
-function setConfig(conf) {
-  config = conf;
-  queue.config = conf;
-}
-
-setConfig(config);
 
 function start() {
   if (config.publish_assets.folderUid) {
