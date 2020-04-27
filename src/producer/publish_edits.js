@@ -10,14 +10,6 @@ let changedFlag = false;
 let bulkPublishSet = [];
 let logFileName;
 
-if (config.publish_edits_on_env.bulkPublish) {
-  logFileName = 'bulk_publish_edits';
-  queue.consumer = bulkPublish;
-} else {
-  logFileName = 'publish_edits';
-  queue.consumer = publishEntry;
-}
-
 iniatlizeLogger(logFileName);
 
 async function getEnvironment(environmentName) {
@@ -46,7 +38,6 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
         skip: skipCount,
         include_publish_details: true,
         locale,
-        publish_details: true,
       },
       headers: {
         api_key: config.apikey,
@@ -102,6 +93,13 @@ async function getEntries(contentType, environmentUid, locale, skip = 0) {
 }
 
 function setConfig(conf) {
+  if (conf.publish_edits_on_env.bulkPublish) {
+    logFileName = 'bulk_publish_edits';
+    queue.consumer = bulkPublish;
+  } else {
+    logFileName = 'publish_edits';
+    queue.consumer = publishEntry;
+  }
   config = conf;
   queue.config = config;
 }
