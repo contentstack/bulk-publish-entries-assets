@@ -45,10 +45,11 @@ module.exports = {
     destEnv: [''], // environment where it needs to be published
   },
   publish_edits_on_env: {
-    contentTypes: ['404'],
-    sourceEnv: 'd96',
-    environments: ['d96'],
+    contentTypes: ['dummyContentType'],
+    sourceEnv: 'dummyEnvironment',
+    environments: ['dummyEnvironment'],
     locales: ['en-us'],
+    bulkPublish: false,
   },
   nonlocalized_field_changes: {
     sourceEnv: 'production', // source Environment
