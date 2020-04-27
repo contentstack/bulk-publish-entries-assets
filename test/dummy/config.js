@@ -25,15 +25,6 @@ module.exports = {
     publishAllContentTypes: true,
     bulkPublish: false,
   },
-  bulkUnpublish: {
-    filter: {
-      environment: 'dummyEnvironment', // source environment
-      content_type_uid: '', // contentType filters
-      locale: 'en-us', // locale filters
-      type: 'asset_published,entry_published',
-    },
-    deliveryToken: 'dummydeliveryToken', // deliveryToken of the environment
-  },
   cross_env_publish: {
     filter: {
       environment: 'bulktest', // source environment
@@ -68,5 +59,15 @@ module.exports = {
       file: null,
       reference: [],
     },
+  },
+  Unpublish: {
+    filter: {
+      environment: 'dummyEnvironment', // source environment
+      content_type_uid: 'dummyContentType', // contentType filters
+      locale: 'en-us', // locale filters
+      type: 'asset_published,entry_published',
+    },
+    deliveryToken: 'dummyDeliveryToken', // deliveryToken of the environment
+    bulkUnpublish: true,
   },
 };
