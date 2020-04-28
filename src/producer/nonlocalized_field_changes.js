@@ -13,16 +13,14 @@ let bulkPublishSet = [];
 
 iniatlizeLogger(logFileName);
 
-if (config.nonlocalized_field_changes.bulkPublish) {
-  logFileName = 'bulk_nonlocalized_field_changes';
-  queue.consumer = bulkPublish;
-} else {
-  logFileName = 'nonlocalized_field_changes';
-  queue.consumer = publishEntry;
-}
-
-
 function setConfig(conf) {
+  if (conf.nonlocalized_field_changes.bulkPublish) {
+    logFileName = 'bulk_nonlocalized_field_changes';
+    queue.consumer = bulkPublish;
+  } else {
+    logFileName = 'nonlocalized_field_changes';
+    queue.consumer = publishEntry;
+  }
   config = conf;
   queue.config = conf;
 }
@@ -321,6 +319,7 @@ async function start() {
 }
 
 module.exports = {
+  start,
   setConfig,
   getLanguages,
   getEntries,
