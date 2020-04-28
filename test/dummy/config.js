@@ -44,9 +44,10 @@ module.exports = {
     bulkPublish: false,
   },
   nonlocalized_field_changes: {
-    sourceEnv: 'production', // source Environment
-    contentTypes: ['testdin'],
-    environments: ['production'], // publishing Environments
+    sourceEnv: 'dummyEnvironment', // source Environment
+    contentTypes: ['helloworld'],
+    environments: ['dummyEnvironment'], // publishing Environments
+    bulkPublish: false,
   },
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
