@@ -27,13 +27,14 @@ module.exports = {
   },
   cross_env_publish: {
     filter: {
-      environment: 'bulktest', // source environment
-      content_type_uid: '', // contentType filters
+      environment: 'dummyEnvironment', // source environment
+      content_type_uid: 'dummyContentType', // contentType filters
       locale: 'en-us', // locale filters
       type: 'asset_published,entry_published',
     },
-    deliveryToken: '', // deliveryToken of the source environment
-    destEnv: [''], // environment where it needs to be published
+    deliveryToken: 'dummyDeliveryToken', // deliveryToken of the source environment
+    destEnv: ['dummyEnvironment1'], // environment where it needs to be published
+    bulkPublish: true,
   },
   publish_edits_on_env: {
     contentTypes: ['dummyContentType'],
