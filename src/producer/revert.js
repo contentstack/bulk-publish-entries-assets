@@ -22,9 +22,6 @@ const intervalBetweenPublishRequests = 3; // interval in seconds
 const unpublishQueue = new Queue();
 const publishQueue = new Queue();
 
-unpublishQueue.consumer = bulkUnPublish;
-publishQueue.consumer = publishUsingVersion;
-
 const revertLogFileName = 'revert';
 
 
@@ -32,6 +29,8 @@ function setConfig(conf) {
   config = conf;
   unpublishQueue.config = conf;
   publishQueue.config = conf;
+  unpublishQueue.consumer = bulkUnPublish;
+  publishQueue.consumer = publishUsingVersion;
 }
 
 function getLogFileDataType(data) {
@@ -328,16 +327,17 @@ async function revertUsingLogs(logFileName) {
 setConfig(config);
 
 async function start() {
-  const ok = await yesno({
-    question: `Are you sure you want to revert using the file "${logfilenameProvidedByUser}" ?`,
-  });
-  if (ok) {
-    revertUsingLogs(logfilenameProvidedByUser);
-  }
+  // const ok = await yesno({
+  //   question: `Are you sure you want to revert using the file "${logfilenameProvidedByUser}" ?`,
+  // });
+  // if (ok) {
+  revertUsingLogs(logfilenameProvidedByUser);
+  // }
 }
 
 module.exports = {
   setConfig,
+  revertUsingLogs,
 };
 
 if (process.argv.slice(2)[0] === '-retryFailed') {
@@ -345,5 +345,5 @@ if (process.argv.slice(2)[0] === '-retryFailed') {
     revertUsingLogs(process.argv.slice(2)[1]);
   }
 } else {
-  start();
+  // start();
 }
