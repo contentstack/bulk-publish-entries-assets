@@ -1,6 +1,5 @@
 const nock = require('nock');
-const { setConfig, getLanguages, getEntries, getContentTypeSchema, start,
-} = require('../../src/producer/nonlocalized_field_changes');
+const { setConfig, getEntries, start } = require('../../src/producer/nonlocalized_field_changes');
 const dummyConfig = require('../dummy/config');
 
 const languagesResponse = require('../dummy/languages');
