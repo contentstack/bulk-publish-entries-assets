@@ -142,9 +142,9 @@ async function formatLogData(data) {
 }
 
 async function mapSeries(iterable, action) {
-  iterable.forEach(async (x) => {
+  for(x of iterable) {
     await action(x);
-  });
+  }
 }
 
 function sleep(ms) {
