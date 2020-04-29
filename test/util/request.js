@@ -2,7 +2,10 @@ const nock = require('nock');
 const req = require('../../src/util/request');
 
 describe('testing request module', () => {
+  const mockedlog = () => {};
+
   beforeEach(() => {
+    console.log = mockedlog;
     nock('https://api.localhost.io')
       .get('/test/')
       .reply(200, { message: 'successful' });
