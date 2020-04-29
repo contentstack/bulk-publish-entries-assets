@@ -53,7 +53,7 @@ module.exports = {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
     locales: ['en-us'],
     contentTypes: ['helloworld'],
-    environments: ['test'],
+    environments: ['dummyEnvironment'],
     defaults: {
       number: null,
       boolean: false,

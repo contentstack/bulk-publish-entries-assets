@@ -11,13 +11,19 @@ let bulkPublishSet = [];
 
 let changedFlag = false;
 
-if (config.addFields.bulkPublish) {
-  logFileName = 'bulk_add_fields';
-  queue.consumer = bulkPublish;
-} else {
-  logFileName = 'addFields';
-  queue.consumer = publishEntry;
+function setConfig(conf) {
+  if (config.addFields.bulkPublish) {
+    logFileName = 'bulk_add_fields';
+    queue.consumer = bulkPublish;
+  } else {
+    logFileName = 'addFields';
+    queue.consumer = publishEntry;
+  }
+  config = conf;
+  queue.config = conf;
 }
+
+setConfig(config);
 
 iniatlizeLogger(logFileName);
 
@@ -256,13 +262,6 @@ async function getEntries(schema, contentType, locale, skip = 0) {
   return true;
 }
 
-function setConfig(conf) {
-  config = conf;
-  queue.config = conf;
-}
-
-setConfig(config);
-
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 
@@ -285,6 +284,7 @@ function start() {
 }
 
 module.exports = {
+  start,
   getContentTypeSchema,
   getEntries,
   setConfig,
