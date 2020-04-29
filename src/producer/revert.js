@@ -142,7 +142,7 @@ async function formatLogData(data) {
 }
 
 async function mapSeries(iterable, action) {
-  for(x of iterable) {
+  for (x of iterable) {
     await action(x);
   }
 }
@@ -345,5 +345,5 @@ if (process.argv.slice(2)[0] === '-retryFailed') {
     revertUsingLogs(process.argv.slice(2)[1]);
   }
 } else {
-  // start();
+  start();
 }
