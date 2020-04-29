@@ -307,8 +307,8 @@ async function publishUsingVersion(bulkPublishObj, config) {
           }),
         };
 
-        const publishEntriesResponse = await req(conf);
         try {
+          const publishEntriesResponse = await req(conf);
           if (publishEntriesResponse.notice && !publishEntriesResponse.error_message) {
             console.log(chalk.green(`Entry sent for publish ${JSON.stringify(entry)}`));
 
@@ -358,7 +358,6 @@ async function publishUsingVersion(bulkPublishObj, config) {
           console.log(chalk.red(`Entry ${JSON.stringify(entry)} failed to publish with error ${JSON.stringify(error)}`));
         }
       });
-
       break;
     case 'asset':
       successfullyPublished = [];
