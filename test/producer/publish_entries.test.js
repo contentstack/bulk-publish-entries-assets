@@ -64,20 +64,20 @@ describe('testing bulk entries publish', () => {
       })
       .reply(200, entryPublishResponse);
 
-    // nock(dummyConfig.apiEndPoint, {
-    //   reqheaders: {
-    //     api_key: dummyConfig.apikey,
-    //     authtoken: dummyConfig.authToken,
-    //     'Content-Type': 'application/json',
-    //   },
-    // })
-    //   .post(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries/dummyEntryId2/publish`, {
-    //     entry: {
-    //       environments: ['dummyEnvironment'],
-    //       locales: ['en-us'],
-    //     },
-    //   })
-    //   .reply(200, entryPublishResponse);
+    nock(dummyConfig.apiEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authtoken: dummyConfig.authToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(/\/content_types\/dummyContentType\/entries\/([a-zA-Z0-9]*)\/publish/, {
+        entry: {
+          environments: ['dummyEnvironment'],
+          locales: ['en-us'],
+        },
+      })
+      .reply(200, entryPublishResponse);
 
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
