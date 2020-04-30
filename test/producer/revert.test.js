@@ -72,4 +72,19 @@ describe('testing bulk entries publish', () => {
   it('testing for entries log', async () => {
     expect(await revertUsingLogs(assetLogFileName)).toBeUndefined();
   });
+
+  it('testing with a wrong log file', async () => {
+    const lf = '1587758242717.PublishEntries.txt';
+    expect(await revertUsingLogs(lf)).toBeUndefined();
+  });
+
+  it('testing with a wrong log file', async () => {
+    const lf = '1587758242717.PublishEntries';
+    expect(await revertUsingLogs(lf)).toBeUndefined();
+  });
+
+  it('testing with a wrong log file', async () => {
+    const lf = '1587758242717.publishentries.success';
+    expect(await revertUsingLogs(lf)).toBeUndefined();
+  });
 });
