@@ -116,6 +116,23 @@ describe('testing bulk entries publish', () => {
       })
       .reply(200, entryPublishedResponse);
 
+    // for publishing assets using version
+    nock(dummyConfig.cdnEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authorization: dummyConfig.manageToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(`/v${dummyConfig.apiVersion}/assets/dummyAssetUid1/publish`, {
+        asset: {
+          environments: ['dummyEnvironment'],
+          locales: ['en-us'],
+        },
+        version: 1,
+      })
+      .reply(200, entryPublishedResponse);
+
     // for unpublish entries
     nock(dummyConfig.apiEndPoint, {
       reqheaders: {
@@ -254,6 +271,42 @@ describe('testing bulk entries publish', () => {
         uid: 'dummyEntryId2',
         content_type: 'dummyContentType2',
         locale: 'en-us',
+        version: 1,
+      }],
+      environments: ['dummyEnvironment'],
+      locale: 'en-us',
+    };
+    expect(await publishUsingVersion(bulkPublishObject, dummyConfig)).toBeUndefined();
+  });
+
+  it('testing publishUsingVersion for entries', async () => {
+    const bulkPublishObject = {
+      Type: 'entry',
+      entries: [{
+        uid: 'dummyEntryId2',
+        content_type: 'dummyContentType1',
+        locale: 'en-us',
+        version: 1,
+      }, {
+        uid: 'dummyEntryId3',
+        content_type: 'dummyContentType2',
+        locale: 'en-us',
+        version: 1,
+      }],
+      environments: ['dummyEnvironment'],
+      locale: 'en-us',
+    };
+    expect(await publishUsingVersion(bulkPublishObject, dummyConfig)).toBeUndefined();
+  });
+
+  it('testing publishUsingVersion for assets', async () => {
+    const bulkPublishObject = {
+      Type: 'asset',
+      assets: [{
+        uid: 'dummyAssetUid1',
+        version: 1,
+      }, {
+        uid: 'dummyAssetUid2',
         version: 1,
       }],
       environments: ['dummyEnvironment'],
