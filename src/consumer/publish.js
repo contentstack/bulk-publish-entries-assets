@@ -15,7 +15,10 @@ function iniatlizeLogger(fileName) {
 
 /* eslint-disable camelcase */
 function removePublishDetails(elements) {
-  return elements.map(({ publish_details, ...rest }) => rest);
+  if (elements && elements.length > 0) {
+    return elements.map(({ publish_details, ...rest }) => rest);
+  }
+  return elements;
 }
 
 async function publishEntry(entryObj, config) {
