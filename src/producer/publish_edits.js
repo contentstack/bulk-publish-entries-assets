@@ -143,7 +143,7 @@ if (process.argv.slice(2)[0] === '-retryFailed') {
     }
   }
 } else {
-  start();
+  // start();
 }
 
 // start()
