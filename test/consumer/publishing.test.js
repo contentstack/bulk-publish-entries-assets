@@ -115,89 +115,132 @@ describe('testing bulk entries publish', () => {
         version: 1,
       })
       .reply(200, entryPublishedResponse);
+
+    // for unpublish entries
+    nock(dummyConfig.apiEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authorization: dummyConfig.manageToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(`/v${dummyConfig.apiVersion}/content_types/dummyContentType1/entries/dummyEntryId/unpublish?locale=en-us`, {
+        entry: {
+          environments: ['dummyEnvironment'],
+          locales: ['en-us'],
+        },
+      })
+      .reply(200, entryPublishedResponse);
+
+    // for unpublish assets
+    nock(dummyConfig.apiEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authorization: dummyConfig.manageToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(`/v${dummyConfig.apiVersion}/assets/dummyAssetUid/unpublish?`, {
+        asset: {
+          environments: ['dummyEnvironment'],
+          locales: ['en-us'],
+        },
+      })
+      .reply(200, entryPublishedResponse);
+
+    // for bulk unpublish
+    nock(dummyConfig.cdnEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authorization: dummyConfig.manageToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(`/v${dummyConfig.apiVersion}/bulk/unpublish`)
+      .reply(200, entryPublishedResponse);
   });
 
-  // it('testing bulk publish entries function', async () => {
-  //   const bulkPublishObject = {
-  //     locale: 'en-us',
-  //     entries: [{
-  //       uid: 'dummyEntryId',
-  //       content_type: 'dummyContentType1',
-  //       locale: 'en-us',
-  //     }, {
-  //       uid: 'dummyEntryId2',
-  //       content_type: 'dummyContentType2',
-  //       locale: 'en-us',
-  //     }],
-  //     Type: 'entry',
-  //     environments: ['dummyEnvironment'],
-  //   };
+  it('testing bulk publish entries function', async () => {
+    const bulkPublishObject = {
+      locale: 'en-us',
+      entries: [{
+        uid: 'dummyEntryId',
+        content_type: 'dummyContentType1',
+        locale: 'en-us',
+      }, {
+        uid: 'dummyEntryId2',
+        content_type: 'dummyContentType2',
+        locale: 'en-us',
+      }],
+      Type: 'entry',
+      environments: ['dummyEnvironment'],
+    };
 
-  //   expect(await bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish')).toBeUndefined();
-  // });
+    expect(await bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish')).toBeUndefined();
+  });
 
 
-  // it('testing bulk publish assets function', async () => {
-  //   const bulkPublishObject = {
-  //     locale: 'en-us',
-  //     assets: [{
-  //       uid: 'dummyAssetUid1',
-  //     }, {
-  //       uid: 'dummyAssetUid1',
-  //     }],
-  //     Type: 'asset',
-  //     environments: ['dummyEnvironment'],
-  //   };
+  it('testing bulk publish assets function', async () => {
+    const bulkPublishObject = {
+      locale: 'en-us',
+      assets: [{
+        uid: 'dummyAssetUid1',
+      }, {
+        uid: 'dummyAssetUid1',
+      }],
+      Type: 'asset',
+      environments: ['dummyEnvironment'],
+    };
 
-  //   expect(await bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish')).toBeUndefined();
-  // });
+    expect(await bulkPublish(bulkPublishObject, dummyConfig, 'bulkpublish')).toBeUndefined();
+  });
 
-  // it('testing bulk publish assets function with error', async () => {
-  //   expect(await bulkPublish({ Type: 'asset', assets: [] }, dummyConfig, 'bulkpublish')).toBeUndefined();
-  // });
+  it('testing bulk publish assets function with error', async () => {
+    expect(await bulkPublish({ Type: 'asset', assets: [] }, dummyConfig, 'bulkpublish')).toBeUndefined();
+  });
 
-  // it('testing bulk publish entries function with error', async () => {
-  //   expect(await bulkPublish({ Type: 'entry', entries: [] }, dummyConfig, 'bulkpublish')).toBeUndefined();
-  // });
+  it('testing bulk publish entries function with error', async () => {
+    expect(await bulkPublish({ Type: 'entry', entries: [] }, dummyConfig, 'bulkpublish')).toBeUndefined();
+  });
 
-  // it('testing bulk publish function with wrong type', async () => {
-  //   expect(await bulkPublish({ Type: 'foo' }, dummyConfig, 'bulkpublish')).toBeUndefined();
-  // });
+  it('testing bulk publish function with wrong type', async () => {
+    expect(await bulkPublish({ Type: 'foo' }, dummyConfig, 'bulkpublish')).toBeUndefined();
+  });
 
-  // it('testing publishEntry', async () => {
-  //   const entryObj = {
-  //     locale: 'en-us',
-  //     content_type: 'dummyContentType',
-  //     entryUid: 'dummyEntryUid',
-  //     environments: ['dummyEnvironment'],
-  //   };
-  //   expect(await publishEntry(entryObj, dummyConfig)).toBeUndefined();
-  // });
+  it('testing publishEntry', async () => {
+    const entryObj = {
+      locale: 'en-us',
+      content_type: 'dummyContentType',
+      entryUid: 'dummyEntryUid',
+      environments: ['dummyEnvironment'],
+    };
+    expect(await publishEntry(entryObj, dummyConfig)).toBeUndefined();
+  });
 
-  // it('testing publishEntry with error', async () => {
-  //   const entryObj = {
-  //     locale: 'en-us',
-  //     entryUid: 'dummyEntryUid',
-  //   };
-  //   expect(await publishEntry(entryObj, dummyConfig)).toBeUndefined();
-  // });
+  it('testing publishEntry with error', async () => {
+    const entryObj = {
+      locale: 'en-us',
+      entryUid: 'dummyEntryUid',
+    };
+    expect(await publishEntry(entryObj, dummyConfig)).toBeUndefined();
+  });
 
-  // it('testing publishAsset', async () => {
-  //   const assetObj = {
-  //     locale: 'en-us',
-  //     assetUid: 'dummyAssetUid',
-  //     environments: ['dummyEnvironment'],
-  //   };
-  //   expect(await publishAsset(assetObj, dummyConfig)).toBeUndefined();
-  // });
+  it('testing publishAsset', async () => {
+    const assetObj = {
+      locale: 'en-us',
+      assetUid: 'dummyAssetUid',
+      environments: ['dummyEnvironment'],
+    };
+    expect(await publishAsset(assetObj, dummyConfig)).toBeUndefined();
+  });
 
-  // it('testing publishAsset with error', async () => {
-  //   const assetObj = {
-  //     locale: 'en-us',
-  //     assetUid: 'dummyAssetUid',
-  //   };
-  //   expect(await publishAsset(assetObj, dummyConfig)).toBeUndefined();
-  // });
+  it('testing publishAsset with error', async () => {
+    const assetObj = {
+      locale: 'en-us',
+      assetUid: 'dummyAssetUid',
+    };
+    expect(await publishAsset(assetObj, dummyConfig)).toBeUndefined();
+  });
 
   it('testing publishUsingVersion for entries', async () => {
     const bulkPublishObject = {
@@ -219,17 +262,41 @@ describe('testing bulk entries publish', () => {
     expect(await publishUsingVersion(bulkPublishObject, dummyConfig)).toBeUndefined();
   });
 
-  // it('testing publishUsingVersion for entries with error', async () => {
+  it('testing unpublish for entries', async () => {
+    const entryObj = {
+      locale: 'en-us',
+      content_type: 'dummyContentType1',
+      entryUid: 'dummyEntryId',
+      environments: ['dummyEnvironment'],
+    };
+    expect(await UnpublishEntry(entryObj, dummyConfig)).toBeUndefined();
+  });
 
-  // });
+  it('testing unpublish for entries with error', async () => {
+    const entryObj = {
+      locale: 'en-us',
+      content_type: 'dummyContentType1',
+      entryUid: 'dummyEntryId',
+    };
+    expect(await UnpublishEntry(entryObj, dummyConfig)).toBeUndefined();
+  });
 
-  // it('testing publishUsingVersion for assets', async () => {
+  it('testing unpublish for assets', async () => {
+    const assetObj = {
+      locale: 'en-us',
+      assetUid: 'dummyAssetUid',
+      environments: ['dummyEnvironment'],
+    };
+    expect(await UnpublishAsset(assetObj, dummyConfig)).toBeUndefined();
+  });
 
-  // });
-
-  // it('testing publishUsingVersion for assets with error', async () => {
-
-  // });
+  it('testing unpublish for assets with error', async () => {
+    const assetObj = {
+      locale: 'en-us',
+      assetUid: 'dummyAssetUid',
+    };
+    expect(await UnpublishAsset(assetObj, dummyConfig)).toBeUndefined();
+  });
 
   // it('logging testing', async () => {
   //   const data = {
