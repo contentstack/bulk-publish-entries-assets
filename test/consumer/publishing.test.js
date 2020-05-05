@@ -82,6 +82,25 @@ describe('testing bulk entries publish', () => {
       })
       .reply(200, entryPublishedResponse);
 
+    // for publishing entries with error_message
+    nock(dummyConfig.cdnEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authorization: dummyConfig.manageToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(`/v${dummyConfig.apiVersion}/content_types/dummyContentType/entries/dummyEntryUid/publish?locale=en-error`, {
+        entry: {
+          environments: ['dummyEnvironment'],
+          locales: ['en-error'],
+        },
+      })
+      .reply(200, {
+        ...entryPublishedResponse,
+        error_message: 'this is a dummy error message',
+      });
+
     // for publishing assets
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
@@ -97,6 +116,25 @@ describe('testing bulk entries publish', () => {
         },
       })
       .reply(200, assetPublishedResponse);
+
+    // for publishing assets with error_message
+    nock(dummyConfig.cdnEndPoint, {
+      reqheaders: {
+        api_key: dummyConfig.apikey,
+        authorization: dummyConfig.manageToken,
+        'Content-Type': 'application/json',
+      },
+    })
+      .post(`/v${dummyConfig.apiVersion}/assets/dummyAssetUid/publish`, {
+        asset: {
+          environments: ['dummyEnvironment'],
+          locales: ['en-error'],
+        },
+      })
+      .reply(200, {
+        ...assetPublishedResponse,
+        error_message: 'this is a dummy error message',
+      });
 
     // for publishing entries using version
     nock(dummyConfig.cdnEndPoint, {
@@ -173,7 +211,19 @@ describe('testing bulk entries publish', () => {
         'Content-Type': 'application/json',
       },
     })
-      .post(`/v${dummyConfig.apiVersion}/bulk/unpublish`)
+      .post(`/v${dummyConfig.apiVersion}/bulk/unpublish`, {
+        entries: [{
+          uid: 'dummyEntryId',
+          content_type: 'dummyContentType1',
+          locale: 'en-us',
+        }, {
+          uid: 'dummyEntryId2',
+          content_type: 'dummyContentType2',
+          locale: 'en-us',
+        }],
+        locales: ['en-us'],
+        environments: ['dummyEnvironment'],
+      })
       .reply(200, entryPublishedResponse);
   });
 
@@ -242,6 +292,16 @@ describe('testing bulk entries publish', () => {
     expect(await publishEntry(entryObj, dummyConfig)).toBeUndefined();
   });
 
+  it('testing publishEntry with error message', async () => {
+    const entryObj = {
+      locale: 'en-error',
+      content_type: 'dummyContentType',
+      entryUid: 'dummyEntryUid',
+      environments: ['dummyEnvironment'],
+    };
+    expect(await publishEntry(entryObj, dummyConfig)).toBeUndefined();
+  });
+
   it('testing publishAsset', async () => {
     const assetObj = {
       locale: 'en-us',
@@ -255,6 +315,15 @@ describe('testing bulk entries publish', () => {
     const assetObj = {
       locale: 'en-us',
       assetUid: 'dummyAssetUid',
+    };
+    expect(await publishAsset(assetObj, dummyConfig)).toBeUndefined();
+  });
+
+  it('testing publishAsset', async () => {
+    const assetObj = {
+      locale: 'en-error',
+      assetUid: 'dummyAssetUid',
+      environments: ['dummyEnvironment'],
     };
     expect(await publishAsset(assetObj, dummyConfig)).toBeUndefined();
   });
@@ -351,6 +420,23 @@ describe('testing bulk entries publish', () => {
     expect(await UnpublishAsset(assetObj, dummyConfig)).toBeUndefined();
   });
 
+  it('testing bulkUnpublish for entries with error', async () => {
+    const entryObj = {
+      entries: [{
+        uid: 'dummyEntryId',
+        content_type: 'dummyContentType1',
+        locale: 'en-us',
+      }, {
+        uid: 'dummyEntryId2',
+        content_type: 'dummyContentType2',
+        locale: 'en-us',
+      }],
+      locales: 'en-as',
+      environments: ['dummyEnvironment'],
+      Type: 'entry',
+    };
+    expect(await bulkUnPublish(entryObj, dummyConfig)).toBeUndefined();
+  });
   // it('logging testing', async () => {
   //   const data = {
   //     case: 'dummyCase',
