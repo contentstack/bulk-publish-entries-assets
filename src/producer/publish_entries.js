@@ -114,25 +114,35 @@ async function getContentTypes(skip = 0, contentTypes = []) {
 }
 
 async function start() {
-  try {
-    if (config.publish_entries.publishAllContentTypes === true) {
-      allContentTypes = await getContentTypes();
-    } else {
-      allContentTypes = config.publish_entries.contentTypes;
-    }
-    for (let loc = 0; loc < config.publish_entries.locales.length; loc += 1) {
-      for (let i = 0; i < allContentTypes.length; i += 1) {
-        try {
-          /* eslint-disable no-await-in-loop */
-          await getEntries(allContentTypes[i].uid || allContentTypes[i], config.publish_entries.locales[loc]);
-          /* eslint-enable no-await-in-loop */
-        } catch (err) {
-          console.log(err);
-        }
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+      if (config.publish_entries.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
       }
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    try {
+      if (config.publish_entries.publishAllContentTypes === true) {
+        allContentTypes = await getContentTypes();
+      } else {
+        allContentTypes = config.publish_entries.contentTypes;
+      }
+      for (let loc = 0; loc < config.publish_entries.locales.length; loc += 1) {
+        for (let i = 0; i < allContentTypes.length; i += 1) {
+          try {
+            /* eslint-disable no-await-in-loop */
+            await getEntries(allContentTypes[i].uid || allContentTypes[i], config.publish_entries.locales[loc]);
+            /* eslint-enable no-await-in-loop */
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
@@ -142,18 +152,3 @@ module.exports = {
   getContentTypes,
   start,
 };
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (config.publish_entries.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
-
-
-// start();
