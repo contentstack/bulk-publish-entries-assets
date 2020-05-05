@@ -1,6 +1,6 @@
 const nock = require('nock');
 const {
-  setConfig, getEntries, start, getEnvironment,
+  setConfig, start,
 } = require('../../src/producer/publish_edits');
 const dummyConfig = require('../dummy/config');
 const bulkentriesResponse1 = require('../dummy/bulkentries1');
@@ -8,6 +8,9 @@ const bulkentriesResponse2 = require('../dummy/bulkentries2');
 const entryPublishResponse = require('../dummy/entrypublished');
 const contentTypesResponse = require('../dummy/bulkContentTypeResponse');
 const environmentResponse = require('../dummy/environment');
+
+const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
+const publishEntriesLog = '1587758242718.PublishEntries.success';
 
 describe('testing bulk entries publish', () => {
   const mockedlog = () => { };
@@ -97,7 +100,7 @@ describe('testing bulk entries publish', () => {
     nock(dummyConfig.cdnEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
-        authorization: dummyConfig.manageToken
+        authorization: dummyConfig.manageToken,
       },
     })
       .get(`/v${dummyConfig.apiVersion}/environments/dummyEnvironment`)
@@ -113,6 +116,18 @@ describe('testing bulk entries publish', () => {
   it('testing get Entries and bulkPublish function', async () => {
     dummyConfig.publish_edits_on_env.bulkPublish = true;
     setConfig(dummyConfig);
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing retryFailed for bulk publish log', async () => {
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing retryFailed for bulk publish log', async () => {
+    dummyConfig.publish_edits_on_env.bulkPublish = false;
+    setConfig(dummyConfig);
+    process.argv = ['stuff', 'stuff', '-retryFailed', publishEntriesLog];
     expect(await start()).toBeUndefined();
   });
 });
