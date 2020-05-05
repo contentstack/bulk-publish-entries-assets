@@ -106,21 +106,21 @@ describe('testing nonlocalized field changes', () => {
 
   setConfig(dummyConfig);
 
-  //   it('testing getEntries with an error', async () => {
-  //     expect(await getEntries(contentTypeResponse.content_type.schema, 'wonderland', languages, 'en-us')).toBeTruthy();
-  //   });
+  it('testing getEntries with an error', async () => {
+    expect(await getEntries(contentTypeResponse.content_type.schema, 'wonderland', languages, 'en-us')).toBeTruthy();
+  });
 
   it('testing getEntries', async () => {
     expect(await getEntries(contentTypeResponse.content_type.schema, 'helloworld', 'en-us', 0)).toBeUndefined();
   });
 
-  //   it('testing getEntries with bulkPublish', async () => {
-  //     dummyConfig.nonlocalized_field_changes.bulkPublish = true;
-  //     setConfig(dummyConfig);
-  //     expect(await getEntries(contentTypeResponse.content_type.schema, 'helloworld', languages, 'en-us')).toBeTruthy();
-  //   });
+  // it('testing getEntries with bulkPublish', async () => {
+  //   dummyConfig.nonlocalized_field_changes.bulkPublish = true;
+  //   setConfig(dummyConfig);
+  //   expect(await getEntries(contentTypeResponse.content_type.schema, 'helloworld', languages, 'en-us')).toBeTruthy();
+  // });
 
-  //   it('testing start', async () => {
-  //     expect(await start()).toBeUndefined();
-  //   });
+  // it('testing start', async () => {
+  //   expect(await start()).toBeUndefined();
+  // });
 });
