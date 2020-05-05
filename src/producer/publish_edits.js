@@ -107,25 +107,37 @@ function setConfig(conf) {
 setConfig(config);
 
 async function start() {
-  if (config.publish_edits_on_env.sourceEnv) {
-    try {
-      const environmentDetails = await getEnvironment(config.publish_edits_on_env.sourceEnv);
-      for (let i = 0; i < config.publish_edits_on_env.contentTypes.length; i += 1) {
-        for (let j = 0; j < config.publish_edits_on_env.locales.length; j += 1) {
-          try {
-            /* eslint-disable no-await-in-loop */
-            await getEntries(config.publish_edits_on_env.contentTypes[i], environmentDetails.environment.uid, config.publish_edits_on_env.locales[j]);
-            /* eslint-enable no-await-in-loop */
-          } catch (err) {
-            console.log(err);
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      if (config.publish_edits_on_env.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
+      }
+    }
+  } else {
+    if (config.publish_edits_on_env.sourceEnv) {
+      try {
+        const environmentDetails = await getEnvironment(config.publish_edits_on_env.sourceEnv);
+        for (let i = 0; i < config.publish_edits_on_env.contentTypes.length; i += 1) {
+          for (let j = 0; j < config.publish_edits_on_env.locales.length; j += 1) {
+            try {
+              /* eslint-disable no-await-in-loop */
+              await getEntries(config.publish_edits_on_env.contentTypes[i], environmentDetails.environment.uid, config.publish_edits_on_env.locales[j]);
+              /* eslint-enable no-await-in-loop */
+            } catch (err) {
+              console.log(err);
+            }
           }
         }
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
     }
   }
 }
+
+start();
 
 module.exports = {
   getEntries,
@@ -133,17 +145,3 @@ module.exports = {
   setConfig,
   start,
 };
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.publish_edits_on_env.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  // start();
-}
-
-// start()
