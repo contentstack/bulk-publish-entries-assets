@@ -10,6 +10,7 @@
     "no-console": "off",
     "no-underscore-dangle":[1,{"allow":["_version"]}],
     "max-len": ["error", { "code": 250 }],
-    "no-param-reassign": [2, {"props": false}]
+    "no-param-reassign": [2, {"props": false}],
+    "no-lonely-if": "off"
   }
 }
