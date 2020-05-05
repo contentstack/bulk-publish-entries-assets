@@ -76,24 +76,23 @@ async function getAssets(folder = 'cs_root', skip = 0) {
 }
 
 function start() {
-  if (config.publish_assets.folderUid) {
-    getAssets(config.publish_assets.folderUid);
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (config.publish_assets.bulkPublish) {
+      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+    } else {
+      retryFailedLogs(process.argv.slice(2)[1], { assetQueue: queue }, 'publish');
+    }
+  } else {
+    if (config.publish_assets.folderUid) {
+      getAssets(config.publish_assets.folderUid);
+    }
   }
 }
 
 module.exports = {
   getAssets,
   setConfig,
+  start,
 };
 
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.publish_assets.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { assetQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
+start();

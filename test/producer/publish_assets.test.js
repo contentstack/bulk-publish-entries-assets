@@ -1,10 +1,13 @@
 const nock = require('nock');
-const { setConfig, getAssets } = require('../../src/producer/publish_assets');
+const { setConfig, getAssets, start } = require('../../src/producer/publish_assets');
 const dummyConfig = require('../dummy/config');
 const bulkassetResponse1 = require('../dummy/bulkasset1');
 const bulkassetResponse2 = require('../dummy/bulkasset2');
 
 const assetPublishResponse = require('../dummy/assetpublished');
+
+const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
+const publishAssetLog = '1587956283100.PublishAssets.success';
 
 describe('testing asset bulk publish', () => {
   const mockedlog = () => {};
@@ -100,5 +103,17 @@ describe('testing asset bulk publish', () => {
 
   it('testing for errors inside get assets call', async () => {
     expect(await getAssets('cs_root', 3)).toBeTruthy();
+  });
+
+  it('testing for errors inside get assets call', async () => {
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing for errors inside get assets call', async () => {
+    dummyConfig.publish_assets.bulkPublish = false;
+    setConfig(dummyConfig);
+    process.argv = ['stuff', 'stuff', '-retryFailed', publishAssetLog];
+    expect(await start()).toBeUndefined();
   });
 });
