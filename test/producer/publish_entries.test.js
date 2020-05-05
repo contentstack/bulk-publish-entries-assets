@@ -1,12 +1,15 @@
 const nock = require('nock');
 const {
-  setConfig, getEntries, getContentTypes,
+  setConfig, getEntries, getContentTypes, start
 } = require('../../src/producer/publish_entries');
 const dummyConfig = require('../dummy/config');
 const bulkentriesResponse1 = require('../dummy/bulkentries1');
 const bulkentriesResponse2 = require('../dummy/bulkentries2');
 const entryPublishResponse = require('../dummy/entrypublished');
 const contentTypesResponse = require('../dummy/bulkContentTypeResponse');
+
+const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
+const publishEntriesLog = '1587758242718.PublishEntries.success';
 
 describe('testing bulk entries publish', () => {
   const mockedlog = () => {};
@@ -109,6 +112,16 @@ describe('testing bulk entries publish', () => {
   setConfig(dummyConfig);
 
   it('testing get Entries and publish function', async () => {
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing get Entries and publish function', async () => {
+    dummyConfig.publish_entries.publishAllContentTypes = false;
+    setConfig(dummyConfig);
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing get Entries and publish function', async () => {
     expect(await getEntries('dummyContentType', 'en-us')).toBeUndefined();
   });
 
@@ -125,5 +138,17 @@ describe('testing bulk entries publish', () => {
 
   it('replying with error in get contentTypes call', async () => {
     expect(await getContentTypes(1)).toBeTruthy();
+  });
+
+  it('testing retryFailed for bulk publish log', async () => {
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing retryFailed for bulk publish log', async () => {
+    dummyConfig.publish_entries.bulkPublish = false;
+    setConfig(dummyConfig);
+    process.argv = ['stuff', 'stuff', '-retryFailed', publishEntriesLog];
+    expect(await start()).toBeUndefined();
   });
 });
