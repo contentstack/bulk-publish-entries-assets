@@ -14,12 +14,12 @@ module.exports = {
   publish_assets: {
     environments: ['test'],
     folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
-    bulkPublish: false,
+    bulkPublish: true,
   },
   publish_entries: {
     contentTypes: ['test'],
     locales: ['en-us', 'fr-fr'],
-    bulkPublish: false,
+    bulkPublish: true,
     environments: ['test'],
     publishAllContentTypes: false,
   },
