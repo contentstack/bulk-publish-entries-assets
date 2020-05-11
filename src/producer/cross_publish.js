@@ -147,24 +147,27 @@ async function getSyncEntries(queryParams, paginationToken = null) {
 setConfig(config);
 
 async function start() {
-  const queryParams = getQueryParams(config.cross_env_publish.filter);
-  await getSyncEntries(queryParams);
+  if (process.argv.slice(2)[0] === '-retryFailed') { 
+    if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+      if (config.cross_env_publish.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
+      }
+    }
+  } else {
+    const queryParams = getQueryParams(config.cross_env_publish.filter);
+    await getSyncEntries(queryParams);
+  }
+
 }
+
+start();
 
 module.exports = {
   getSyncEntries,
   setConfig,
   getQueryParams,
+  start,
 };
 
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (config.cross_env_publish.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
