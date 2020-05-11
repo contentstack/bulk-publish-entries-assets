@@ -109,24 +109,36 @@ async function getEntries(contentType, environmentUid, skip = 0) {
 }
 
 async function start() {
-  try {
-    if (config.publish_unpublished_env.sourceEnv) {
-      const environmentDetails = await getEnvironment(config.publish_unpublished_env.sourceEnv);
-      for (let i = 0; i < config.publish_unpublished_env.contentTypes.length; i += 1) {
-        try {
-          /* eslint-disable no-await-in-loop */
-          await getEntries(config.publish_unpublished_env.contentTypes[i], environmentDetails.environment.uid);
-          /* eslint-enable no-await-in-loop */
-          changedFlag = false;
-        } catch (err) {
-          console.log(err);
-        }
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      if (config.publish_unpublished_env.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
       }
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    try {
+      if (config.publish_unpublished_env.sourceEnv) {
+        const environmentDetails = await getEnvironment(config.publish_unpublished_env.sourceEnv);
+        for (let i = 0; i < config.publish_unpublished_env.contentTypes.length; i += 1) {
+          try {
+            /* eslint-disable no-await-in-loop */
+            await getEntries(config.publish_unpublished_env.contentTypes[i], environmentDetails.environment.uid);
+            /* eslint-enable no-await-in-loop */
+            changedFlag = false;
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
+
+start();
 
 module.exports = {
   getEntries,
@@ -134,16 +146,3 @@ module.exports = {
   setConfig,
   start,
 };
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.publish_unpublished_env.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
-// start()
