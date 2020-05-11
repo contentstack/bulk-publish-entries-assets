@@ -1,5 +1,5 @@
 const nock = require('nock');
-const { getSyncEntries, setConfig, getQueryParams } = require('../../src/producer/unpublish');
+const { getSyncEntries, setConfig, getQueryParams, start } = require('../../src/producer/unpublish');
 // const environmentResponse = require('../dummy/environment');
 const dummyConfig = require('../dummy/config');
 // const entriesResponse = require('../dummy/entriesResponse');
@@ -7,6 +7,8 @@ const dummyConfig = require('../dummy/config');
 const syncEntriesResponse = require('../dummy/unpublish_response');
 const bulkUnpublishResponse = require('../dummy/bulkUnpublishResponse');
 
+const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
+const publishAssetLog = '1587956283100.PublishAssets.success';
 
 describe('testing unpublish case', () => {
   const mockedlog = () => { };
@@ -95,5 +97,17 @@ describe('testing unpublish case', () => {
     setConfig(dummyConfig);
     const queryParams = getQueryParams(dummyConfig.Unpublish.filter);
     expect(await getSyncEntries('en-us', queryParams)).toBeTruthy();
+  });
+
+  it('testing retryFailed call', async () => {
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing retryFailed call when bulkUnpublish is true', async () => {
+    dummyConfig.Unpublish.bulkUnpublish = true;
+    setConfig(dummyConfig);
+    process.argv = ['stuff', 'stuff', '-retryFailed', publishAssetLog];
+    expect(await start()).toBeUndefined();
   });
 });
