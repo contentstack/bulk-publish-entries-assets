@@ -266,8 +266,17 @@ async function getEntries(schema, contentType, locale, skip = 0) {
 /* eslint-disable no-loop-func */
 
 function start() {
-  for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
-    getContentTypeSchema(config.addFields.contentTypes[i])
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      if (config.addFields.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
+      }
+    }
+  } else {
+    for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
+      getContentTypeSchema(config.addFields.contentTypes[i])
       .then(async (schema) => {
         for (let j = 0; j < config.addFields.locales.length; j += 1) {
           try {
@@ -280,8 +289,11 @@ function start() {
       .catch((err) => {
         console.log(`Failed to fetch schema${JSON.stringify(err)}`);
       });
-  }
+    }
+  }  
 }
+
+start();
 
 module.exports = {
   start,
@@ -291,16 +303,3 @@ module.exports = {
   removeUnwanted,
   addFields,
 };
-
-// start();
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.addFields.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
