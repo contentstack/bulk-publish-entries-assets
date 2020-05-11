@@ -299,24 +299,36 @@ async function getLanguages() {
 
 setConfig(config);
 async function start() {
-  try {
-    const masterLocale = config.nonlocalized_field_changes.masterLocale || 'en-us';
-    const languages = await getLanguages();
-    const { contentTypes } = config.nonlocalized_field_changes;
-    for (let i = 0; i < contentTypes.length; i += 1) {
-      try {
-        /* eslint-disable no-await-in-loop */
-        const schema = await getContentTypeSchema(contentTypes[i]);
-        await getEntries(schema, contentTypes[i], languages, masterLocale);
-        /* eslint-enable no-await-in-loop */
-      } catch (err) {
-        console.log(err);
+  if (process.argv.slice(2)[0] === '-retryFailed') { 
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      if (config.nonlocalized_field_changes.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
       }
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    try {
+      const masterLocale = config.nonlocalized_field_changes.masterLocale || 'en-us';
+      const languages = await getLanguages();
+      const { contentTypes } = config.nonlocalized_field_changes;
+      for (let i = 0; i < contentTypes.length; i += 1) {
+        try {
+          /* eslint-disable no-await-in-loop */
+          const schema = await getContentTypeSchema(contentTypes[i]);
+          await getEntries(schema, contentTypes[i], languages, masterLocale);
+          /* eslint-enable no-await-in-loop */
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
+
+start();
 
 module.exports = {
   start,
@@ -328,14 +340,3 @@ module.exports = {
   checkNonLocalizedFieldChanges,
 };
 
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.nonlocalized_field_changes.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
