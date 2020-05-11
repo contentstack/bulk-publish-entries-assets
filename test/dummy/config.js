@@ -61,6 +61,7 @@ module.exports = {
       file: null,
       reference: [],
     },
+    bulkPublish: true,
   },
   Unpublish: {
     filter: {
