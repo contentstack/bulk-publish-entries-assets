@@ -105,12 +105,12 @@ describe('testing asset bulk publish', () => {
     expect(await getAssets('cs_root', 3)).toBeTruthy();
   });
 
-  it('testing for errors inside get assets call', async () => {
+  it('testing retryFailed block', async () => {
     process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
     expect(await start()).toBeUndefined();
   });
 
-  it('testing for errors inside get assets call', async () => {
+  it('testing retryFailed when bulkPublish is false', async () => {
     dummyConfig.publish_assets.bulkPublish = false;
     setConfig(dummyConfig);
     process.argv = ['stuff', 'stuff', '-retryFailed', publishAssetLog];
