@@ -4,6 +4,7 @@ let config = require('../../config');
 const req = require('../util/request');
 const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 let changedFlag = false;
 const queue = new Queue();
@@ -301,6 +302,11 @@ setConfig(config);
 async function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') { 
     if (typeof process.argv.slice(2)[1] === 'string') {
+
+      if(!validateFile(process.argv.slice(2)[1], ['nonlocalized_field_changes', 'bulk_nonlocalized_field_changes'])) {
+        return false;
+      }
+
       if (config.nonlocalized_field_changes.bulkPublish) {
         retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
       } else {

@@ -6,6 +6,7 @@ const { validateFile } = require('../util/fs');
 let config = require('../../config');
 const req = require('../util/request');
 const { iniatlizeLogger, bulkUnPublish, publishUsingVersion } = require('../consumer/publish');
+const { validateFile } = require('../util/fs');
 
 // for checking if a logfile has been provided by user
 function getRevertAndLogfile(args) {
@@ -329,6 +330,11 @@ setConfig(config);
 async function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') {
     if (typeof process.argv.slice(2)[1] === 'string') {
+
+      if(!validateFile(process.argv.slice(2)[1], ['revert'])) {
+        return false;
+      }
+
       revertUsingLogs(process.argv.slice(2)[1]);
     }
   } else {

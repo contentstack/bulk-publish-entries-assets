@@ -5,6 +5,7 @@ const {
   bulkPublish, publishEntry, publishAsset, iniatlizeLogger,
 } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 const queue = new Queue();
 const entryQueue = new Queue();
@@ -149,6 +150,11 @@ setConfig(config);
 async function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') { 
     if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+
+      if(!validateFile(process.argv.slice(2)[1], ['cross_publish', 'bulk_cross_publish'])) {
+        return false;
+      }
+
       if (config.cross_env_publish.bulkPublish) {
         retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
       } else {
