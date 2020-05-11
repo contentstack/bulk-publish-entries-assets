@@ -327,23 +327,24 @@ async function revertUsingLogs(logFileName) {
 setConfig(config);
 
 async function start() {
-  // const ok = await yesno({
-  //   question: `Are you sure you want to revert using the file "${logfilenameProvidedByUser}" ?`,
-  // });
-  // if (ok) {
-  revertUsingLogs(logfilenameProvidedByUser);
-  // }
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      revertUsingLogs(process.argv.slice(2)[1]);
+    }
+  } else {
+    // const ok = await yesno({
+    //   question: `Are you sure you want to revert using the file "${logfilenameProvidedByUser}" ?`,
+    // });
+    // if (ok) {
+    revertUsingLogs(logfilenameProvidedByUser);
+    // }
+  }
 }
+
+start();
 
 module.exports = {
   setConfig,
   revertUsingLogs,
+  start
 };
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    revertUsingLogs(process.argv.slice(2)[1]);
-  }
-} else {
-  start();
-}
