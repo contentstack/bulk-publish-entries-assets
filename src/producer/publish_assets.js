@@ -3,6 +3,7 @@ let config = require('../../config');
 const req = require('../util/request');
 const { bulkPublish, publishAsset, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 const queue = new Queue();
 let logFileName;
@@ -77,10 +78,16 @@ async function getAssets(folder = 'cs_root', skip = 0) {
 
 function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') {
-    if (config.publish_assets.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { assetQueue: queue }, 'publish');
+    if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+      if(!validateFile(process.argv.slice(2)[1], ['PublishAssets', 'bulkPublishAssets'])) {
+        return false;
+      }
+
+      if (config.publish_assets.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { assetQueue: queue }, 'publish');
+      }
     }
   } else {
     if (config.publish_assets.folderUid) {

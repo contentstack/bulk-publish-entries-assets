@@ -3,6 +3,7 @@ const req = require('../util/request');
 const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 let config = require('../../config');
+const { validateFile } = require('../util/fs');
 
 let skipCount;
 const queue = new Queue();
@@ -109,6 +110,11 @@ setConfig(config);
 async function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') {
     if (typeof process.argv.slice(2)[1] === 'string') {
+
+      if(!validateFile(process.argv.slice(2)[1], ['publish_edits', 'bulk_publish_edits'])) {
+        return false;
+      }
+
       if (config.publish_edits_on_env.bulkPublish) {
         retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
       } else {

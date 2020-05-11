@@ -5,6 +5,7 @@ const {
   bulkUnPublish, UnpublishEntry, UnpublishAsset, iniatlizeLogger,
 } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 const queue = new Queue();
 const entryQueue = new Queue();
@@ -144,6 +145,11 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
 async function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') {
     if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+
+      if(!validateFile(process.argv.slice(2)[1], ['Unpublish', 'bulkUnpublish'])) {
+        return false;
+      }
+
       if (config.Unpublish.bulkUnpublish) {
         retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
       } else {
