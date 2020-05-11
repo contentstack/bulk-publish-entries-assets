@@ -141,29 +141,26 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
   return true;
 }
 
+async function start() {
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+      if (config.Unpublish.bulkUnpublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
+      }
+    }
+  } else {
+    const queryParams = getQueryParams(config.Unpublish.filter);
+    await getSyncEntries(config.Unpublish.filter.locale, queryParams);
+  }
+}
+
+start();
 
 module.exports = {
   getSyncEntries,
   setConfig,
   getQueryParams,
+  start,
 };
-
-async function start() {
-  const queryParams = getQueryParams(config.Unpublish.filter);
-  await getSyncEntries(config.Unpublish.filter.locale, queryParams);
-}
-
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (config.Unpublish.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
-
-// start();
