@@ -18,6 +18,15 @@ const logs = [
   '1587758242718.PublishEntries.success',
   '1587758242719.PublishEntries.success',
   '1587956283100.PublishAssets.success',
+  '1587758242717.bulk_add_fields.error',
+  '1587758242717.bulk_cross_publish.error',
+  '1587758242717.bulk_nonlocalized_field_changes.error',
+  '1587758242717.bulkPublishAssets.error',
+  '1587758242717.Bulk_publish_draft.error',
+  '1587758242717.bulk_publish_edits.error',
+  '1587758242717.bulkPublishEntries.error',
+  '1587758242717.bulkUnpublish.error',
+  '1587758242717.revert.error',
 ];
 
 logs.forEach((element) => {

@@ -269,8 +269,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
 function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') {
     if (typeof process.argv.slice(2)[1] === 'string') {
-
-      if(!validateFile(process.argv.slice(2)[1], ['bulk_add_fields', 'addFields'])) {
+      if (!validateFile(process.argv.slice(2)[1], ['bulk_add_fields', 'addFields'])) {
         return false;
       }
 
@@ -283,20 +282,20 @@ function start() {
   } else {
     for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
       getContentTypeSchema(config.addFields.contentTypes[i])
-      .then(async (schema) => {
-        for (let j = 0; j < config.addFields.locales.length; j += 1) {
-          try {
-            await getEntries(schema, config.addFields.contentTypes[i], config.addFields.locales[j]);
-          } catch (err) {
-            console.log(`Failed to get Entries with contentType ${config.addFields.contentTypes[i]} and locale ${config.addFields.locales[j]}`);
+        .then(async (schema) => {
+          for (let j = 0; j < config.addFields.locales.length; j += 1) {
+            try {
+              await getEntries(schema, config.addFields.contentTypes[i], config.addFields.locales[j]);
+            } catch (err) {
+              console.log(`Failed to get Entries with contentType ${config.addFields.contentTypes[i]} and locale ${config.addFields.locales[j]}`);
+            }
           }
-        }
-      })
-      .catch((err) => {
-        console.log(`Failed to fetch schema${JSON.stringify(err)}`);
-      });
+        })
+        .catch((err) => {
+          console.log(`Failed to fetch schema${JSON.stringify(err)}`);
+        });
     }
-  }  
+  }
 }
 
 start();

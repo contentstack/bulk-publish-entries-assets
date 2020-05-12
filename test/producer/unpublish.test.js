@@ -7,8 +7,7 @@ const dummyConfig = require('../dummy/config');
 const syncEntriesResponse = require('../dummy/unpublish_response');
 const bulkUnpublishResponse = require('../dummy/bulkUnpublishResponse');
 
-const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
-const publishAssetLog = '1587956283100.PublishAssets.success';
+const bulkUnpublishLog = '1587758242717.bulkUnpublish.error';
 
 describe('testing unpublish case', () => {
   const mockedlog = () => { };
@@ -100,14 +99,14 @@ describe('testing unpublish case', () => {
   });
 
   it('testing retryFailed call', async () => {
-    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkUnpublishLog];
     expect(await start()).toBeUndefined();
   });
 
   it('testing retryFailed call when bulkUnpublish is true', async () => {
     dummyConfig.Unpublish.bulkUnpublish = true;
     setConfig(dummyConfig);
-    process.argv = ['stuff', 'stuff', '-retryFailed', publishAssetLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkUnpublishLog];
     expect(await start()).toBeUndefined();
   });
 });
