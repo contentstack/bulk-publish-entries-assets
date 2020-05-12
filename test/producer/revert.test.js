@@ -12,7 +12,7 @@ const assetLogFileName = '1587956283100.PublishAssets.success';
 //   .pipe(fs.createWriteStream(path.join(__dirname, '../', '../', 'logs/', assetLogFileName)));
 
 const {
-  setConfig, revertUsingLogs, start
+  setConfig, revertUsingLogs, start,
 } = require('../../src/producer/revert');
 
 const dummyConfig = require('../dummy/config');
@@ -23,8 +23,7 @@ const entryPublishResponse = require('../dummy/entrypublished');
 
 const environmentsResponse = require('../dummy/environments');
 
-const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
-const publishAssetLog = '1587956283100.PublishAssets.success';
+const retryFailedLog = '1587758242717.revert.error';
 
 describe('testing bulk entries publish', () => {
   const mockedlog = () => { };
@@ -92,7 +91,7 @@ describe('testing bulk entries publish', () => {
   });
 
   it('testing retryFailed block', async () => {
-    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', retryFailedLog];
     expect(await start()).toBeUndefined();
   });
 });

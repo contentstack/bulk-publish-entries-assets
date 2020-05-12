@@ -7,8 +7,7 @@ const contentTypeResponse = require('../dummy/contentTypeResponse');
 const localizedEntryResponse = require('../dummy/entry');
 const masterEntry = require('../dummy/masterEntry');
 
-const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
-const publishEntriesLog = '1587758242718.PublishEntries.success';
+const bulkNonLocalizedLog = '1587758242717.bulk_nonlocalized_field_changes.error';
 
 function fillArray(value, len) {
   if (len === 0) return [];
@@ -117,14 +116,14 @@ describe('testing nonlocalized field changes', () => {
   });
 
   it('testing retryFailed for bulk publish log', async () => {
-    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkNonLocalizedLog];
     expect(await start()).toBeUndefined();
   });
 
   it('testing retryFailed for bulk publish log', async () => {
     dummyConfig.nonlocalized_field_changes.bulkPublish = false;
     setConfig(dummyConfig);
-    process.argv = ['stuff', 'stuff', '-retryFailed', publishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkNonLocalizedLog];
     expect(await start()).toBeUndefined();
   });
 });

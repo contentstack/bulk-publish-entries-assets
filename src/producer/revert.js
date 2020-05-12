@@ -6,7 +6,6 @@ const { validateFile } = require('../util/fs');
 let config = require('../../config');
 const req = require('../util/request');
 const { iniatlizeLogger, bulkUnPublish, publishUsingVersion } = require('../consumer/publish');
-const { validateFile } = require('../util/fs');
 
 // for checking if a logfile has been provided by user
 function getRevertAndLogfile(args) {

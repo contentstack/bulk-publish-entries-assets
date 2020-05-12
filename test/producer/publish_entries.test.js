@@ -8,8 +8,7 @@ const bulkentriesResponse2 = require('../dummy/bulkentries2');
 const entryPublishResponse = require('../dummy/entrypublished');
 const contentTypesResponse = require('../dummy/bulkContentTypeResponse');
 
-const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
-const publishEntriesLog = '1587758242718.PublishEntries.success';
+const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.error';
 
 describe('testing bulk entries publish', () => {
   const mockedlog = () => {};
@@ -148,7 +147,7 @@ describe('testing bulk entries publish', () => {
   it('testing retryFailed for bulk publish log', async () => {
     dummyConfig.publish_entries.bulkPublish = false;
     setConfig(dummyConfig);
-    process.argv = ['stuff', 'stuff', '-retryFailed', publishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
     expect(await start()).toBeUndefined();
   });
 });
