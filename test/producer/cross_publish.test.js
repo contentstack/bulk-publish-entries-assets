@@ -6,8 +6,7 @@ const dummyConfig = require('../dummy/config');
 // const entryPublishResponse = require('../dummy/entrypublished');
 const syncEntriesResponse = require('../dummy/unpublish_response');
 
-const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
-const publishEntriesLog = '1587758242718.PublishEntries.success';
+const bulkCrossPublishLog = '1587758242717.bulk_cross_publish.error';
 
 describe('testing unpublish case', () => {
   const mockedlog = () => {};
@@ -48,14 +47,14 @@ describe('testing unpublish case', () => {
   });
 
   it('testing retryFailed for bulk publish log', async () => {
-    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkCrossPublishLog];
     expect(await start()).toBeUndefined();
   });
 
   it('testing retryFailed for bulk publish log', async () => {
     dummyConfig.cross_env_publish.bulkPublish = true;
     setConfig(dummyConfig);
-    process.argv = ['stuff', 'stuff', '-retryFailed', publishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkCrossPublishLog];
     expect(await start()).toBeUndefined();
   });
 });

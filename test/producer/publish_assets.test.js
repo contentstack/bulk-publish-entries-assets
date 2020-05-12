@@ -6,8 +6,7 @@ const bulkassetResponse2 = require('../dummy/bulkasset2');
 
 const assetPublishResponse = require('../dummy/assetpublished');
 
-const bulkPublishEntriesLog = '1587758242717.bulkPublishEntries.success';
-const publishAssetLog = '1587956283100.PublishAssets.success';
+const bulkPublishAssetsLog = '1587758242717.bulkPublishAssets.error';
 
 describe('testing asset bulk publish', () => {
   const mockedlog = () => {};
@@ -106,14 +105,14 @@ describe('testing asset bulk publish', () => {
   });
 
   it('testing retryFailed block', async () => {
-    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishEntriesLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishAssetsLog];
     expect(await start()).toBeUndefined();
   });
 
   it('testing retryFailed when bulkPublish is false', async () => {
     dummyConfig.publish_assets.bulkPublish = false;
     setConfig(dummyConfig);
-    process.argv = ['stuff', 'stuff', '-retryFailed', publishAssetLog];
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishAssetsLog];
     expect(await start()).toBeUndefined();
   });
 });
