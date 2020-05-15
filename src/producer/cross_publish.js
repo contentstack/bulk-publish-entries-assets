@@ -59,7 +59,7 @@ function bulkAction(items) {
         bulkPublishSet.push({
           uid: item.data.uid,
           content_type: item.content_type_uid,
-          locle: item.data.publish_details.locale || 'en-us',
+          locale: item.data.publish_details.locale || 'en-us',
           version: item.data._version,
           publish_details: [item.data.publish_details] || [],
         });
@@ -148,10 +148,9 @@ async function getSyncEntries(queryParams, paginationToken = null) {
 setConfig(config);
 
 async function start() {
-  if (process.argv.slice(2)[0] === '-retryFailed') { 
+  if (process.argv.slice(2)[0] === '-retryFailed') {
     if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-
-      if(!validateFile(process.argv.slice(2)[1], ['cross_publish', 'bulk_cross_publish'])) {
+      if (!validateFile(process.argv.slice(2)[1], ['cross_publish', 'bulk_cross_publish'])) {
         return false;
       }
 
@@ -165,7 +164,6 @@ async function start() {
     const queryParams = getQueryParams(config.cross_env_publish.filter);
     await getSyncEntries(queryParams);
   }
-
 }
 
 start();
@@ -176,4 +174,3 @@ module.exports = {
   getQueryParams,
   start,
 };
-
