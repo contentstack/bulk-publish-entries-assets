@@ -77,7 +77,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
             }
           } else {
             queue.Enqueue({
-              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale, Type: 'entry',
+              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_unpublished_env.environments, entryUid: entry.uid, locale, Type: 'entry',
             });
           }
         }
@@ -112,8 +112,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
 async function start() {
   if (process.argv.slice(2)[0] === '-retryFailed') {
     if (typeof process.argv.slice(2)[1] === 'string') {
-
-      if(!validateFile(process.argv.slice(2)[1], ['publish_draft', 'Bulk_publish_draft'])) {
+      if (!validateFile(process.argv.slice(2)[1], ['publish_draft', 'Bulk_publish_draft'])) {
         return false;
       }
 
