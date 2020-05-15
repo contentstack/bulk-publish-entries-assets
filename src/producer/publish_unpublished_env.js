@@ -71,7 +71,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
             }
           } else {
             queue.Enqueue({
-              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_entries.environments, entryUid: entry.uid, locale, Type: 'entry',
+              content_type: contentType, publish_details: entry.publish_details, environments: config.publish_unpublished_env.environments, entryUid: entry.uid, locale, Type: 'entry',
             });
           }
         }
