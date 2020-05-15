@@ -58,7 +58,7 @@ function bulkAction(items) {
         bulkUnPublishSet.push({
           uid: item.data.uid,
           content_type: item.content_type_uid,
-          locle: item.data.publish_details.locale || 'en-us',
+          locale: item.data.publish_details.locale || 'en-us',
           version: item.data._version,
           publish_details: [item.data.publish_details] || [],
         });
