@@ -5,6 +5,7 @@ const {
   bulkUnPublish, UnpublishEntry, UnpublishAsset, iniatlizeLogger,
 } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 const queue = new Queue();
 const entryQueue = new Queue();
@@ -14,19 +15,24 @@ let bulkUnPublishSet = [];
 let bulkUnPulishAssetSet = [];
 let logFileName;
 
-let changedFlag = false;
-
-
-if (config.Unpublish.bulkUnpublish) {
-  logFileName = 'bulkUnpublish';
-  queue.consumer = bulkUnPublish;
-} else {
-  logFileName = 'Unpublish';
-  entryQueue.consumer = UnpublishEntry;
-  assetQueue.consumer = UnpublishAsset;
+function setConfig(conf) {
+  if (conf.Unpublish.bulkUnpublish) {
+    logFileName = 'bulkUnpublish';
+    queue.consumer = bulkUnPublish;
+  } else {
+    logFileName = 'Unpublish';
+    entryQueue.consumer = UnpublishEntry;
+    assetQueue.consumer = UnpublishAsset;
+  }
+  config = conf;
+  queue.config = conf;
+  entryQueue.config = conf;
+  assetQueue.config = conf;
 }
 
+let changedFlag = false;
 
+setConfig(config);
 iniatlizeLogger(logFileName);
 
 function getQueryParams(filter) {
@@ -38,13 +44,6 @@ function getQueryParams(filter) {
   });
 
   return queryString;
-}
-
-function setConfig(conf) {
-  config = conf;
-  queue.config = conf;
-  entryQueue.config = conf;
-  assetQueue.config = conf;
 }
 
 function bulkAction(items) {
@@ -120,7 +119,7 @@ function bulkAction(items) {
 async function getSyncEntries(locale, queryParams, paginationToken = null) {
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/stacks/sync?${paginationToken ? `pagination_token=${paginationToken}` : 'init=true'}${queryParams}`,
       headers: {
         api_key: config.apikey,
         access_token: config.Unpublish.deliveryToken,
@@ -143,31 +142,31 @@ async function getSyncEntries(locale, queryParams, paginationToken = null) {
   return true;
 }
 
+async function start() {
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
+
+      if(!validateFile(process.argv.slice(2)[1], ['Unpublish', 'bulkUnpublish'])) {
+        return false;
+      }
+
+      if (config.Unpublish.bulkUnpublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
+      }
+    }
+  } else {
+    const queryParams = getQueryParams(config.Unpublish.filter);
+    await getSyncEntries(config.Unpublish.filter.locale, queryParams);
+  }
+}
+
+start();
 
 module.exports = {
   getSyncEntries,
   setConfig,
   getQueryParams,
+  start,
 };
-
-setConfig(config);
-
-async function start() {
-  const queryParams = getQueryParams(config.Unpublish.filter);
-  await getSyncEntries(config.Unpublish.filter.locale, queryParams);
-}
-
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string' && process.argv.slice(2)[1]) {
-    if (config.Unpublish.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue, assetQueue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
-
-// start();

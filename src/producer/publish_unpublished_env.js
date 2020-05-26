@@ -3,6 +3,7 @@ let config = require('../../config');
 const req = require('../util/request');
 const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 const queue = new Queue();
 let skipCount;
@@ -10,21 +11,26 @@ let changedFlag = false;
 let logFileName = 'publish_unpublished_env';
 let bulkPublishSet = [];
 
-if (config.publish_unpublished_env.bulkPublish) {
-  logFileName = 'Bulk_publish_draft';
-  queue.consumer = bulkPublish;
-} else {
-  logFileName = 'publish_draft';
-  queue.consumer = publishEntry;
+function setConfig(conf) {
+  if (conf.publish_unpublished_env.bulkPublish) {
+    logFileName = 'Bulk_publish_draft';
+    queue.consumer = bulkPublish;
+  } else {
+    logFileName = 'publish_draft';
+    queue.consumer = publishEntry;
+  }
+  config = conf;
+  queue.config = config;
 }
 
-iniatlizeLogger(logFileName);
+setConfig(config);
 
+iniatlizeLogger(logFileName);
 
 async function getEnvironment(environmentName) {
   try {
     const options = {
-      url: `${config.cdnEndPoint}/v3/environments/${environmentName}`,
+      url: `${config.cdnEndPoint}/v${config.apiVersion}/environments/${environmentName}`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -41,7 +47,7 @@ async function getEntries(contentType, environmentUid, skip = 0) {
   skipCount = skip;
   try {
     const conf = {
-      url: `${config.apiEndPoint}/v3/content_types/${contentType}/entries`,
+      url: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries`,
       qs: {
         include_count: true,
         skip: skipCount,
@@ -103,31 +109,41 @@ async function getEntries(contentType, environmentUid, skip = 0) {
   }
 }
 
-function setConfig(conf) {
-  config = conf;
-  queue.config = config;
-}
-
-setConfig(config);
 async function start() {
-  try {
-    if (config.publish_unpublished_env.sourceEnv) {
-      const environmentDetails = await getEnvironment(config.publish_unpublished_env.sourceEnv);
-      for (let i = 0; i < config.publish_unpublished_env.contentTypes.length; i += 1) {
-        try {
-          /* eslint-disable no-await-in-loop */
-          await getEntries(config.publish_unpublished_env.contentTypes[i], environmentDetails.environment.uid);
-          /* eslint-enable no-await-in-loop */
-          changedFlag = false;
-        } catch (err) {
-          console.log(err);
-        }
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      if (!validateFile(process.argv.slice(2)[1], ['publish_draft', 'Bulk_publish_draft'])) {
+        return false;
+      }
+
+      if (config.publish_unpublished_env.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
       }
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    try {
+      if (config.publish_unpublished_env.sourceEnv) {
+        const environmentDetails = await getEnvironment(config.publish_unpublished_env.sourceEnv);
+        for (let i = 0; i < config.publish_unpublished_env.contentTypes.length; i += 1) {
+          try {
+            /* eslint-disable no-await-in-loop */
+            await getEntries(config.publish_unpublished_env.contentTypes[i], environmentDetails.environment.uid);
+            /* eslint-enable no-await-in-loop */
+            changedFlag = false;
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
+
+start();
 
 module.exports = {
   getEntries,
@@ -135,16 +151,3 @@ module.exports = {
   setConfig,
   start,
 };
-
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.publish_unpublished_env.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}
-// start()

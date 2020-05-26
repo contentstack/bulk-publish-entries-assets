@@ -1,23 +1,25 @@
 const nock = require('nock');
-const { setConfig, getAssets } = require('../../src/producer/publish_assets');
+const { setConfig, getAssets, start } = require('../../src/producer/publish_assets');
 const dummyConfig = require('../dummy/config');
 const bulkassetResponse1 = require('../dummy/bulkasset1');
 const bulkassetResponse2 = require('../dummy/bulkasset2');
 
 const assetPublishResponse = require('../dummy/assetpublished');
 
+const bulkPublishAssetsLog = '1587758242717.bulkPublishAssets.error';
+
 describe('testing asset bulk publish', () => {
-  // const mockedlog = () => {};
+  const mockedlog = () => {};
 
   beforeEach(() => {
-    // console.log = mockedlog;
-    nock(dummyConfig.cdnEndPoint, {
+    console.log = mockedlog;
+    nock(dummyConfig.apiEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/assets')
+      .get(`/v${dummyConfig.apiVersion}/assets`)
       .query({
         folder: 'cs_root',
         include_count: true,
@@ -27,13 +29,13 @@ describe('testing asset bulk publish', () => {
       })
       .reply(200, bulkassetResponse1);
 
-    nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.apiEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/assets')
+      .get(`/v${dummyConfig.apiVersion}/assets`)
       .query({
         folder: 'cs_root',
         include_count: true,
@@ -49,24 +51,16 @@ describe('testing asset bulk publish', () => {
         authorization: dummyConfig.manageToken,
       },
     })
-      .post('/v3/bulk/publish', {
-        assets: [{
-          uid: 'dummyAssetId',
-        }, {
-          uid: 'dummyAssetId2',
-        }],
-        locales: ['en-us'],
-        environments: ['dummyEnvironment'],
-      })
+      .post(`/v${dummyConfig.apiVersion}/bulk/publish`)
       .reply(200, assetPublishResponse);
 
-    nock(dummyConfig.cdnEndPoint, {
+    nock(dummyConfig.apiEndPoint, {
       reqheaders: {
         api_key: dummyConfig.apikey,
         authorization: dummyConfig.manageToken,
       },
     })
-      .get('/v3/assets')
+      .get(`/v${dummyConfig.apiVersion}/assets`)
       .query({
         folder: 'cs_root',
         include_count: true,
@@ -76,22 +70,22 @@ describe('testing asset bulk publish', () => {
       })
       .reply(200, bulkassetResponse2);
 
-    nock(dummyConfig.cdnEndPoint, {
-      reqheaders: {
-        api_key: dummyConfig.apikey,
-        authorization: dummyConfig.manageToken,
-      },
-    })
-      .post('/v3/bulk/publish', {
-        assets: [{
-          uid: 'dummyAssetId',
-        }, {
-          uid: 'dummyAssetId2',
-        }],
-        locales: ['en-us'],
-        environments: ['dummyEnvironment'],
-      })
-      .replyWithError('Some Error');
+    // nock(dummyConfig.cdnEndPoint, {
+    //   reqheaders: {
+    //     api_key: dummyConfig.apikey,
+    //     authorization: dummyConfig.manageToken,
+    //   },
+    // })
+    //   .post(`/v${dummyConfig.apiVersion}/bulk/publish`, {
+    //     assets: [{
+    //       uid: 'dummyAssetId',
+    //     }, {
+    //       uid: 'dummyAssetId2',
+    //     }],
+    //     locales: ['en-us'],
+    //     environments: ['dummyEnvironment'],
+    //   })
+    //   .replyWithError('Some Error');
   });
 
   setConfig(dummyConfig);
@@ -100,7 +94,25 @@ describe('testing asset bulk publish', () => {
     expect(await getAssets('cs_root')).toBeTruthy();
   });
 
+  it('testing get Assets and bulk publish function', async () => {
+    dummyConfig.publish_assets.bulkPublish = true;
+    setConfig(dummyConfig);
+    expect(await getAssets('cs_root')).toBeTruthy();
+  });
+
   it('testing for errors inside get assets call', async () => {
     expect(await getAssets('cs_root', 3)).toBeTruthy();
+  });
+
+  it('testing retryFailed block', async () => {
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishAssetsLog];
+    expect(await start()).toBeUndefined();
+  });
+
+  it('testing retryFailed when bulkPublish is false', async () => {
+    dummyConfig.publish_assets.bulkPublish = false;
+    setConfig(dummyConfig);
+    process.argv = ['stuff', 'stuff', '-retryFailed', bulkPublishAssetsLog];
+    expect(await start()).toBeUndefined();
   });
 });
