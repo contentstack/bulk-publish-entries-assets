@@ -14,7 +14,7 @@ function doesFileExistInLogsDirectory(filename) {
   console.log(chalk.red(`Error: ${filename} doesn't exist in logs directory at ${logsDir}`));
 }
 
-function validateFile(filename) {
+function validateFile(filename, types) {
   if (doesFileExistInLogsDirectory(filename)) {
     const [timestamp, logType, status] = filename.split('.');
 
@@ -48,6 +48,19 @@ function validateFile(filename) {
         case 'bulkUnpublish':
         case 'Unpublish':
         case 'revert':
+          if (types && types.length > 0) {
+
+            if(status !=='error') {
+              console.log(chalk.red('Error: The given log file is not an error log file.'));
+              return false;
+            }
+
+            if(types.indexOf(logType) === -1) {
+              console.log(chalk.red('Error: For this operation, the log file should be of the following types'));
+              types.forEach((type) => { console.log(chalk.red("\t" + type)); });
+              return false;
+            }
+          }
           return true;
         default:
           console.log(chalk.red(`Error: ${filename} is not a valid log file or the log name has been changed`));

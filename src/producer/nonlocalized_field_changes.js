@@ -4,6 +4,7 @@ let config = require('../../config');
 const req = require('../util/request');
 const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 let changedFlag = false;
 const queue = new Queue();
@@ -13,16 +14,14 @@ let bulkPublishSet = [];
 
 iniatlizeLogger(logFileName);
 
-if (config.nonlocalized_field_changes.bulkPublish) {
-  logFileName = 'bulk_nonlocalized_field_changes';
-  queue.consumer = bulkPublish;
-} else {
-  logFileName = 'nonlocalized_field_changes';
-  queue.consumer = publishEntry;
-}
-
-
 function setConfig(conf) {
+  if (conf.nonlocalized_field_changes.bulkPublish) {
+    logFileName = 'bulk_nonlocalized_field_changes';
+    queue.consumer = bulkPublish;
+  } else {
+    logFileName = 'nonlocalized_field_changes';
+    queue.consumer = publishEntry;
+  }
   config = conf;
   queue.config = conf;
 }
@@ -30,7 +29,7 @@ function setConfig(conf) {
 async function getContentTypeSchema(contentType) {
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}?include_global_field_schema=true`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${contentType}?include_global_field_schema=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -50,7 +49,7 @@ async function getLocalizedEntry(entry, contentType, locale) {
   let conf;
   try {
     conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}/entries/${entry.uid}?locale=${locale}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_publish_details=true`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries/${entry.uid}?locale=${locale}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_publish_details=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -215,7 +214,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
   skipCount = skip;
   try {
     const conf = {
-      uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${masterLocale || 'en-us'}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_count=true&skip=${skipCount}`,
+      uri: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries?locale=${masterLocale || 'en-us'}&environment=${config.nonlocalized_field_changes.sourceEnv}&include_count=true&skip=${skipCount}`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -284,7 +283,7 @@ async function getEntries(schema, contentType, languages, masterLocale, skip = 0
 async function getLanguages() {
   try {
     const conf = {
-      uri: `${config.apiEndPoint}/v3/locales`,
+      uri: `${config.apiEndPoint}/v${config.apiVersion}/locales`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -301,26 +300,44 @@ async function getLanguages() {
 
 setConfig(config);
 async function start() {
-  try {
-    const masterLocale = config.nonlocalized_field_changes.masterLocale || 'en-us';
-    const languages = await getLanguages();
-    const { contentTypes } = config.nonlocalized_field_changes;
-    for (let i = 0; i < contentTypes.length; i += 1) {
-      try {
-        /* eslint-disable no-await-in-loop */
-        const schema = await getContentTypeSchema(contentTypes[i]);
-        await getEntries(schema, contentTypes[i], languages, masterLocale);
-        /* eslint-enable no-await-in-loop */
-      } catch (err) {
-        console.log(err);
+  if (process.argv.slice(2)[0] === '-retryFailed') { 
+    if (typeof process.argv.slice(2)[1] === 'string') {
+
+      if(!validateFile(process.argv.slice(2)[1], ['nonlocalized_field_changes', 'bulk_nonlocalized_field_changes'])) {
+        return false;
+      }
+
+      if (config.nonlocalized_field_changes.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
       }
     }
-  } catch (err) {
-    console.log(err);
+  } else {
+    try {
+      const masterLocale = config.nonlocalized_field_changes.masterLocale || 'en-us';
+      const languages = await getLanguages();
+      const { contentTypes } = config.nonlocalized_field_changes;
+      for (let i = 0; i < contentTypes.length; i += 1) {
+        try {
+          /* eslint-disable no-await-in-loop */
+          const schema = await getContentTypeSchema(contentTypes[i]);
+          await getEntries(schema, contentTypes[i], languages, masterLocale);
+          /* eslint-enable no-await-in-loop */
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
 
+start();
+
 module.exports = {
+  start,
   setConfig,
   getLanguages,
   getEntries,
@@ -329,14 +346,3 @@ module.exports = {
   checkNonLocalizedFieldChanges,
 };
 
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.nonlocalized_field_changes.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}

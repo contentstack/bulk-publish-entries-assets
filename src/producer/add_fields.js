@@ -3,6 +3,7 @@ let config = require('../../config');
 const req = require('../util/request');
 const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
+const { validateFile } = require('../util/fs');
 
 const queue = new Queue();
 queue.consumer = bulkPublish;
@@ -11,20 +12,26 @@ let bulkPublishSet = [];
 
 let changedFlag = false;
 
-if (config.addFields.bulkPublish) {
-  logFileName = 'bulk_add_fields';
-  queue.consumer = bulkPublish;
-} else {
-  logFileName = 'addFields';
-  queue.consumer = publishEntry;
+function setConfig(conf) {
+  if (config.addFields.bulkPublish) {
+    logFileName = 'bulk_add_fields';
+    queue.consumer = bulkPublish;
+  } else {
+    logFileName = 'addFields';
+    queue.consumer = publishEntry;
+  }
+  config = conf;
+  queue.config = conf;
 }
+
+setConfig(config);
 
 iniatlizeLogger(logFileName);
 
 async function getContentTypeSchema(contentType) {
   try {
     const conf = {
-      uri: `${config.cdnEndPoint}/v3/content_types/${contentType}?include_global_field_schema=true`,
+      uri: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${contentType}?include_global_field_schema=true`,
       headers: {
         api_key: config.apikey,
         authorization: config.manageToken,
@@ -168,7 +175,7 @@ async function updateEntry(updatedEntry, contentType, locale) {
     entry: updatedEntry,
   };
   const conf = {
-    uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries/${updatedEntry.uid}?locale=${locale || 'en-us'}`,
+    uri: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries/${updatedEntry.uid}?locale=${locale || 'en-us'}`,
     method: 'PUT',
     headers: {
       api_key: config.apikey,
@@ -196,7 +203,7 @@ async function getEntries(schema, contentType, locale, skip = 0) {
   console.log(contentType);
   console.log(locale);
   const conf = {
-    uri: `${config.apiEndPoint}/v3/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skip}&include_publish_details=true`,
+    uri: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${contentType}/entries?locale=${locale || 'en-us'}&include_count=true&skip=${skip}&include_publish_details=true`,
     headers: {
       api_key: config.apikey,
       authorization: config.manageToken,
@@ -256,51 +263,48 @@ async function getEntries(schema, contentType, locale, skip = 0) {
   return true;
 }
 
-function setConfig(conf) {
-  config = conf;
-  queue.config = conf;
-}
-
-setConfig(config);
-
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-loop-func */
 
 function start() {
-  for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
-    getContentTypeSchema(config.addFields.contentTypes[i])
-      .then(async (schema) => {
-        for (let j = 0; j < config.addFields.locales.length; j += 1) {
-          try {
-            await getEntries(schema, config.addFields.contentTypes[i], config.addFields.locales[j]);
-          } catch (err) {
-            console.log(`Failed to get Entries with contentType ${config.addFields.contentTypes[i]} and locale ${config.addFields.locales[j]}`);
+  if (process.argv.slice(2)[0] === '-retryFailed') {
+    if (typeof process.argv.slice(2)[1] === 'string') {
+      if (!validateFile(process.argv.slice(2)[1], ['bulk_add_fields', 'addFields'])) {
+        return false;
+      }
+
+      if (config.addFields.bulkPublish) {
+        retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
+      } else {
+        retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
+      }
+    }
+  } else {
+    for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
+      getContentTypeSchema(config.addFields.contentTypes[i])
+        .then(async (schema) => {
+          for (let j = 0; j < config.addFields.locales.length; j += 1) {
+            try {
+              await getEntries(schema, config.addFields.contentTypes[i], config.addFields.locales[j]);
+            } catch (err) {
+              console.log(`Failed to get Entries with contentType ${config.addFields.contentTypes[i]} and locale ${config.addFields.locales[j]}`);
+            }
           }
-        }
-      })
-      .catch((err) => {
-        console.log(`Failed to fetch schema${JSON.stringify(err)}`);
-      });
+        })
+        .catch((err) => {
+          console.log(`Failed to fetch schema${JSON.stringify(err)}`);
+        });
+    }
   }
 }
 
+start();
+
 module.exports = {
+  start,
   getContentTypeSchema,
   getEntries,
   setConfig,
   removeUnwanted,
   addFields,
 };
-
-// start();
-if (process.argv.slice(2)[0] === '-retryFailed') {
-  if (typeof process.argv.slice(2)[1] === 'string') {
-    if (config.addFields.bulkPublish) {
-      retryFailedLogs(process.argv.slice(2)[1], queue, 'bulk');
-    } else {
-      retryFailedLogs(process.argv.slice(2)[1], { entryQueue: queue }, 'publish');
-    }
-  }
-} else {
-  start();
-}

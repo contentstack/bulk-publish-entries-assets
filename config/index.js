@@ -2,6 +2,7 @@ module.exports = {
   apikey: '', // api Key of the stack
   apiEndPoint: 'https://api.contentstack.io',
   cdnEndPoint: 'https://cdn.contentstack.io',
+  apiVersion: '3',
   manageToken: '', // management token of the stack
   publish_unpublished_env: {
     contentTypes: ['helloworld'],
@@ -12,13 +13,13 @@ module.exports = {
   },
   publish_assets: {
     environments: ['test'],
-    folderUid: 'blt0829fdfd03dfabc5', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
+    folderUid: 'cs_root', // uid of the folder whose contents needs to be published, cs_root for every asset of the stack
     bulkPublish: true,
   },
   publish_entries: {
     contentTypes: ['test'],
     locales: ['en-us', 'fr-fr'],
-    bulkPublish: false,
+    bulkPublish: true,
     environments: ['test'],
     publishAllContentTypes: false,
   },
@@ -29,7 +30,7 @@ module.exports = {
       locale: 'en-us', // locale filters
       type: 'asset_published,entry_published',
     },
-    deliveryToken: '***REMOVED***', // deliveryToken of the environment
+    deliveryToken: '', // deliveryToken of the environment
     bulkUnpublish: true,
   },
   cross_env_publish: {
@@ -39,7 +40,7 @@ module.exports = {
       locale: 'en-us', // locale filters
       type: 'asset_published,entry_published',
     },
-    deliveryToken: '***REMOVED***', // deliveryToken of the source environment
+    deliveryToken: '', // deliveryToken of the source environment
     destEnv: ['test'], // environment where it needs to be published
     bulkPublish: true,
   },
