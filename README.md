@@ -31,7 +31,7 @@ $ npm install
 ```
 #### Specify Stack details in config file(config/index.js)
 ```sh
-$ module.exports = {
+module.exports = {
   apikey:'', //api key of the stack
   apiEndPoint:'https://api.contentstack.io',
   cdnEndPoint:'https://cdn.contentstack.io',
@@ -47,7 +47,7 @@ $ module.exports = {
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   publish_unpublished_env:{
     contentTypes:['test'], //list of contentTypes
     sourceEnv : 'staging', //sourceEnv
@@ -69,7 +69,7 @@ $ npm run publish_unpublish
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   publish_assets:{
     environments:['bulktest'],
     folderUid:"cs_root", //Id of the folder to be published, cs_root for assets
@@ -88,7 +88,7 @@ $ npm run publish_assets
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   publish_entries:{
     contentTypes:['redirect_rule'], //list of contentTypes which needs to be published
     locales:['en-us'], //list of locales which need to be considered for mentioned CTs
@@ -108,7 +108,7 @@ $ npm run publish_entries
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   bulkUnpublish :{
     filter:{
       environment: 'bulktest', //source environment
@@ -131,7 +131,7 @@ $ npm run unpublish
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
     publish_edits_on_env: {
     contentTypes: ['test','helloworld'], 
     sourceEnv: 'test',
@@ -151,7 +151,7 @@ $ npm run publish_edits
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   cross_env_publish:{
      filter: {
       environment: 'bulktest', // source environment
@@ -175,7 +175,7 @@ $ npm run cross_publish
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   nonlocalized_field_changes: {
     sourceEnv: 'production', //source Environment
     contentTypes: ['testdin'],
@@ -195,7 +195,7 @@ $ npm run publish_localized
 **Specify case details in config file**
 
 ```sh
-$ module.exports = {
+module.exports = {
   addFields: {
     deleteFields: ['updated_by', 'created_by', 'created_at', 'updated_at', '_version', 'ACL'],
     locales: ['en-us'],
@@ -239,7 +239,7 @@ $ npm run publish_assets -- -retryFailed ${logFilename}
 
 ```
 for example
-//npm run publish_entries - - -retryFailed 18003bulkPublishEntries.error
+//npm run publish_entries -- -retryFailed 18003bulkPublishEntries.error
 
 
 #### Known Limitations:
