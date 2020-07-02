@@ -1,43 +1,58 @@
 {
-  "name": "bulk-publish-entries-assets",
-  "version": "1.0.0",
-  "description": "This script lets you bulk publish entries and assets of your stack",
-  "main": "index.js",
-  "scripts": {
-    "test": "node copyLogs.js && jest",
-    "publish_assets": "node src/producer/publish_assets.js",
-    "publish_entries": "node src/producer/publish_entries.js",
-    "publish_unpublish": "node src/producer/publish_unpublished_env.js",
-    "unpublish": "node src/producer/unpublish.js",
-    "publish_edits": "node src/producer/publish_edits.js",
-    "cross_publish": "node src/producer/cross_publish.js",
-    "publish_localized": "node src/producer/nonlocalized_field_changes.js",
-    "add_fields": "node src/producer/add_fields.js",
-    "revert": "node src/producer/revert.js"
+  "name": "bulk-publish",
+  "version": "0.0.0",
+  "author": "Abhinav Gupta @abhinav-from-contentstack",
+  "bin": {
+    "bulk-publish": "./bin/run"
   },
-  "author": "",
-  "license": "ISC",
+  "bugs": "https://github.com/abhinav-from-contentstack/bulk-publish/issues",
   "dependencies": {
+    "@oclif/command": "^1.6.1",
+    "@oclif/config": "^1.15.1",
+    "@oclif/plugin-help": "^3.1.0",
     "bluebird": "^3.7.2",
-    "chalk": "^3.0.0",
-    "debug": "^4.1.1",
-    "lodash": "^4.17.15",
+    "nock": "^13.0.0",
     "request": "^2.88.2",
-    "winston": "^3.2.1",
-    "yesno": "^0.3.1"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
-    ]
+    "winston": "^3.3.0"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.1.0",
-    "eslint-plugin-import": "^2.20.1",
-    "jest": "^25.1.0",
-    "jest-html-reporter": "^2.8.1",
-    "nock": "^12.0.3"
+    "@oclif/dev-cli": "^1.22.2",
+    "@oclif/test": "^1.2.6",
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-oclif": "^3.1.0",
+    "globby": "^10.0.2",
+    "mocha": "^5.2.0",
+    "nyc": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src"
+  ],
+  "homepage": "https://github.com/abhinav-from-contentstack/bulk-publish",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "bulk-publish",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "abhinav-from-contentstack/bulk-publish",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint .",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "test": "node copyLogs.js && nyc --reporter lcov mocha \"test/**/*.test.js\"",
+    "version": "oclif-dev readme && git add README.md"
   }
 }

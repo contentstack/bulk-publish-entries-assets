@@ -109,7 +109,7 @@ module.exports = {
     uid: 'dummyEntryId13',
     title: 'my title 13',
     publish_details: [{
-      environment: 'dummyEnvironment',
+      environment: 'dummyEnv',
       locale: 'en-us',
     }],
   }],

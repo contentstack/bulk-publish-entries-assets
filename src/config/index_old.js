@@ -1,9 +1,9 @@
 module.exports = {
-  apikey: '', // api Key of the stack
+  apikey: 'bltdaaa5dfadb94dc87', // api Key of the stack
   apiEndPoint: 'https://api.contentstack.io',
   cdnEndPoint: 'https://cdn.contentstack.io',
   apiVersion: '3',
-  manageToken: '', // management token of the stack
+  manageToken: '***REMOVED***', // management token of the stack
   publish_unpublished_env: {
     contentTypes: ['helloworld'],
     sourceEnv: 'test',
@@ -71,7 +71,7 @@ module.exports = {
     },
     bulkPublish: true,
   },
-};
+}
 
 // apiEndPoint:'https://api.contentstack.io',
 // cdnEndPoint:'https://cdn.contentstack.io',

@@ -1,0 +1,5 @@
+{
+  "apiEndPoint": "https://api.contentstack.io",
+  "cdnEndPoint": "https://cdn.contentstack.io",
+  "apiVersion": 3
+}
