@@ -109,7 +109,7 @@ $ npm run publish_entries
 
 ```sh
 module.exports = {
-  bulkUnpublish :{
+  Unpublish :{
     filter:{
       environment: 'bulktest', //source environment
       content_type_uid: '', //Add content type uid to be unpublished. Keep this blank to consider all
