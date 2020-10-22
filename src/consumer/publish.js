@@ -25,7 +25,7 @@ async function publishEntry(entryObj, config) {
   const lang = [];
   lang.push(entryObj.locale);
   const conf = {
-    url: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${entryObj.content_type}/entries/${entryObj.entryUid}/publish?locale=${entryObj.locale ? entryObj.locale : 'en-us'}`,
+    url: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${entryObj.content_type}/entries/${entryObj.entryUid}/publish?locale=${entryObj.locale ? entryObj.locale : 'en-us'}`,
     method: 'POST',
     headers: {
       api_key: config.apikey,
@@ -56,7 +56,7 @@ async function publishEntry(entryObj, config) {
 
 async function publishAsset(assetobj, config) {
   const conf = {
-    uri: `${config.cdnEndPoint}/v${config.apiVersion}/assets/${assetobj.assetUid}/publish`,
+    uri: `${config.apiEndPoint}/v${config.apiVersion}/assets/${assetobj.assetUid}/publish`,
     method: 'POST',
     headers: {
       api_key: config.apikey,
@@ -152,7 +152,7 @@ async function bulkPublish(bulkPublishObj, config) {
   switch (bulkPublishObj.Type) {
     case 'entry':
       conf = {
-        uri: `${config.cdnEndPoint}/v${config.apiVersion}/bulk/publish`,
+        uri: `${config.apiEndPoint}/v${config.apiVersion}/bulk/publish`,
         method: 'POST',
         headers: {
           api_key: config.apikey,
@@ -180,7 +180,7 @@ async function bulkPublish(bulkPublishObj, config) {
       break;
     case 'asset':
       conf = {
-        uri: `${config.cdnEndPoint}/v${config.apiVersion}/bulk/publish`,
+        uri: `${config.apiEndPoint}/v${config.apiVersion}/bulk/publish`,
         method: 'POST',
         headers: {
           api_key: config.apikey,
@@ -217,7 +217,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
   switch (bulkUnPublishObj.Type) {
     case 'entry':
       conf = {
-        uri: `${config.cdnEndPoint}/v${config.apiVersion}/bulk/unpublish`,
+        uri: `${config.apiEndPoint}/v${config.apiVersion}/bulk/unpublish`,
         method: 'POST',
         headers: {
           api_key: config.apikey,
@@ -245,7 +245,7 @@ async function bulkUnPublish(bulkUnPublishObj, config) {
       break;
     case 'asset':
       conf = {
-        uri: `${config.cdnEndPoint}/v${config.apiVersion}/bulk/unpublish`,
+        uri: `${config.apiEndPoint}/v${config.apiVersion}/bulk/unpublish`,
         method: 'POST',
         headers: {
           api_key: config.apikey,
@@ -293,7 +293,7 @@ async function publishUsingVersion(bulkPublishObj, config) {
       };
       bulkPublishObj.entries.forEach(async (entry) => {
         conf = {
-          uri: `${config.cdnEndPoint}/v${config.apiVersion}/content_types/${entry.content_type}/entries/${entry.uid}/publish`,
+          uri: `${config.apiEndPoint}/v${config.apiVersion}/content_types/${entry.content_type}/entries/${entry.uid}/publish`,
           method: 'POST',
           headers: {
             api_key: config.apikey,
@@ -371,7 +371,7 @@ async function publishUsingVersion(bulkPublishObj, config) {
       };
       bulkPublishObj.assets.forEach(async (asset) => {
         conf = {
-          uri: `${config.cdnEndPoint}/v${config.apiVersion}/assets/${asset.uid}/publish`,
+          uri: `${config.apiEndPoint}/v${config.apiVersion}/assets/${asset.uid}/publish`,
           method: 'POST',
           headers: {
             api_key: config.apikey,
