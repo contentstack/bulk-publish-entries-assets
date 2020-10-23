@@ -32,7 +32,7 @@ iniatlizeLogger(logFileName);
 function getQueryParams(filter) {
   let queryString = '';
   Object.keys(filter).forEach((key) => {
-    if (filter[key]) {
+    if (filter[key] && filter[key].length > 0) {
       queryString = `${queryString}&${key}=${filter[key]}`;
     }
   });
@@ -47,75 +47,96 @@ function setConfig(conf) {
   assetQueue.config = conf;
 }
 
-function bulkAction(items) {
-  items.forEach((item, index) => {
-    changedFlag = true;
-    if (item.data.publish_details) {
-      item.data.publish_details.version = item.data._version;
-    }
+function bulkAction(items, type) {
+  switch(type) {
+    case "entries":
+      let {filteredEntries: entries, locale} = items
+      entries.forEach((item, index) => {
+        changedFlag = true;
+        if (item.data.publish_details) {
+          item.data.publish_details.version = item.data._version;
+        }
 
-    if (config.cross_env_publish.bulkPublish) {
-      if (bulkPublishSet.length < 10 && item.type === 'entry_published') {
-        bulkPublishSet.push({
-          uid: item.data.uid,
-          content_type: item.content_type_uid,
-          locale: item.data.publish_details.locale || 'en-us',
-          version: item.data._version,
-          publish_details: [item.data.publish_details] || [],
-        });
-      }
+        if (config.cross_env_publish.bulkPublish) {
+          if (bulkPublishSet.length < 10) {
+            bulkPublishSet.push({
+              uid: item.data.uid,
+              content_type: item.content_type_uid,
+              locale: item.data.publish_details.locale || 'en-us',
+              version: item.data._version,
+              publish_details: [item.data.publish_details] || [],
+            });
+          }
 
-      if (bulkPublishAssetSet.length < 10 && item.type === 'asset_published') {
-        bulkPublishAssetSet.push({
-          uid: item.data.uid,
-          version: item.data._version,
-          publish_details: [item.data.publish_details] || [],
-        });
-      }
+          if (bulkPublishSet.length === 10) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale: config.cross_env_publish.filter.locale || locale, Type: 'entry', environments: config.cross_env_publish.destEnv,
+            });
+            bulkPublishSet = [];
+            // need to find out the reason for a return statement here
+            return;
+          }
 
-      if (bulkPublishAssetSet.length === 10) {
-        queue.Enqueue({
-          assets: bulkPublishAssetSet, Type: 'asset', locale: config.cross_env_publish.filter.locale, environments: config.cross_env_publish.destEnv,
-        });
-        bulkPublishAssetSet = [];
-        return;
-      }
+          if (index === entries.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
+            queue.Enqueue({
+              entries: bulkPublishSet, locale: config.cross_env_publish.filter.locale || locale, Type: 'entry', environments: config.cross_env_publish.destEnv,
+            });
+            bulkPublishSet = [];
+          }
+        } else {
+          entryQueue.Enqueue({
+            content_type: item.content_type_uid, publish_details: [item.data.publish_details], environments: config.cross_env_publish.destEnv, entryUid: item.data.uid, locale: item.data.publish_details.locale || 'en-us', Type: 'entry',
+          });
+        }
+      });
+      break;
+    case "assets":
+      items.forEach((item, index) => {
+        changedFlag = true;
+        if (item.data.publish_details) {
+          item.data.publish_details.version = item.data._version;
+        }
 
-      if (bulkPublishSet.length === 10) {
-        queue.Enqueue({
-          entries: bulkPublishSet, locale: config.cross_env_publish.filter.locale, Type: 'entry', environments: config.cross_env_publish.destEnv,
-        });
-        bulkPublishSet = [];
-        return;
-      }
+        if (config.cross_env_publish.bulkPublish) {
+          if (bulkPublishAssetSet.length < 10) {
+            bulkPublishAssetSet.push({
+              uid: item.data.uid,
+              version: item.data._version,
+              publish_details: [item.data.publish_details] || [],
+            });
+          }
 
-      if (index === items.length - 1 && bulkPublishAssetSet.length <= 10 && bulkPublishAssetSet.length > 0) {
-        queue.Enqueue({
-          assets: bulkPublishAssetSet, Type: 'asset', locale: config.cross_env_publish.filter.locale, environments: config.cross_env_publish.destEnv,
-        });
-        bulkPublishAssetSet = [];
-        return;
-      }
+          if (bulkPublishAssetSet.length === 10) {
+            queue.Enqueue({
+              assets: bulkPublishAssetSet, Type: 'asset', locale: config.cross_env_publish.filter.locale, environments: config.cross_env_publish.destEnv,
+            });
+            bulkPublishAssetSet = [];
+            return;
+          }
 
-      if (index === items.length - 1 && bulkPublishSet.length <= 10 && bulkPublishSet.length > 0) {
-        queue.Enqueue({
-          entries: bulkPublishSet, locale: config.cross_env_publish.filter.locale, Type: 'entry', environments: config.cross_env_publish.destEnv,
-        });
-        bulkPublishSet = [];
-      }
-    } else {
-      if (item.type === 'entry_published') {
-        entryQueue.Enqueue({
-          content_type: item.content_type_uid, publish_details: [item.data.publish_details], environments: config.cross_env_publish.destEnv, entryUid: item.data.uid, locale: item.data.publish_details.locale || 'en-us', Type: 'entry',
-        });
-      }
-      if (item.type === 'asset_published') {
-        assetQueue.Enqueue({
-          assetUid: item.data.uid, publish_details: [item.data.publish_details], environments: config.cross_env_publish.destEnv, Type: 'asset',
-        });
-      }
-    }
-  });
+          if (index === items.length - 1 && bulkPublishAssetSet.length <= 10 && bulkPublishAssetSet.length > 0) {
+            queue.Enqueue({
+              assets: bulkPublishAssetSet, Type: 'asset', locale: config.cross_env_publish.filter.locale, environments: config.cross_env_publish.destEnv,
+            });
+            bulkPublishAssetSet = [];
+            return;
+          }
+        } else {
+          assetQueue.Enqueue({
+            assetUid: item.data.uid, publish_details: [item.data.publish_details], environments: config.cross_env_publish.destEnv, Type: 'asset',
+          });
+        }
+      });
+      break;  
+  }
+}
+
+function handleEntries(entries) {
+  let uniqueLocales = entries.map(entry => entry.data.publish_details.locale).filter((locale, index, self) => self.indexOf(locale) === index)
+  uniqueLocales.forEach(locale => {
+    let filteredEntries = entries.filter(entry => entry.data.publish_details.locale === locale)
+    bulkAction({filteredEntries, locale}, 'entries')
+  })
 }
 
 async function getSyncEntries(queryParams, paginationToken = null) {
@@ -127,16 +148,23 @@ async function getSyncEntries(queryParams, paginationToken = null) {
         access_token: config.cross_env_publish.deliveryToken,
       },
     };
-    const entriesResponse = await req(conf);
-    if (entriesResponse.items.length > 0) {
-      bulkAction(entriesResponse.items);
+    const response = await req(conf);
+    if (response.items.length > 0) {
+      let entries = response.items.filter(item => item.type === 'entry_published')
+      let assets = response.items.filter(item => item.type === 'asset_published')
+      if (entries.length > 0) {
+        handleEntries(entries)
+      }
+      if (assets.length > 0) {
+        bulkAction(assets, 'assets')
+      }
     }
-    if (!entriesResponse.pagination_token) {
+    if (!response.pagination_token) {
       if (!changedFlag) console.log('No Entries/Assets Found published on specified environment');
       return Promise.resolve();
     }
     setTimeout(() => {
-      getSyncEntries(queryParams, entriesResponse.pagination_token);
+      getSyncEntries(queryParams, response.pagination_token);
     }, 3000);
   } catch (Err) {
     console.log(Err);
