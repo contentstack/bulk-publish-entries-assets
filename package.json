@@ -1,6 +1,6 @@
 {
   "name": "bulk-publish-entries-assets",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "This script lets you bulk publish entries and assets of your stack",
   "main": "index.js",
   "scripts": {
