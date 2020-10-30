@@ -53,6 +53,13 @@ function bulkAction(items, type) {
       let {filteredEntries: entries, locale} = items
       entries.forEach((item, index) => {
         changedFlag = true;
+
+        if (!item.data.publish_details) {
+          // adding this condition because sometimes
+          // item.data.publish_details.locale failes because publish_details is undefined
+          item.data.publish_details = {}
+        }
+
         if (item.data.publish_details) {
           item.data.publish_details.version = item.data._version;
         }
@@ -93,6 +100,12 @@ function bulkAction(items, type) {
     case "assets":
       items.forEach((item, index) => {
         changedFlag = true;
+        if (!item.data.publish_details) {
+          // adding this condition because sometimes
+          // item.data.publish_details.locale failes because publish_details is undefined
+          item.data.publish_details = {}
+        }
+
         if (item.data.publish_details) {
           item.data.publish_details.version = item.data._version;
         }
