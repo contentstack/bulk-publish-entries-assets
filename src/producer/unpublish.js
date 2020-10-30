@@ -49,6 +49,12 @@ function getQueryParams(filter) {
 function bulkAction(items) {
   items.forEach((item, index) => {
     changedFlag = true;
+    if (!item.data.publish_details) {
+      // adding this condition because sometimes
+      // item.data.publish_details.locale failes because publish_details is undefined
+      item.data.publish_details = {}
+    }
+
     if (item.data.publish_details) {
       item.data.publish_details.version = item.data._version;
     }
