@@ -155,8 +155,8 @@ module.exports = {
   cross_env_publish:{
      filter: {
       environment: 'bulktest', // source environment
-      content_type_uid: '', // //Add content type uid to be published. Keep this blank to consider all
-      locale: 'en-us', // locale filters
+      content_type_uid: '', // //Add content type uid to be published. Keep this blank to consider all (keep this empty while publishing only assets)
+      locale: 'en-us', // locale filters. Keep this blank to consider all
       type: 'asset_published,entry_published',  //entries and assets both will be published, remove asset_published if u want to publish only entries and vice versa.
     },
     deliveryToken: '', // deliveryToken of the source environment
