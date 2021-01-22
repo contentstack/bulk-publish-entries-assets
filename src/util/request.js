@@ -1,6 +1,7 @@
 const Bluebird = require('bluebird');
 const request = Bluebird.promisify(require('request'));
 const debug = require('debug')('requests');
+const timedout = require('debug')('timedout');
 const config = require('../../config');
 
 const MAX_RETRY_LIMIT = 8;
@@ -41,7 +42,19 @@ var makeCall = module.exports = function (req, RETRY) {
         debug(`Request failed\n${JSON.stringify(req)}`);
         debug(`Response received\n${JSON.stringify(response)}`);
         return reject(response.body);
-      }).catch(reject);
+      }).catch(error => {
+        // handled ETIMEDOUT error
+        if (error.code === 'ETIMEDOUT') {
+          timeDelay = Math.pow(Math.SQRT2, RETRY) * 100;
+          timedout(`Recevied ${error.code} error\nBody ${JSON.stringify(error)}`);
+          timedout(`Retrying ${req.uri || req.url} with ${timeDelay} sec delay`);
+          RETRY++;
+          return setTimeout((req, RETRY) => makeCall(req, RETRY)
+            .then(resolve)
+            .catch(reject), timeDelay, req, RETRY); 
+        }
+        reject(error)
+      });
     } catch (error) {
       debug(error);
       return reject(error);
