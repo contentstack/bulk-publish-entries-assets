@@ -189,7 +189,7 @@ async function bulkPublish(bulkPublishObj, config) {
         },
         body: JSON.stringify({
           assets: removePublishDetails(bulkPublishObj.assets),
-          locales: ['en-us'],
+          locales: [bulkPublishObj.locale || 'en-us'],
           environments: bulkPublishObj.environments,
         }),
       };
