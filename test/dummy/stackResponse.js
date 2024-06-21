@@ -6,12 +6,12 @@ module.exports = {
     name: 'cross-publishing-test',
     description: 'stack for cross environment publishing test',
     org_uid: 'bltff6ec735225b72b5',
-    api_key: 'blt22ec27e4a9805c70',
+    api_key: '***REMOVED***',
     master_locale: 'en-us',
     is_asset_download_public: true,
-    owner_uid: 'blt7d7118ed69e5742a',
+    owner_uid: '***REMOVED***',
     user_uids: [
-      'blt7d7118ed69e5742a',
+      '***REMOVED***',
     ],
     settings: {
       version: '2019-04-30',
@@ -19,7 +19,7 @@ module.exports = {
       webhook_enabled: true,
       language_fallback: false,
     },
-    master_key: 'bltfb1ee4a08f009b56',
+    master_key: '***REMOVED***',
     SYS_ACL: {
       others: {
         invite: false,
