@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const sanitizePath = require('./src/util/utility');
 
 const logFileDir = 'logs';
 const dummyDir = 'test/dummy/';
@@ -30,5 +31,5 @@ const logs = [
 ];
 
 logs.forEach((element) => {
-  fs.createReadStream(path.join(__dirname, dummyDir, element)).pipe(fs.createWriteStream(path.join(__dirname, logFileDir, element)));
+  fs.createReadStream(path.join(sanitizePath(__dirname), sanitizePath(dummyDir), sanitizePath(element))).pipe(fs.createWriteStream(path.join(sanitizePath(__dirname), sanitizePath(logFileDir), sanitizePath(element))));
 });

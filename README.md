@@ -1,5 +1,7 @@
 [![Contentstack](https://www.contentstack.com/docs/static/images/contentstack.png)](https://www.contentstack.com/)
 
+**Note**: The contentstack-export command-line utility will soon be deprecated. We recommend you to check out our latest [CLI documentation](https://www.contentstack.com/docs/developers/cli) for performing content management activities.
+
 Contentstack is a headless CMS with an API-first approach. It is a CMS that developers can use to build powerful cross-platform applications in their favorite languages. Build your application frontend, and Contentstack will take care of the rest. [Read More](https://www.contentstack.com/).
 
 ## Contentstack publishing script
