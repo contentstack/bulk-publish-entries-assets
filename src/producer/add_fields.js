@@ -4,7 +4,7 @@ const req = require('../util/request');
 const { bulkPublish, publishEntry, iniatlizeLogger } = require('../consumer/publish');
 const retryFailedLogs = require('../util/retryfailed');
 const { validateFile } = require('../util/fs');
-
+const merge = require('lodash/merge')
 const queue = new Queue();
 queue.consumer = bulkPublish;
 let logFileName;
@@ -117,7 +117,7 @@ function addFields(contentType, entry) {
     }
 
     if (schema.data_type === 'group' && !schema.multiple) {
-      addFields(schema.schema, entry[schema.uid]);
+        addFields(schema.schema, entry[schema.uid]);
     }
     if (schema.data_type === 'group' && schema.multiple) {
       entry[schema.uid].forEach((field) => {
@@ -283,6 +283,9 @@ function start() {
     for (let i = 0; i < config.addFields.contentTypes.length; i += 1) {
       getContentTypeSchema(config.addFields.contentTypes[i])
         .then(async (schema) => {
+          let tempObj = Object.create(null);
+          merge(tempObj,schema);
+          schema = tempObj;
           for (let j = 0; j < config.addFields.locales.length; j += 1) {
             try {
               await getEntries(schema, config.addFields.contentTypes[i], config.addFields.locales[j]);

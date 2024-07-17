@@ -1,10 +1,11 @@
 const path = require('path');
 const winston = require('winston');
+const sanitizePath = require('./utility');
 
 let filename;
 
 module.exports.getLoggerInstance = (fileName) => {
-  filename = path.join(__dirname, '../', '../', 'logs', fileName);
+  filename = path.join(sanitizePath(__dirname), '../', '../', 'logs', sanitizePath(fileName));
   const logger = winston.createLogger({
     transports: [
       new winston.transports.File({ filename: `${filename}.error`, level: 'error' }),
@@ -16,7 +17,7 @@ module.exports.getLoggerInstance = (fileName) => {
 
 /* eslint-disable no-multi-assign */
 const getFileLoggerInstance = module.exports.getFileLoggerInstance = (fileName) => {
-  filename = path.join(__dirname, '../', '../', 'logs', fileName);
+  filename = path.join(sanitizePath(__dirname), '../', '../', 'logs', sanitizePath(fileName));
   const logger = winston.createLogger({
     transports: [
       new winston.transports.File({ filename }),
